@@ -179,7 +179,7 @@
       var raw = await blinkRequest("dms/" + channel.blinkPair + "/messages");
       return normalizeBlinkMessages(raw, channel);
     }
-    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/channels/" + encodeURIComponent(channel.id) + "/messages");
+    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/channels/" + encodeURIComponent(channel.id) + "/messages");
     return normalizeMessages(payload.messages);
   }
 
@@ -317,7 +317,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -355,7 +355,7 @@
     var values = Array.from(state.mutedChannels);
     state.settings.neoChatMutedChannels = values;
     try { localStorage.setItem(notificationStorageKey(), JSON.stringify(values)); } catch (error) {}
-    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/me/settings", { method: "PATCH", body: { neoChatMutedChannels: values } }).catch(function () {});
+    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/me/settings", { method: "PATCH", body: { neoChatMutedChannels: values } }).catch(function () {});
   }
 
   function loadPinnedChannels() {
@@ -382,7 +382,7 @@
     var values = state.pinnedChannelIds.slice(0, 9);
     state.settings.neoChatPinnedChannels = values;
     try { localStorage.setItem(pinnedStorageKey(), JSON.stringify(values)); } catch (error) {}
-    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/me/settings", { method: "PATCH", body: { neoChatPinnedChannels: values } }).catch(function () {});
+    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/me/settings", { method: "PATCH", body: { neoChatPinnedChannels: values } }).catch(function () {});
   }
 
   function pinChannel(channelId, beforeId) {
@@ -789,7 +789,7 @@
   async function loadEverything() {
     setConnection("Connecting", false);
     var results = await Promise.all([
-      api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/members"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/dm"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/friends"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/me/settings").catch(function () { return { settings: {} }; }), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/unread").catch(function () { return { unread: {} }; })
+      api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/members"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/dm"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/friends"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/me/settings").catch(function () { return { settings: {} }; }), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/unread").catch(function () { return { unread: {} }; })
     ]);
     state.members = results[0].members || [];
     state.memberMap = new Map(state.members.map(function (member) { return [member.id, member]; }));
@@ -883,7 +883,7 @@
       renderMessages();
       if (channel.backend === "blink") rememberBlinkRead(id, Date.now());
       else {
-        await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/channels/" + encodeURIComponent(id) + "/read", { method: "POST", body: {} }).catch(function () {});
+        await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/channels/" + encodeURIComponent(id) + "/read", { method: "POST", body: {} }).catch(function () {});
         state.unreads[id] = Date.now();
       }
       renderSidebar();
@@ -980,7 +980,7 @@
     bubble.appendChild(tools); stack.appendChild(bubble);
     if (window.CHERRI_CHAT) window.ChatReactions.attach({
       message, channelId:state.activeChannel.id, userId:state.me.id, tools, stack,
-      send: (id,emoji)=>api('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/messages/'+encodeURIComponent(id)+'/react',{method:'POST',body:{emoji}}),
+      send: (id,emoji)=>api('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/messages/'+encodeURIComponent(id)+'/react',{method:'POST',body:{emoji}}),
       update: (channelId,id,reactions)=>{
         const list=state.messages.get(channelId)||[];
         const target=list.find(item=>item.id===id);
@@ -1027,7 +1027,7 @@
         if (body.attachments) blinkBody.attachments = body.attachments;
         var created = await blinkRequest("dms/" + state.activeChannel.blinkPair + "/messages", { method: "POST", body: blinkBody });
         payload = { message: { id: created.name, authorId: state.me.id, text: text, createdAt: blinkBody.ts, replyTo: blinkBody.replyTo || null, attachments: blinkBody.attachments || [] } };
-      } else payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/channels/" + encodeURIComponent(state.activeChannel.id) + "/messages", { method: "POST", body: body });
+      } else payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/channels/" + encodeURIComponent(state.activeChannel.id) + "/messages", { method: "POST", body: body });
       var list = state.messages.get(state.activeChannel.id) || [];
       if (payload.message && !list.some(function (item) { return item.id === payload.message.id; })) list.push(payload.message);
       state.messages.set(state.activeChannel.id, normalizeMessages(list));
@@ -1128,7 +1128,7 @@
   }
 
   async function searchGifSnap(query, signal) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", "1");
     url.searchParams.set("limit", "24");
@@ -1244,7 +1244,7 @@
   }
 
   async function searchGiphy(query, signal) {
-    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
+    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
     if(!response.ok) throw new Error(response.status===401?'Sign in again to use GIPHY.':response.status===429?'GIPHY is busy. Try again shortly.':'GIPHY is temporarily unavailable.');
     const data=await response.json();
     const items=Array.isArray(data)?data:data.gifs || data.data;
@@ -1345,7 +1345,7 @@
       if (state.activeChannel.backend === "blink") rememberBlinkRead(channelId, Date.now());
       else {
         state.unreads[channelId] = Date.now();
-        api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/channels/" + encodeURIComponent(channelId) + "/read", { method: "POST", body: {} }).catch(function () {});
+        api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/channels/" + encodeURIComponent(channelId) + "/read", { method: "POST", body: {} }).catch(function () {});
       }
       renderMessages();
     }
@@ -1365,7 +1365,7 @@
     state.pollTimer = window.setInterval(async function () {
       if (document.hidden) return;
       try {
-        var unreadPayload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/unread").catch(function () { return { unread: state.unreads }; });
+        var unreadPayload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/unread").catch(function () { return { unread: state.unreads }; });
         state.unreads = Object.assign({}, state.unreads, unreadPayload.unread || {});
         await loadBlinkChannels();
         state.channelMap = new Map(state.channels.map(function (channel) { return [channel.id, channel]; }));
@@ -1390,7 +1390,7 @@
   async function startDm(user) {
     try {
       if (window.NEO_CHAT_BRIDGE && window.NEO_CHAT_BRIDGE.mode === "neo") {
-        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/dm", { method: "POST", body: { username: user.username, userId: user.id } });
+        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/dm", { method: "POST", body: { username: user.username, userId: user.id } });
         var neoChannel = payload.channel;
         if (!neoChannel || !neoChannel.id) throw new Error("Conversation unavailable");
         state.channelMap.set(neoChannel.id, neoChannel);
@@ -1414,16 +1414,16 @@
   }
 
   async function answerFriend(id, action) {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/friends/requests/" + encodeURIComponent(id) + "/" + action, { method: "POST", body: {} }); await refreshFriends(); toast(action === "accept" ? "Friend added" : "Request declined"); }
+    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/friends/requests/" + encodeURIComponent(id) + "/" + action, { method: "POST", body: {} }); await refreshFriends(); toast(action === "accept" ? "Friend added" : "Request declined"); }
     catch (error) { toast(error.message); }
   }
 
   async function refreshFriends() {
-    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/friends"); state.friends = payload.friends || []; updateRequestBadge(); renderSidebar();
+    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/friends"); state.friends = payload.friends || []; updateRequestBadge(); renderSidebar();
   }
 
   async function sendFriendRequest(user) {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/friends/requests", { method: "POST", body: { username: user.username } }); await refreshFriends(); toast("Friend request sent to @" + user.username); }
+    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/friends/requests", { method: "POST", body: { username: user.username } }); await refreshFriends(); toast("Friend request sent to @" + user.username); }
     catch (error) { toast(error.message); }
   }
 
@@ -1514,9 +1514,9 @@
       ? "[tapback:" + state.profileChoice.value + "] " + name
       : name;
     try {
-      var updated = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/users/me", { method: "PATCH", body: { displayName: serverName } });
+      var updated = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/users/me", { method: "PATCH", body: { displayName: serverName } });
       state.profile = { kind: state.profileChoice.kind, value: state.profileChoice.value, displayName: name };
-      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } }).catch(function () {});
+      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } }).catch(function () {});
       state.me = updated.user || Object.assign({}, state.me, { displayName: serverName });
       var key = "cherri-chat-profile:" + state.me.id;
       try { localStorage.setItem(key, JSON.stringify(state.profile)); } catch (error) {}
@@ -1540,7 +1540,7 @@
     event.preventDefault();
     el.authSubmit.disabled = true; el.authFeedback.textContent = state.authMode === "login" ? "Signing in…" : "Creating account…";
     try {
-      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/auth/" + state.authMode, { method: "POST", body: { username: el.authUsername.value.trim(), password: el.authPassword.value } });
+      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/auth/" + state.authMode, { method: "POST", body: { username: el.authUsername.value.trim(), password: el.authPassword.value } });
       state.me = payload.user; hideOverlay(el.authOverlay); el.authFeedback.textContent = ""; await loadEverything();
     } catch (error) {
       el.authFeedback.textContent = error instanceof TypeError
@@ -1552,7 +1552,7 @@
   }
 
   async function logout() {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
+    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
     if (state.socket) state.socket.close();
     window.clearInterval(state.pollTimer);
     location.reload();
@@ -1571,7 +1571,7 @@
     renderEmojiPicker();
     wireEvents();
     try {
-      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/auth/me");
+      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/auth/me");
       state.me = payload.user;
       hideOverlay(el.authOverlay);
       await loadEverything();
@@ -1664,7 +1664,7 @@
     if (channel.backend === "blink") rememberBlinkRead(channel.id, stamp);
     else {
       state.unreads[channel.id] = stamp;
-      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/channels/" + encodeURIComponent(channel.id) + "/read", { method: "POST", body: {} }).catch(function () {});
+      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/channels/" + encodeURIComponent(channel.id) + "/read", { method: "POST", body: {} }).catch(function () {});
     }
     renderSidebar();
     toast("Conversation marked as read.");
@@ -1758,7 +1758,7 @@
     var channel = state.activeChannel; if (!channel) return;
     try {
       if (channel.backend === "blink") await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "DELETE" });
-      else await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/messages/" + encodeURIComponent(message.id), { method: "DELETE" });
+      else await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/messages/" + encodeURIComponent(message.id), { method: "DELETE" });
       var list = state.messages.get(channel.id) || [];
       state.messages.set(channel.id, list.filter(function (item) { return item.id !== message.id; }));
       renderMessages(); renderSidebar(); toast("Message deleted");
@@ -1774,7 +1774,7 @@
         await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "PATCH", body: { text: text.trim(), editedAt: editedAt } });
         receiveMessage(channel.id, Object.assign({}, message, { text: text.trim(), editedAt: editedAt }));
       } else {
-        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/messages/" + encodeURIComponent(message.id), { method: "PATCH", body: { text: text.trim() } });
+        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/api/messages/" + encodeURIComponent(message.id), { method: "PATCH", body: { text: text.trim() } });
         receiveMessage(channel.id, payload.message);
       }
       toast("Message edited");

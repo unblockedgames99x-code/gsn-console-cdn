@@ -1549,3 +1549,5 @@ html[data-neo-app="chat"] .emoji-button { width: 28px; height: 28px; }
   .gif-picker { max-height: min(470px, calc(100% - 78px)); padding: 10px; }
   .gif-results { grid-auto-rows: 94px; }
 }
+
+.auth-brand .brand-mark{background:transparent;border:0}.auth-brand .brand-mark img{transform:translateY(1.5%) scale(1.23)}
