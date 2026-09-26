@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <base href="https://cdn.jsdelivr.net/gh/BreaddeningBread/games@main/FlyCarStunt5/">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>FlyCarStunt5</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <script src="merger.js"></script>
+    <script>
+loadMergedGameData("Build/FlyCarStunt5.data.unityweb", 1, 2, (mergedUrl) => {
+    var origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (method, url) {
+        if (typeof url === "string" && url.includes("blob:")) {
+            url = url.substring(url.indexOf("blob:"));
+        }
+        return origOpen.call(this, method, url);
+    };
+
+    var gameInstance = UnityLoader.instantiate(
+        "gameContainer",
+        "Build/FlyCarStunt5.json",
+        {
+            onProgress: UnityProgress,
+            dataUrl: mergedUrl,
+            cachingAsync: false,
+            Module: {
+                dataUrl: mergedUrl,
+                decompress: {
+                    "FlyCarStunt5.data.unityweb": false
+                }
+            }
+        }
+    );
+
+});
+</script>
+</head>
+
+<body>
+    <div class="webgl-content">
+        <div id="gameContainer" style="width: 1920px; height: 1080px"></div>
+    </div>
+    <script src="TemplateData/responsive.js"></script>
+</body>
+
+</html>

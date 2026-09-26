@@ -1,0 +1,312 @@
+<!-- Ultimate Game Stash file--> 
+<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
+<!--this is a shooter game. Uses jsdelivr-->
+<Module>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>really cool flash game</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+    #flash-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: black;
+      overflow: hidden;
+    }
+    .black-box {
+      position: fixed;
+      background: black;
+      z-index: 10;
+    }
+    #box-top {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+    }
+    #box-bottom {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+    }
+    #box-left {
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+    }
+    #box-right {
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 100%;
+    }
+    ruffle-player {
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: block;
+    }
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      border: 2px solid #444;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    #controls.collapsed {
+      width: auto;
+    }
+    #controls.expanded {
+      padding: 15px;
+    }
+    #toggle-btn {
+      padding: 10px 15px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      width: 100%;
+      text-align: left;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #toggle-btn:hover {
+      background: #0052a3;
+    }
+    #toggle-btn:active {
+      background: #003d7a;
+    }
+    #controls-content {
+      max-height: 500px;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    #controls.collapsed #controls-content {
+      max-height: 0;
+      padding: 0;
+    }
+    #controls.expanded #controls-content {
+      max-height: 500px;
+      padding-top: 15px;
+    }
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+    .control-group label {
+      color: #fff;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      white-space: nowrap;
+    }
+    .control-group input {
+      width: 60px;
+      padding: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #666;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    button:active {
+      background: #003d7a;
+    }
+    .preset-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    #aspect-display {
+      color: #aaa;
+      font-family: monospace;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.2.0-nightly.2025.10.2/ruffle.min.js"></script>
+</head>
+<body>
+  <div id="flash-container"></div>
+  <div class="black-box" id="box-top"></div>
+  <div class="black-box" id="box-bottom"></div>
+  <div class="black-box" id="box-left"></div>
+  <div class="black-box" id="box-right"></div>
+  
+  <div id="controls" class="expanded">
+    <button id="toggle-btn">
+      <span>Aspect Ratio</span>
+      <span id="toggle-icon">−</span>
+    </button>
+    <div id="controls-content">
+      <div class="control-group">
+        <label for="aspect-input">Custom:</label>
+        <input type="number" id="aspect-input" value="4" step="0.1" min="0.5" max="10">
+        <span style="color: #aaa;">: 3</span>
+        <button onclick="applyAspectRatio()">Apply</button>
+      </div>
+      <div class="control-group">
+        <div style="width: 100%; color: #ccc; font-size: 13px; margin-bottom: 5px;">Presets:</div>
+        <div class="preset-buttons">
+          <button onclick="setAspectRatio(4/3)">4:3</button>
+          <button onclick="setAspectRatio(16/9)">16:9</button>
+          <button onclick="setAspectRatio(16/10)">16:10</button>
+          <button onclick="setAspectRatio(5.5/3)">5.5:3</button>
+          <button onclick="setAspectRatio(21/9)">21:9</button>
+        </div>
+      </div>
+      <div id="aspect-display">Current: 4:3 (1.33)</div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById("flash-container");
+    const boxTop = document.getElementById("box-top");
+    const boxBottom = document.getElementById("box-bottom");
+    const boxLeft = document.getElementById("box-left");
+    const boxRight = document.getElementById("box-right");
+    const aspectInput = document.getElementById("aspect-input");
+    const aspectDisplay = document.getElementById("aspect-display");
+    const controlsPanel = document.getElementById("controls");
+    const toggleBtn = document.getElementById("toggle-btn");
+    const toggleIcon = document.getElementById("toggle-icon");
+    
+    let currentAspectRatio = 4 / 3;
+    let isPanelExpanded = true;
+    
+    // Toggle panel collapse/expand
+    toggleBtn.addEventListener("click", () => {
+      isPanelExpanded = !isPanelExpanded;
+      if (isPanelExpanded) {
+        controlsPanel.classList.remove("collapsed");
+        controlsPanel.classList.add("expanded");
+        toggleIcon.textContent = "−";
+      } else {
+        controlsPanel.classList.remove("expanded");
+        controlsPanel.classList.add("collapsed");
+        toggleIcon.textContent = "+";
+      }
+    });
+    
+    function resizeGame() {
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      
+      // Calculate dimensions while maintaining aspect ratio
+      let width = Math.floor(windowWidth);
+      let height = Math.floor(width / currentAspectRatio);
+      
+      // If height exceeds window, constrain by height instead
+      if (height > windowHeight) {
+        height = Math.floor(windowHeight);
+        width = Math.floor(height * currentAspectRatio);
+      }
+      
+      container.style.width = `${width}px`;
+      container.style.height = `${height}px`;
+      
+      // Calculate margins for centering
+      const topMargin = (windowHeight - height) / 2;
+      const leftMargin = (windowWidth - width) / 2;
+      
+      // Set black box sizes
+      boxTop.style.height = `${topMargin}px`;
+      boxBottom.style.height = `${topMargin}px`;
+      boxLeft.style.width = `${leftMargin}px`;
+      boxRight.style.width = `${leftMargin}px`;
+    }
+    
+    function setAspectRatio(ratio) {
+      currentAspectRatio = ratio;
+      aspectInput.value = (ratio * 3).toFixed(2);
+      updateDisplay();
+      resizeGame();
+    }
+    
+    function applyAspectRatio() {
+      const inputValue = parseFloat(aspectInput.value);
+      if (!isNaN(inputValue) && inputValue > 0) {
+        currentAspectRatio = inputValue / 3;
+        updateDisplay();
+        resizeGame();
+      }
+    }
+    
+    function updateDisplay() {
+      const ratioValue = (currentAspectRatio * 3).toFixed(2);
+      const decimal = currentAspectRatio.toFixed(2);
+      aspectDisplay.textContent = `Current: ${ratioValue}:3 (${decimal})`;
+    }
+    
+    // Allow Enter key to apply aspect ratio
+    aspectInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        applyAspectRatio();
+      }
+    });
+    
+    window.addEventListener("resize", resizeGame);
+    window.addEventListener("DOMContentLoaded", () => {
+      resizeGame();
+      const ruffle = window.RufflePlayer?.newest() || window.RufflePlayer?.createPlayer();
+      if (ruffle && container) {
+        const player = ruffle.createPlayer();
+        player.style.width = "100%";
+        player.style.height = "100%";
+        player.style.background = "black";
+        container.appendChild(player);
+        player.load("$1");
+      } else {
+        container.textContent = "Ruffle failed to load."; 
+      }
+    });
+  </script>
+    <param name="movie" value="https://cdn.jsdelivr.net/gh/Stinkalistic/Flash-games@main/621239_lb_a10.swf">
+    <embed src="https://cdn.jsdelivr.net/gh/Stinkalistic/Flash-games@main/621239_lb_a10.swf" width="100%" height="100%">
+</body>
+</html>
+]]></Content>
+</Module>

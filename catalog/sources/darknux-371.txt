@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <base href="https://cdn.jsdelivr.net/gh/bandit968thegamer-ops/undertale@main/baldi-plus/">
+  <meta charset="utf-8">
+  <title>Unity WebGL Player | Baldi's Basics Plus</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #231F20;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div
+    id="loading-text"
+    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"
+  >
+    LOADING...
+  </div>
+
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+  <script src="Build/Export.loader.js"></script>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingText = document.querySelector("#loading-text");
+
+    let totalBytes = 0;
+    let loadedBytes = 0;
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      const meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content =
+        "width=device-width, height=device-height, initial-scale=1.0, " +
+        "user-scalable=no, shrink-to-fit=yes";
+      document.head.appendChild(meta);
+    }
+
+    const formatSize = bytes =>
+      bytes > 1024 ** 3
+        ? `${(bytes / 1024 ** 3).toFixed(2)} GB`
+        : bytes > 1024 ** 2
+          ? `${(bytes / 1024 ** 2).toFixed(2)} MB`
+          : bytes > 1024
+            ? `${(bytes / 1024).toFixed(2)} KB`
+            : `${bytes} B`;
+
+    const getSize = async url => {
+      try {
+        const response = await fetch(url, { method: "HEAD" });
+        return parseInt(response.headers.get("Content-Length") || "0", 10);
+      } catch {
+        return 0;
+      }
+    };
+
+    async function fetchWithProgress(url) {
+      const reader = (await fetch(url)).body.getReader();
+      const chunks = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        received += value.length;
+        loadedBytes += value.length;
+        chunks.push(value);
+
+        loadingText.textContent =
+          `LOADING... ${formatSize(loadedBytes)} / ${formatSize(totalBytes)} ` +
+          `(${((loadedBytes / totalBytes) * 100).toFixed(1)}%)`;
+      }
+
+      const buffer = new Uint8Array(received);
+      let offset = 0;
+
+      for (const chunk of chunks) {
+        buffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      return buffer.buffer;
+    }
+
+    const getParts = (file, count) =>
+      Array.from({ length: count }, (_, i) => `${file}.part${i + 1}`);
+
+    async function mergeFiles(parts) {
+      return URL.createObjectURL(
+        new Blob(await Promise.all(parts.map(fetchWithProgress)))
+      );
+    }
+
+    (async () => {
+      const dataParts = getParts("Build/Export.data", 2);
+      const wasmParts = getParts("Build/Export.wasm", 3);
+      const allParts = [...dataParts, ...wasmParts];
+
+      totalBytes = (await Promise.all(allParts.map(getSize)))
+        .reduce((total, size) => total + size, 0);
+
+      const [dataUrl, wasmUrl] = await Promise.all([
+        mergeFiles(dataParts),
+        mergeFiles(wasmParts)
+      ]);
+
+      createUnityInstance(canvas, {
+        dataUrl,
+        frameworkUrl: "Build/Export.framework.js",
+        codeUrl: wasmUrl,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Basically Games",
+        productName: "Baldi's Basics Plus",
+        productVersion: "0.3.2"
+      }).then(() => loadingText.remove());
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,4120 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+<base href="https://rawcdn.githack.com/linkawaken1979-alt/kisakcod/630a6ebb14277f746ea6c7fb2fe4d2c945232f1b/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+    <title>kisakcod webport</title>
+    <script>
+    alert("Note: This game is large and it's gonna lag on your chromebook/any not so powerful device like crazy, we recommend running this with a device that can run large PC games to avoid some lag issues probably, if it doesn't work, feel free to join the ultimate game stash or daknux dc and report it as a bug or just play any other game");
+    </script>
+
+    <style>
+        @font-face {
+            font-family: "Conduit ITC";
+            src: url("assets/conduit-itc-regular.otf") format("opentype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            width: 100%;
+            height: 100%;
+            min-width: 100%;
+            min-height: 100%;
+            overflow: hidden;
+            font-family: "Conduit ITC", sans-serif;
+            font-size: 18px;
+        }
+
+        body {
+            position: fixed;
+            inset: 0;
+        }
+
+        #canvas {
+            position: fixed;
+            inset: 0;
+
+            display: block;
+
+            width: 100%;
+            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            width: 100dvw;
+            height: 100dvh;
+
+            max-width: none;
+            max-height: none;
+
+            margin: 0;
+            padding: 0;
+            border: 0;
+
+            outline: 0;
+
+            /*
+             * Fill the entire browser viewport.
+             * The game's internal framebuffer remains controlled by
+             * KisakCOD/Emscripten.
+             */
+            object-fit: fill;
+
+            cursor: none;
+
+            touch-action: none;
+
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        #installer-panel {
+            position: absolute;
+            inset: 0;
+            background: rgba(16, 11, 20, .96);
+            color: #d8d8d8;
+            z-index: 3;
+            overflow: auto;
+            padding: 36px 40px 56px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        #installer-panel h1 {
+            margin: 0 0 12px;
+            font-size: 32px;
+            color: #fff;
+            letter-spacing: .06em;
+        }
+
+        #installer-panel p.hint {
+            color: #9aa;
+            max-width: 52em;
+            font-size: 18px;
+            line-height: 1.45;
+            margin: 0 auto 24px;
+        }
+
+        #installer-panel button {
+            background: #6ec26e;
+            color: #183318;
+            border: none;
+            padding: 9px 13px;
+            margin: 6px;
+            font-size: 18px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        #installer-panel button:disabled {
+            opacity: .4;
+            cursor: default;
+        }
+
+        #installer-panel button.danger {
+            background: #3a1c1c;
+            color: #fcc;
+        }
+
+        #installer-panel button.secondary {
+            background: #333;
+            color: #ddd;
+        }
+
+        #installer-panel .row {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px auto;
+        }
+
+        #install-options {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #install-options[hidden] {
+            display: none;
+        }
+
+        #install-copy-size {
+            color: #aaa;
+            font-size: 16px;
+            margin: 12px auto;
+        }
+
+        #progress-wrap {
+            max-width: 760px;
+            margin: 22px auto 0;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 22px;
+            background: #222;
+            border: 1px solid #444;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #6ec26e;
+            transition: width .08s linear;
+        }
+
+        #progress-text {
+            margin-top: 8px;
+            color: #aaa;
+            font-size: 16px;
+            min-height: 20px;
+        }
+
+        #download-status {
+            margin-top: 14px;
+            color: #ddd;
+            font-size: 18px;
+            min-height: 22px;
+        }
+
+        #download-detail {
+            margin-top: 5px;
+            color: #888;
+            font-size: 14px;
+            min-height: 18px;
+        }
+
+        #status {
+            color: #ddd;
+            margin-top: 10px;
+            min-height: 22px;
+        }
+
+        #install-log {
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #9a9;
+            margin: 16px auto 0;
+            max-width: 68em;
+            max-height: 260px;
+            overflow: auto;
+            text-align: left;
+        }
+
+        .small {
+            color: #777;
+            font-size: 14px;
+        }
+
+        #fullscreen-button {
+            display: none;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            z-index: 5;
+            background: #6ec26e;
+            color: #183318;
+            border: none;
+            border-radius: 2px;
+            padding: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 18px;
+        }
+
+        body.game-running:not(.is-fullscreen) #fullscreen-button {
+            display: block;
+        }
+
+        body.game-running #installer-panel {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="installer-panel">
+
+        <h1>KisakCOD</h1>
+
+        <p class="hint">
+            Install the game files from the split ZIP archive.
+            The archive is processed piece-by-piece and extracted directly
+            into browser storage.
+        </p>
+
+        <div class="row">
+
+            <button id="install-button" type="button">
+                Install Game
+            </button>
+
+            <button id="play-button" type="button" disabled>
+                Play
+            </button>
+
+            <button id="wipe-data-button" type="button" class="danger">
+                Wipe data
+            </button>
+
+        </div>
+
+        <div id="install-options" hidden>
+
+            <div class="row">
+
+                <label>
+                    <input id="include-audio" type="checkbox" checked>
+                    Audio
+                </label>
+
+                <label>
+                    <input id="include-video" type="checkbox">
+                    Video
+                </label>
+
+            </div>
+
+            <div id="install-copy-size"></div>
+
+            <div id="progress-wrap">
+
+                <div id="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+
+                <div id="progress-text">
+                    Waiting...
+                </div>
+
+                <div id="download-status"></div>
+
+                <div id="download-detail"></div>
+
+            </div>
+
+        </div>
+
+        <div id="status"></div>
+
+        <div id="install-log"></div>
+
+        <div class="small">
+            Game data is stored locally using Origin Private File System.
+        </div>
+
+    </div>
+
+    <canvas
+        id="canvas"
+        tabindex="-1"
+        width="1280"
+        height="720">
+    </canvas>
+
+    <button id="fullscreen-button" type="button">
+        Fullscreen
+    </button>
+
+    <template id="module-script-template">
+        <script async src="kisakcod-sp.js"></script>
+    </template>
+
+    <script>
+        "use strict";
+
+        /* ============================================================
+           UI
+           ============================================================ */
+
+        const canvas =
+            document.getElementById("canvas");
+
+        const fullscreenButton =
+            document.getElementById("fullscreen-button");
+
+        const installerPanel =
+            document.getElementById("installer-panel");
+
+        const installButton =
+            document.getElementById("install-button");
+
+        const playButton =
+            document.getElementById("play-button");
+
+        const wipeButton =
+            document.getElementById("wipe-data-button");
+
+        const installOptions =
+            document.getElementById("install-options");
+
+        const includeAudio =
+            document.getElementById("include-audio");
+
+        const includeVideo =
+            document.getElementById("include-video");
+
+        const installCopySize =
+            document.getElementById("install-copy-size");
+
+        const progressFill =
+            document.getElementById("progress-fill");
+
+        const progressText =
+            document.getElementById("progress-text");
+
+        const downloadStatus =
+            document.getElementById("download-status");
+
+        const downloadDetail =
+            document.getElementById("download-detail");
+
+        const statusElement =
+            document.getElementById("status");
+
+        const installLog =
+            document.getElementById("install-log");
+
+
+        function log(message) {
+            installLog.textContent +=
+                message + "\n";
+
+            installLog.scrollTop =
+                installLog.scrollHeight;
+        }
+
+
+        function status(message) {
+            statusElement.textContent =
+                message;
+        }
+
+
+        function setProgress(value, text) {
+
+            value = Math.max(
+                0,
+                Math.min(1, value)
+            );
+
+            progressFill.style.width =
+                (value * 100).toFixed(2) + "%";
+
+            if (text !== undefined) {
+                progressText.textContent =
+                    text;
+            }
+        }
+
+
+        function setDownloadUI(main, detail) {
+
+            downloadStatus.textContent =
+                main || "";
+
+            downloadDetail.textContent =
+                detail || "";
+        }
+
+
+        /* ============================================================
+           KEYBOARD SHORTCUTS
+           ============================================================ */
+
+        const blockedShortcuts =
+            new Set([
+                "KeyD",
+                "KeyW",
+                "KeyT",
+                "KeyN",
+                "KeyS",
+                "KeyP",
+                "KeyR",
+                "KeyF",
+                "KeyG",
+                "KeyH",
+                "KeyJ",
+                "KeyU"
+            ]);
+
+        const blockedFunctionKeys =
+            new Set([
+                "F1",
+                "F3",
+                "F5",
+                "F11"
+            ]);
+
+
+        window.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    (
+                        (
+                            event.ctrlKey ||
+                            event.metaKey
+                        ) &&
+                        blockedShortcuts.has(
+                            event.code
+                        )
+                    ) ||
+                    blockedFunctionKeys.has(
+                        event.key
+                    )
+                ) {
+
+                    if (
+                        document.body.classList.contains(
+                            "game-running"
+                        )
+                    ) {
+
+                        event.preventDefault();
+
+                    }
+
+                }
+
+            },
+            true
+        );
+
+
+        /* ============================================================
+           FULLSCREEN
+           ============================================================ */
+
+        fullscreenButton.addEventListener(
+            "click",
+            async () => {
+
+                try {
+
+                    if (!document.fullscreenElement) {
+
+                        await document
+                            .documentElement
+                            .requestFullscreen();
+
+                    } else {
+
+                        await document.exitFullscreen();
+
+                    }
+
+                    try {
+
+                        await navigator
+                            .keyboard
+                            ?.lock?.();
+
+                    } catch {}
+
+                } catch {}
+
+            }
+        );
+
+
+        document.addEventListener(
+            "fullscreenchange",
+            () => {
+
+                const fullscreen =
+                    !!document.fullscreenElement;
+
+                document.body.classList.toggle(
+                    "is-fullscreen",
+                    fullscreen
+                );
+
+                if (fullscreen) {
+
+                    try {
+
+                        navigator
+                            .keyboard
+                            ?.lock?.()
+                            .catch(() => {});
+
+                    } catch {}
+
+                }
+
+                resizeGameCanvas();
+
+            }
+        );
+
+
+        /* ============================================================
+           CANVAS RESIZE
+           ============================================================ */
+
+        function resizeGameCanvas() {
+
+            /*
+             * Only change the CSS/display size.
+             *
+             * KisakCOD/Emscripten continues to own the internal
+             * framebuffer dimensions.
+             */
+
+            canvas.style.left = "0";
+            canvas.style.top = "0";
+            canvas.style.transform = "none";
+
+            canvas.style.width = "100vw";
+            canvas.style.height = "100vh";
+
+            if (window.visualViewport) {
+
+                canvas.style.width = "100dvw";
+                canvas.style.height = "100dvh";
+
+            }
+
+        }
+
+
+        window.addEventListener(
+            "resize",
+            resizeGameCanvas,
+            {
+                passive: true
+            }
+        );
+
+
+        if (window.visualViewport) {
+
+            window.visualViewport.addEventListener(
+                "resize",
+                resizeGameCanvas,
+                {
+                    passive: true
+                }
+            );
+
+        }
+
+
+        resizeGameCanvas();
+
+
+        /* ============================================================
+           EMSCRIPTEN MODULE
+           ============================================================ */
+
+        var Module = {
+
+            canvas: canvas,
+
+            locateFile: path =>
+                path + "?v=creditsmute1",
+
+            kisakLanUrl:
+                ("https:" === location.protocol
+                    ? "wss://"
+                    : "ws://") +
+                location.host +
+                "/lan",
+
+            print: console.log,
+
+            printErr: console.log,
+
+            setStatus() {},
+
+            onAbort: message => {
+
+                console.log(
+                    "abort: " + message
+                );
+
+                status(
+                    "Game aborted: " +
+                    message
+                );
+
+            }
+
+        };
+
+
+        /* ============================================================
+           ORIGINAL KISAKCOD INPUT BRIDGE
+           
+           IMPORTANT:
+           This is based directly on the original HTML supplied by
+           the user. The Kisak input memory layout and event queue
+           are intentionally preserved.
+           ============================================================ */
+
+        let inputInstalled = false;
+
+        window.__kisakInstallInput = function () {
+
+            var base =
+                0 | Module.kisakInputBase;
+
+            if (
+                !base ||
+                inputInstalled
+            ) {
+                return;
+            }
+
+            inputInstalled = true;
+
+            canvas.style.cursor = "default";
+
+            let mouseDown = false;
+
+            var wantLockOff =
+                Module.kisakWantLockOff >> 2;
+
+
+            function getHeap32() {
+
+                if (Module.HEAP32)
+                    return Module.HEAP32;
+
+                var memory =
+                    Module.wasmMemory;
+
+                if (
+                    memory &&
+                    memory.buffer
+                ) {
+
+                    return new Int32Array(
+                        memory.buffer
+                    );
+
+                }
+
+                throw new Error(
+                    "no HEAP32/wasmMemory"
+                );
+
+            }
+
+
+            var lastX = 0;
+            var lastY = 0;
+            var hasMousePosition = false;
+
+
+            /*
+             * ORIGINAL MOUSE POSITION FUNCTION
+             *
+             * This is intentionally kept equivalent to the
+             * original webport.
+             */
+
+            function updateMouse(
+                event,
+                isButtonEvent
+            ) {
+
+                var heap =
+                    getHeap32();
+
+                var base32 =
+                    base >> 2;
+
+
+                if (
+                    document.pointerLockElement ===
+                    canvas
+                ) {
+
+                    if (isButtonEvent)
+                        return;
+
+
+                    var dx =
+                        0 | event.movementX;
+
+                    var dy =
+                        0 | event.movementY;
+
+
+                    if (dx > 80)
+                        dx = 80;
+                    else if (dx < -80)
+                        dx = -80;
+
+
+                    if (dy > 80)
+                        dy = 80;
+                    else if (dy < -80)
+                        dy = -80;
+
+
+                    heap[base32 + 2] += dx;
+                    heap[base32 + 3] += dy;
+
+                    return;
+                }
+
+
+                var rect =
+                    canvas.getBoundingClientRect();
+
+                var width =
+                    rect.width || 1;
+
+                var height =
+                    rect.height || 1;
+
+
+                var nx =
+                    (
+                        event.clientX -
+                        rect.left
+                    ) / width;
+
+                var ny =
+                    (
+                        event.clientY -
+                        rect.top
+                    ) / height;
+
+
+                if (nx < 0)
+                    nx = 0;
+
+                if (ny < 0)
+                    ny = 0;
+
+                if (nx > 1)
+                    nx = 1;
+
+                if (ny > 1)
+                    ny = 1;
+
+
+                var logicalWidth =
+                    0 |
+                    heap[base32 + 6];
+
+                var logicalHeight =
+                    0 |
+                    heap[base32 + 7];
+
+
+                if (logicalWidth < 64)
+                    logicalWidth = 1280;
+
+                if (logicalHeight < 64)
+                    logicalHeight = 720;
+
+
+                var x =
+                    nx *
+                    logicalWidth |
+                    0;
+
+                var y =
+                    ny *
+                    logicalHeight |
+                    0;
+
+
+                heap[base32] = x;
+                heap[base32 + 1] = y;
+
+
+                if (
+                    !isButtonEvent &&
+                    hasMousePosition
+                ) {
+
+                    heap[base32 + 2] +=
+                        x - lastX;
+
+                    heap[base32 + 3] +=
+                        y - lastY;
+
+                }
+
+
+                lastX = x;
+                lastY = y;
+
+                hasMousePosition = true;
+
+            }
+
+
+            /*
+             * ORIGINAL POINTER-LOCK STATE
+             */
+
+            function getWantLock() {
+
+                return 0 |
+                    getHeap32()[
+                        (base >> 2) +
+                        wantLockOff
+                    ];
+
+            }
+
+
+            function updateCursor() {
+
+                var wantLock =
+                    getWantLock();
+
+
+                canvas.style.cursor =
+                    wantLock
+                        ? "none"
+                        : "default";
+
+
+                if (
+                    !wantLock &&
+                    document.pointerLockElement ===
+                    canvas
+                ) {
+
+                    try {
+                        document.exitPointerLock();
+                    } catch {}
+
+                }
+
+            }
+
+
+            /*
+             * ORIGINAL INPUT QUEUE
+             *
+             * These offsets are intentionally unchanged.
+             */
+
+            function pushKeyEvent(
+                type,
+                keyCode,
+                character
+            ) {
+
+                var heap =
+                    getHeap32();
+
+                var base32 =
+                    base >> 2;
+
+                var queueState =
+                    heap[
+                        base32 + 8
+                    ] >>> 0;
+
+                var index =
+                    queueState & 63;
+
+
+                heap[
+                    base32 +
+                    10 +
+                    index
+                ] =
+                    type;
+
+
+                heap[
+                    base32 +
+                    10 +
+                    64 +
+                    index
+                ] =
+                    keyCode;
+
+
+                heap[
+                    base32 +
+                    10 +
+                    128 +
+                    index
+                ] =
+                    character;
+
+
+                heap[
+                    base32 + 8
+                ] =
+                    queueState + 1;
+
+            }
+
+
+            /*
+             * AUTOMATION
+             */
+
+            if (
+                new URLSearchParams(
+                    location.search
+                ).has("automation")
+            ) {
+
+                window.__kisakTestKey =
+                    function (
+                        keyCode,
+                        down,
+                        character
+                    ) {
+
+                        pushKeyEvent(
+                            down ? 1 : 0,
+                            0 | keyCode,
+                            0 | character
+                        );
+
+                    };
+
+            }
+
+
+            /*
+             * MOUSE MOVE
+             */
+
+            canvas.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    updateCursor();
+
+                    updateMouse(
+                        event,
+                        false
+                    );
+
+                }
+            );
+
+
+            /*
+             * ORIGINAL MOUSE DOWN
+             *
+             * This is the important part for menu clicks.
+             */
+
+            canvas.addEventListener(
+                "mousedown",
+                function (event) {
+
+                    mouseDown = true;
+
+
+                    try {
+
+                        canvas.focus();
+
+                    } catch {}
+
+
+                    updateCursor();
+
+
+                    if (
+                        getWantLock() &&
+                        document.pointerLockElement !==
+                        canvas
+                    ) {
+
+                        try {
+
+                            var lockPromise =
+                                canvas.requestPointerLock();
+
+                            if (
+                                lockPromise &&
+                                lockPromise.catch
+                            ) {
+
+                                lockPromise.catch(
+                                    function () {}
+                                );
+
+                            }
+
+                        } catch {}
+
+                    }
+
+
+                    /*
+                     * Update the game's actual mouse position
+                     * before sending the button event.
+                     */
+
+                    updateMouse(
+                        event,
+                        true
+                    );
+
+
+                    /*
+                     * ORIGINAL BUTTON MASK OFFSET.
+                     *
+                     * Do not replace this with a guessed layout.
+                     */
+
+                    getHeap32()[
+                        4 +
+                        (base >> 2)
+                    ] =
+                        0 |
+                        event.buttons;
+
+
+                    /*
+                     * ORIGINAL MOUSE BUTTON EVENT.
+                     *
+                     * 256 + browser mouse button.
+                     */
+
+                    pushKeyEvent(
+                        1,
+                        256 +
+                        (
+                            0 |
+                            event.button
+                        ),
+                        0
+                    );
+
+
+                    event.preventDefault();
+
+                }
+            );
+
+
+            /*
+             * ORIGINAL MOUSE UP
+             */
+
+            canvas.addEventListener(
+                "mouseup",
+                function (event) {
+
+                    updateMouse(
+                        event,
+                        true
+                    );
+
+
+                    getHeap32()[
+                        4 +
+                        (base >> 2)
+                    ] =
+                        0 |
+                        event.buttons;
+
+
+                    pushKeyEvent(
+                        0,
+                        256 +
+                        (
+                            0 |
+                            event.button
+                        ),
+                        0
+                    );
+
+
+                    event.preventDefault();
+
+                }
+            );
+
+
+            /*
+             * POINTER LOCK
+             */
+
+            document.addEventListener(
+                "pointerlockchange",
+                function () {
+
+                    var heap =
+                        getHeap32();
+
+                    var base32 =
+                        base >> 2;
+
+
+                    heap[base32 + 2] = 0;
+                    heap[base32 + 3] = 0;
+
+                    hasMousePosition = false;
+
+                }
+            );
+
+
+            /*
+             * WHEEL
+             */
+
+            canvas.addEventListener(
+                "wheel",
+                function (event) {
+
+                    getHeap32()[
+                        5 +
+                        (base >> 2)
+                    ] +=
+                        event.deltaY > 0
+                            ? 1
+                            : event.deltaY < 0
+                                ? -1
+                                : 0;
+
+
+                    event.preventDefault();
+
+                },
+                {
+                    passive: false
+                }
+            );
+
+
+            /*
+             * ORIGINAL KEYBOARD DOWN
+             *
+             * The original webport intentionally gates keyboard
+             * input using mouseDown.
+             */
+
+            window.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        mouseDown &&
+                        event.key !== "F12"
+                    ) {
+
+                        var character =
+                            event.key &&
+                            event.key.length === 1
+                                ? event.key.charCodeAt(0)
+                                : 0;
+
+
+                        pushKeyEvent(
+                            1,
+                            0 | event.keyCode,
+                            character
+                        );
+
+
+                        if (
+                            event.key === "Tab" ||
+                            event.key === " " ||
+                            event.key.indexOf("Arrow") === 0 ||
+                            event.key === "Backspace"
+                        ) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * ORIGINAL KEYBOARD UP
+             */
+
+            window.addEventListener(
+                "keyup",
+                function (event) {
+
+                    if (mouseDown) {
+
+                        pushKeyEvent(
+                            0,
+                            0 | event.keyCode,
+                            0
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * ORIGINAL OUTSIDE-CANVAS MOUSE HANDLING
+             *
+             * Preserved because it controls when keyboard input
+             * becomes active.
+             */
+
+            window.addEventListener(
+                "mousedown",
+                function (event) {
+
+                    if (
+                        event.target !== canvas
+                    ) {
+
+                        mouseDown = false;
+
+                    }
+
+                },
+                true
+            );
+
+
+            updateCursor();
+
+
+            setInterval(
+                updateCursor,
+                100
+            );
+
+        };
+
+
+        /* ============================================================
+           SPLIT ZIP CONFIG
+           ============================================================ */
+
+        const PART_COUNT = 329;
+
+        const PART_PREFIX =
+            "game-files/cod4-modern-warfare.zip.part";
+
+        const PART_DIGITS = 3;
+
+
+        /* ============================================================
+           FAST SPLIT ZIP READER
+           ============================================================ */
+
+        class SplitZipReader {
+
+            constructor(
+                partCount,
+                prefix = PART_PREFIX
+            ) {
+
+                this.partCount = partCount;
+                this.prefix = prefix;
+
+                this.offsets =
+                    new Array(
+                        partCount + 1
+                    );
+
+                this.offsets[0] = 0;
+
+                this.totalSize = 0;
+
+                this.loadedPart = -1;
+                this.loadedBuffer = null;
+
+                this.loadingPart = -1;
+                this.loadingPromise = null;
+
+                this.bytesDownloaded = 0;
+
+            }
+
+
+            partUrl(index) {
+
+                if (
+                    !Number.isInteger(index) ||
+                    index < 0 ||
+                    index >= this.partCount
+                ) {
+
+                    throw new RangeError(
+                        "Invalid archive part: " +
+                        index
+                    );
+
+                }
+
+
+                return (
+                    this.prefix +
+                    String(
+                        index + 1
+                    ).padStart(
+                        PART_DIGITS,
+                        "0"
+                    )
+                );
+
+            }
+
+
+            async getPartSize(index) {
+
+                const url =
+                    this.partUrl(index);
+
+
+                try {
+
+                    const head =
+                        await fetch(
+                            url,
+                            {
+                                method: "HEAD",
+                                cache: "no-store"
+                            }
+                        );
+
+
+                    if (head.ok) {
+
+                        const length =
+                            head.headers.get(
+                                "content-length"
+                            );
+
+                        const size =
+                            Number(length);
+
+
+                        if (
+                            Number.isSafeInteger(size) &&
+                            size > 0
+                        ) {
+
+                            return size;
+
+                        }
+
+                    }
+
+                } catch {}
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Could not check archive part ${index + 1}: HTTP ${response.status}`
+                    );
+
+                }
+
+
+                if (!response.body) {
+
+                    throw new Error(
+                        `Archive part ${index + 1} has no readable body.`
+                    );
+
+                }
+
+
+                const reader =
+                    response.body.getReader();
+
+                let size = 0;
+
+
+                try {
+
+                    while (true) {
+
+                        const {
+                            value,
+                            done
+                        } =
+                            await reader.read();
+
+
+                        if (done)
+                            break;
+
+
+                        if (value)
+                            size +=
+                                value.byteLength;
+
+                    }
+
+                } finally {
+
+                    try {
+                        reader.releaseLock();
+                    } catch {}
+
+                }
+
+
+                return size;
+
+            }
+
+
+            async initialize() {
+
+                let total = 0;
+
+                this.offsets[0] = 0;
+
+
+                for (
+                    let i = 0;
+                    i < this.partCount;
+                    i++
+                ) {
+
+                    const partNumber =
+                        i + 1;
+
+
+                    setProgress(
+                        (
+                            i /
+                            this.partCount
+                        ) * 0.12,
+                        `Checking COD4 part ${partNumber} / ${this.partCount}`
+                    );
+
+
+                    setDownloadUI(
+                        `Checking COD4 part ${partNumber} / ${this.partCount}`,
+                        "Reading archive metadata..."
+                    );
+
+
+                    const size =
+                        await this.getPartSize(i);
+
+
+                    if (
+                        !Number.isSafeInteger(size) ||
+                        size <= 0
+                    ) {
+
+                        throw new Error(
+                            `Invalid size for archive part ${partNumber}.`
+                        );
+
+                    }
+
+
+                    total += size;
+
+                    this.offsets[i + 1] =
+                        total;
+
+                }
+
+
+                this.totalSize =
+                    total;
+
+
+                if (
+                    !Number.isSafeInteger(
+                        this.totalSize
+                    )
+                ) {
+
+                    throw new Error(
+                        "Split ZIP is too large for safe JavaScript offsets."
+                    );
+
+                }
+
+
+                setProgress(
+                    0.12,
+                    "Archive metadata ready."
+                );
+
+
+                setDownloadUI(
+                    "Archive metadata ready.",
+                    `${this.partCount} parts • ${formatBytes(this.totalSize)} total`
+                );
+
+            }
+
+
+            findPart(position) {
+
+                let low = 0;
+
+                let high =
+                    this.partCount - 1;
+
+
+                while (
+                    low <= high
+                ) {
+
+                    const middle =
+                        (
+                            low +
+                            high
+                        ) >> 1;
+
+
+                    if (
+                        position >=
+                        this.offsets[middle] &&
+                        position <
+                        this.offsets[middle + 1]
+                    ) {
+
+                        return middle;
+
+                    }
+
+
+                    if (
+                        position <
+                        this.offsets[middle]
+                    ) {
+
+                        high =
+                            middle - 1;
+
+                    } else {
+
+                        low =
+                            middle + 1;
+
+                    }
+
+                }
+
+
+                throw new Error(
+                    "Could not locate archive part."
+                );
+
+            }
+
+
+            async loadPart(index) {
+
+                if (
+                    this.loadedPart === index &&
+                    this.loadedBuffer
+                ) {
+
+                    return this.loadedBuffer;
+
+                }
+
+
+                if (
+                    this.loadingPart === index &&
+                    this.loadingPromise
+                ) {
+
+                    return this.loadingPromise;
+
+                }
+
+
+                this.loadingPart =
+                    index;
+
+
+                this.loadingPromise =
+                    (async () => {
+
+                        const url =
+                            this.partUrl(index);
+
+
+                        const response =
+                            await fetch(
+                                url,
+                                {
+                                    cache:
+                                        "force-cache"
+                                }
+                            );
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                `Failed to download COD4 part ${index + 1}: HTTP ${response.status}`
+                            );
+
+                        }
+
+
+                        if (response.body) {
+
+                            const reader =
+                                response.body.getReader();
+
+                            const chunks = [];
+
+                            let totalLoaded = 0;
+
+
+                            const expected =
+                                Number(
+                                    response.headers.get(
+                                        "content-length"
+                                    )
+                                );
+
+
+                            while (true) {
+
+                                const {
+                                    value,
+                                    done
+                                } =
+                                    await reader.read();
+
+
+                                if (done)
+                                    break;
+
+
+                                if (
+                                    value &&
+                                    value.byteLength
+                                ) {
+
+                                    chunks.push(value);
+
+                                    totalLoaded +=
+                                        value.byteLength;
+
+
+                                    const partSize =
+                                        this.offsets[index + 1] -
+                                        this.offsets[index];
+
+
+                                    const partFraction =
+                                        expected > 0
+                                            ? totalLoaded / expected
+                                            : totalLoaded /
+                                              Math.max(
+                                                  1,
+                                                  partSize
+                                              );
+
+
+                                    const overall =
+                                        (
+                                            index +
+                                            Math.min(
+                                                1,
+                                                partFraction
+                                            )
+                                        ) /
+                                        this.partCount;
+
+
+                                    const displayProgress =
+                                        0.12 +
+                                        overall *
+                                        0.48;
+
+
+                                    setProgress(
+                                        displayProgress,
+                                        `Downloading COD4 part ${index + 1} / ${this.partCount}`
+                                    );
+
+
+                                    setDownloadUI(
+                                        `Downloading COD4 part ${index + 1} / ${this.partCount}`,
+                                        `${formatBytes(totalLoaded)}${expected > 0 ? " / " + formatBytes(expected) : ""}`
+                                    );
+
+                                }
+
+                            }
+
+
+                            const buffer =
+                                new Uint8Array(
+                                    totalLoaded
+                                );
+
+
+                            let position = 0;
+
+
+                            for (
+                                const chunk of chunks
+                            ) {
+
+                                buffer.set(
+                                    chunk,
+                                    position
+                                );
+
+                                position +=
+                                    chunk.byteLength;
+                            }
+
+
+                            this.loadedPart =
+                                index;
+
+                            this.loadedBuffer =
+                                buffer;
+
+                            this.bytesDownloaded +=
+                                buffer.byteLength;
+
+
+                            return buffer;
+
+                        }
+
+
+                        const buffer =
+                            new Uint8Array(
+                                await response.arrayBuffer()
+                            );
+
+
+                        this.loadedPart =
+                            index;
+
+                        this.loadedBuffer =
+                            buffer;
+
+                        this.bytesDownloaded +=
+                            buffer.byteLength;
+
+
+                        return buffer;
+
+                    })();
+
+
+                try {
+
+                    return await this.loadingPromise;
+
+                } finally {
+
+                    this.loadingPart = -1;
+                    this.loadingPromise = null;
+
+                }
+
+            }
+
+
+            async read(
+                position,
+                length
+            ) {
+
+                if (length === 0) {
+
+                    return new Uint8Array(0);
+
+                }
+
+
+                if (
+                    !Number.isSafeInteger(position) ||
+                    !Number.isSafeInteger(length) ||
+                    position < 0 ||
+                    length < 0 ||
+                    position + length >
+                    this.totalSize
+                ) {
+
+                    throw new Error(
+                        "Archive read outside bounds."
+                    );
+
+                }
+
+
+                const output =
+                    new Uint8Array(length);
+
+
+                let current = position;
+                let remaining = length;
+                let outputOffset = 0;
+
+
+                while (
+                    remaining > 0
+                ) {
+
+                    const part =
+                        this.findPart(current);
+
+
+                    const buffer =
+                        await this.loadPart(part);
+
+
+                    const inside =
+                        current -
+                        this.offsets[part];
+
+
+                    const available =
+                        buffer.length -
+                        inside;
+
+
+                    if (available <= 0) {
+
+                        throw new Error(
+                            "Invalid split archive boundary."
+                        );
+
+                    }
+
+
+                    const amount =
+                        Math.min(
+                            remaining,
+                            available
+                        );
+
+
+                    output.set(
+                        buffer.subarray(
+                            inside,
+                            inside + amount
+                        ),
+                        outputOffset
+                    );
+
+
+                    current += amount;
+                    outputOffset += amount;
+                    remaining -= amount;
+
+                }
+
+
+                return output;
+
+            }
+
+
+            async stream(
+                position,
+                length
+            ) {
+
+                if (length === 0) {
+
+                    return new ReadableStream({
+
+                        start(controller) {
+                            controller.close();
+                        }
+
+                    });
+
+                }
+
+
+                const reader = this;
+
+                let current = position;
+                let remaining = length;
+
+                const CHUNK_SIZE =
+                    8 * 1024 * 1024;
+
+
+                return new ReadableStream({
+
+                    async pull(controller) {
+
+                        if (
+                            remaining <= 0
+                        ) {
+
+                            controller.close();
+                            return;
+
+                        }
+
+
+                        const amount =
+                            Math.min(
+                                CHUNK_SIZE,
+                                remaining
+                            );
+
+
+                        try {
+
+                            const chunk =
+                                await reader.read(
+                                    current,
+                                    amount
+                                );
+
+
+                            current += amount;
+                            remaining -= amount;
+
+
+                            controller.enqueue(
+                                chunk
+                            );
+
+
+                            if (
+                                remaining <= 0
+                            ) {
+
+                                controller.close();
+
+                            }
+
+                        } catch (error) {
+
+                            controller.error(
+                                error
+                            );
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        }
+
+
+        /* ============================================================
+           ZIP HELPERS
+           ============================================================ */
+
+        function u16(
+            buffer,
+            offset
+        ) {
+
+            return (
+                buffer[offset] |
+                (
+                    buffer[offset + 1] << 8
+                )
+            ) >>> 0;
+
+        }
+
+
+        function u32(
+            buffer,
+            offset
+        ) {
+
+            return (
+                buffer[offset] |
+                (
+                    buffer[offset + 1] << 8
+                ) |
+                (
+                    buffer[offset + 2] << 16
+                ) |
+                (
+                    buffer[offset + 3] << 24
+                )
+            ) >>> 0;
+
+        }
+
+
+        function u64(
+            buffer,
+            offset
+        ) {
+
+            let value = 0n;
+
+
+            for (
+                let i = 7;
+                i >= 0;
+                i--
+            ) {
+
+                value =
+                    (
+                        value << 8n
+                    ) |
+                    BigInt(
+                        buffer[offset + i]
+                    );
+
+            }
+
+
+            return value;
+
+        }
+
+
+        function decodeUTF8(bytes) {
+
+            return new TextDecoder(
+                "utf-8"
+            ).decode(bytes);
+
+        }
+
+
+        function findSignature(
+            buffer,
+            signature
+        ) {
+
+            for (
+                let i =
+                    buffer.length - 4;
+                i >= 0;
+                i--
+            ) {
+
+                if (
+                    u32(
+                        buffer,
+                        i
+                    ) === signature
+                ) {
+
+                    return i;
+
+                }
+
+            }
+
+
+            return -1;
+
+        }
+
+
+        /* ============================================================
+           ZIP DIRECTORY
+           ============================================================ */
+
+        async function readZipDirectory(zip) {
+
+            status(
+                "Reading ZIP directory..."
+            );
+
+
+            setProgress(
+                0.61,
+                "Reading ZIP directory..."
+            );
+
+
+            setDownloadUI(
+                "Reading ZIP directory...",
+                "Finding ZIP64 central directory..."
+            );
+
+
+            const tailSize =
+                Math.min(
+                    zip.totalSize,
+                    65557 + 22
+                );
+
+
+            const tail =
+                await zip.read(
+                    zip.totalSize -
+                    tailSize,
+                    tailSize
+                );
+
+
+            const eocd =
+                findSignature(
+                    tail,
+                    0x06054b50
+                );
+
+
+            if (eocd < 0) {
+
+                throw new Error(
+                    "ZIP end-of-central-directory record was not found."
+                );
+
+            }
+
+
+            let entries =
+                u16(
+                    tail,
+                    eocd + 10
+                );
+
+
+            let directorySize =
+                u32(
+                    tail,
+                    eocd + 12
+                );
+
+
+            let directoryOffset =
+                u32(
+                    tail,
+                    eocd + 16
+                );
+
+
+            if (
+                entries === 0xffff ||
+                directorySize === 0xffffffff ||
+                directoryOffset === 0xffffffff
+            ) {
+
+                const locator =
+                    findSignature(
+                        tail.subarray(
+                            0,
+                            eocd
+                        ),
+                        0x07064b50
+                    );
+
+
+                if (locator < 0) {
+
+                    throw new Error(
+                        "ZIP64 archive detected but ZIP64 locator is missing."
+                    );
+
+                }
+
+
+                const zip64Offset =
+                    u64(
+                        tail,
+                        locator + 8
+                    );
+
+
+                if (
+                    zip64Offset >
+                    BigInt(
+                        Number.MAX_SAFE_INTEGER
+                    )
+                ) {
+
+                    throw new Error(
+                        "ZIP64 offset is too large."
+                    );
+
+                }
+
+
+                const record =
+                    await zip.read(
+                        Number(zip64Offset),
+                        56
+                    );
+
+
+                if (
+                    u32(record, 0) !==
+                    0x06064b50
+                ) {
+
+                    throw new Error(
+                        "Invalid ZIP64 end record."
+                    );
+
+                }
+
+
+                entries =
+                    Number(
+                        u64(record, 32)
+                    );
+
+
+                directorySize =
+                    Number(
+                        u64(record, 40)
+                    );
+
+
+                directoryOffset =
+                    Number(
+                        u64(record, 48)
+                    );
+
+            }
+
+
+            log(
+                "ZIP entries: " +
+                entries
+            );
+
+
+            const directory =
+                await zip.read(
+                    directoryOffset,
+                    directorySize
+                );
+
+
+            const result = [];
+
+            let offset = 0;
+
+
+            for (
+                let i = 0;
+                i < entries;
+                i++
+            ) {
+
+                if (
+                    u32(
+                        directory,
+                        offset
+                    ) !==
+                    0x02014b50
+                ) {
+
+                    throw new Error(
+                        "Invalid central directory entry at " +
+                        i
+                    );
+
+                }
+
+
+                const flags =
+                    u16(
+                        directory,
+                        offset + 8
+                    );
+
+
+                const method =
+                    u16(
+                        directory,
+                        offset + 10
+                    );
+
+
+                let compressedSize =
+                    u32(
+                        directory,
+                        offset + 20
+                    );
+
+
+                let uncompressedSize =
+                    u32(
+                        directory,
+                        offset + 24
+                    );
+
+
+                const nameLength =
+                    u16(
+                        directory,
+                        offset + 28
+                    );
+
+
+                const extraLength =
+                    u16(
+                        directory,
+                        offset + 30
+                    );
+
+
+                const commentLength =
+                    u16(
+                        directory,
+                        offset + 32
+                    );
+
+
+                let localOffset =
+                    u32(
+                        directory,
+                        offset + 42
+                    );
+
+
+                const externalAttributes =
+                    u32(
+                        directory,
+                        offset + 38
+                    );
+
+
+                const name =
+                    decodeUTF8(
+                        directory.subarray(
+                            offset + 46,
+                            offset +
+                            46 +
+                            nameLength
+                        )
+                    );
+
+
+                const extraStart =
+                    offset +
+                    46 +
+                    nameLength;
+
+
+                const extra =
+                    directory.subarray(
+                        extraStart,
+                        extraStart +
+                        extraLength
+                    );
+
+
+                if (
+                    compressedSize === 0xffffffff ||
+                    uncompressedSize === 0xffffffff ||
+                    localOffset === 0xffffffff
+                ) {
+
+                    let p = 0;
+
+
+                    while (
+                        p + 4 <= extra.length
+                    ) {
+
+                        const id =
+                            u16(
+                                extra,
+                                p
+                            );
+
+
+                        const size =
+                            u16(
+                                extra,
+                                p + 2
+                            );
+
+
+                        if (id === 0x0001) {
+
+                            let q =
+                                p + 4;
+
+
+                            if (
+                                uncompressedSize ===
+                                0xffffffff
+                            ) {
+
+                                uncompressedSize =
+                                    Number(
+                                        u64(
+                                            extra,
+                                            q
+                                        )
+                                    );
+
+                                q += 8;
+
+                            }
+
+
+                            if (
+                                compressedSize ===
+                                0xffffffff
+                            ) {
+
+                                compressedSize =
+                                    Number(
+                                        u64(
+                                            extra,
+                                            q
+                                        )
+                                    );
+
+                                q += 8;
+
+                            }
+
+
+                            if (
+                                localOffset ===
+                                0xffffffff
+                            ) {
+
+                                localOffset =
+                                    Number(
+                                        u64(
+                                            extra,
+                                            q
+                                        )
+                                    );
+
+                            }
+
+
+                            break;
+
+                        }
+
+
+                        p +=
+                            4 +
+                            size;
+
+                    }
+
+                }
+
+
+                /*
+                 * DIRECTORY DETECTION MUST HAPPEN BEFORE
+                 * PATH NORMALIZATION.
+                 */
+
+                const directoryEntry =
+                    name.endsWith("/") ||
+                    (
+                        (
+                            externalAttributes &
+                            0x10
+                        ) !== 0
+                    );
+
+
+                result.push({
+
+                    name,
+
+                    flags,
+
+                    method,
+
+                    compressedSize,
+
+                    uncompressedSize,
+
+                    localOffset,
+
+                    externalAttributes,
+
+                    directory:
+                        directoryEntry
+
+                });
+
+
+                offset +=
+                    46 +
+                    nameLength +
+                    extraLength +
+                    commentLength;
+
+            }
+
+
+            /* --------------------------------------------------------
+               Detect common archive wrapper
+               -------------------------------------------------------- */
+
+            const topLevelCandidates =
+                new Set();
+
+
+            for (
+                const entry of result
+            ) {
+
+                const normalized =
+                    normalizeZipPath(
+                        entry.name
+                    );
+
+
+                if (!normalized)
+                    continue;
+
+
+                const slash =
+                    normalized.indexOf("/");
+
+
+                if (slash > 0) {
+
+                    topLevelCandidates.add(
+                        normalized.slice(
+                            0,
+                            slash
+                        )
+                    );
+
+                } else if (
+                    !entry.directory
+                ) {
+
+                    topLevelCandidates.add("");
+
+                }
+
+            }
+
+
+            const wrapper =
+                topLevelCandidates.size === 1 &&
+                !topLevelCandidates.has("")
+                    ? [
+                        ...topLevelCandidates
+                    ][0]
+                    : "";
+
+
+            if (wrapper) {
+
+                log(
+                    "Archive root folder detected: " +
+                    wrapper
+                );
+
+
+                log(
+                    "Game files will be extracted directly into /cod4."
+                );
+
+            } else {
+
+                log(
+                    "No archive root wrapper detected."
+                );
+
+            }
+
+
+            for (
+                const entry of result
+            ) {
+
+                entry.archiveRoot =
+                    wrapper;
+
+            }
+
+
+            setProgress(
+                0.65,
+                "ZIP directory loaded."
+            );
+
+
+            setDownloadUI(
+                "ZIP directory loaded.",
+                `${entries.toLocaleString()} entries found`
+            );
+
+
+            return result;
+
+        }
+
+
+        /* ============================================================
+           SAFE ZIP PATH
+           ============================================================ */
+
+        function normalizeZipPath(name) {
+
+            name =
+                name.replaceAll(
+                    "\\",
+                    "/"
+                );
+
+
+            while (
+                name.startsWith("/")
+            ) {
+
+                name =
+                    name.slice(1);
+
+            }
+
+
+            const parts =
+                name.split("/");
+
+            const safe = [];
+
+
+            for (
+                const part of parts
+            ) {
+
+                if (
+                    !part ||
+                    part === "."
+                ) {
+
+                    continue;
+
+                }
+
+
+                if (
+                    part === ".."
+                ) {
+
+                    throw new Error(
+                        "Unsafe ZIP path: " +
+                        name
+                    );
+
+                }
+
+
+                safe.push(part);
+
+            }
+
+
+            return safe.join("/");
+
+        }
+
+
+        /* ============================================================
+           GAME PATH
+           ============================================================ */
+
+        function getGamePath(entry) {
+
+            let path =
+                normalizeZipPath(
+                    entry.name
+                );
+
+
+            const wrapper =
+                entry.archiveRoot ||
+                "";
+
+
+            if (wrapper) {
+
+                const prefix =
+                    wrapper + "/";
+
+
+                if (
+                    path === wrapper
+                ) {
+
+                    return "";
+
+                }
+
+
+                if (
+                    path.startsWith(prefix)
+                ) {
+
+                    path =
+                        path.slice(
+                            prefix.length
+                        );
+
+                }
+
+            }
+
+
+            return normalizeZipPath(path);
+
+        }
+
+
+        /* ============================================================
+           OPFS
+           ============================================================ */
+
+        async function getOPFSRoot() {
+
+            if (
+                !navigator.storage ||
+                !navigator.storage.getDirectory
+            ) {
+
+                throw new Error(
+                    "This browser does not support Origin Private File System."
+                );
+
+            }
+
+
+            return navigator.storage.getDirectory();
+
+        }
+
+
+        async function getFreshCod4Directory() {
+
+            const root =
+                await getOPFSRoot();
+
+
+            let existingType = "none";
+
+
+            try {
+
+                await root.getDirectoryHandle(
+                    "cod4"
+                );
+
+
+                existingType =
+                    "directory";
+
+            } catch (error) {
+
+                if (
+                    error?.name ===
+                    "TypeMismatchError"
+                ) {
+
+                    try {
+
+                        await root.getFileHandle(
+                            "cod4"
+                        );
+
+
+                        existingType =
+                            "file";
+
+                    } catch (fileError) {
+
+                        if (
+                            fileError?.name !==
+                            "NotFoundError"
+                        ) {
+
+                            throw fileError;
+
+                        }
+
+                    }
+
+                } else if (
+                    error?.name !==
+                    "NotFoundError"
+                ) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            if (
+                existingType ===
+                "directory"
+            ) {
+
+                log(
+                    "Removing existing /cod4 directory..."
+                );
+
+
+                await root.removeEntry(
+                    "cod4",
+                    {
+                        recursive: true
+                    }
+                );
+
+            } else if (
+                existingType ===
+                "file"
+            ) {
+
+                log(
+                    "Removing incorrect /cod4 file..."
+                );
+
+
+                await root.removeEntry(
+                    "cod4"
+                );
+
+            }
+
+
+            try {
+
+                await root.getDirectoryHandle(
+                    "cod4"
+                );
+
+
+                throw new Error(
+                    "Could not replace the existing /cod4 directory."
+                );
+
+            } catch (error) {
+
+                if (
+                    error?.name !==
+                    "NotFoundError"
+                ) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            const cod4 =
+                await root.getDirectoryHandle(
+                    "cod4",
+                    {
+                        create: true
+                    }
+                );
+
+
+            log(
+                "Created fresh /cod4 directory."
+            );
+
+
+            return cod4;
+
+        }
+
+
+        async function getOPFSParent(
+            root,
+            path
+        ) {
+
+            const parts =
+                path.split("/");
+
+            const filename =
+                parts.pop();
+
+            let directory =
+                root;
+
+            let currentPath = "";
+
+
+            for (
+                const part of parts
+            ) {
+
+                if (!part)
+                    continue;
+
+
+                currentPath +=
+                    (
+                        currentPath
+                            ? "/"
+                            : ""
+                    ) +
+                    part;
+
+
+                try {
+
+                    directory =
+                        await directory.getDirectoryHandle(
+                            part
+                        );
+
+                } catch (error) {
+
+                    if (
+                        error?.name ===
+                        "NotFoundError"
+                    ) {
+
+                        directory =
+                            await directory.getDirectoryHandle(
+                                part,
+                                {
+                                    create: true
+                                }
+                            );
+
+                        continue;
+
+                    }
+
+
+                    if (
+                        error?.name ===
+                        "TypeMismatchError"
+                    ) {
+
+                        throw new Error(
+                            `ZIP path conflict: "${currentPath}" is a file, but the ZIP needs it to be a directory.`
+                        );
+
+                    }
+
+
+                    throw error;
+
+                }
+
+            }
+
+
+            return {
+                directory,
+                filename
+            };
+
+        }
+
+
+        async function writeStreamToOPFS(
+            root,
+            path,
+            stream
+        ) {
+
+            const parent =
+                await getOPFSParent(
+                    root,
+                    path
+                );
+
+
+            let file;
+
+
+            try {
+
+                file =
+                    await parent.directory.getFileHandle(
+                        parent.filename,
+                        {
+                            create: true
+                        }
+                    );
+
+            } catch (error) {
+
+                if (
+                    error?.name ===
+                    "TypeMismatchError"
+                ) {
+
+                    throw new Error(
+                        `ZIP path conflict: "${path}" already exists as a directory, but the ZIP needs it to be a file.`
+                    );
+
+                }
+
+
+                throw error;
+
+            }
+
+
+            const writable =
+                await file.createWritable();
+
+
+            try {
+
+                await stream.pipeTo(
+                    writable
+                );
+
+            } catch (error) {
+
+                try {
+                    await writable.abort();
+                } catch {}
+
+
+                throw error;
+
+            }
+
+        }
+
+
+        async function ensureOPFSDirectory(
+            root,
+            path
+        ) {
+
+            const normalized =
+                normalizeZipPath(path);
+
+
+            if (!normalized)
+                return root;
+
+
+            let directory =
+                root;
+
+
+            for (
+                const part of
+                normalized.split("/")
+            ) {
+
+                try {
+
+                    directory =
+                        await directory.getDirectoryHandle(
+                            part
+                        );
+
+                } catch (error) {
+
+                    if (
+                        error?.name ===
+                        "NotFoundError"
+                    ) {
+
+                        directory =
+                            await directory.getDirectoryHandle(
+                                part,
+                                {
+                                    create: true
+                                }
+                            );
+
+                        continue;
+
+                    }
+
+
+                    if (
+                        error?.name ===
+                        "TypeMismatchError"
+                    ) {
+
+                        throw new Error(
+                            `ZIP path conflict: "${normalized}" contains a file where a directory is required.`
+                        );
+
+                    }
+
+
+                    throw error;
+
+                }
+
+            }
+
+
+            return directory;
+
+        }
+
+
+        async function hasInstalledGame() {
+
+            try {
+
+                const root =
+                    await getOPFSRoot();
+
+
+                const cod4 =
+                    await root.getDirectoryHandle(
+                        "cod4"
+                    );
+
+
+                await cod4.getFileHandle(
+                    "localization.txt"
+                );
+
+
+                return true;
+
+            } catch {
+
+                return false;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           FILE FILTER
+           ============================================================ */
+
+        function shouldExtract(entry) {
+
+            if (entry.directory)
+                return false;
+
+
+            const path =
+                getGamePath(entry);
+
+
+            if (!path)
+                return false;
+
+
+            if (
+                path.startsWith("__MACOSX/") ||
+                path.endsWith(".DS_Store")
+            ) {
+
+                return false;
+
+            }
+
+
+            const lower =
+                path.toLowerCase();
+
+
+            if (
+                !includeAudio.checked &&
+                (
+                    lower.endsWith(".mp3") ||
+                    lower.endsWith(".wav") ||
+                    lower.endsWith(".ogg") ||
+                    lower.endsWith(".flac") ||
+                    lower.endsWith(".aac") ||
+                    lower.endsWith(".m4a")
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                !includeVideo.checked &&
+                (
+                    lower.endsWith(".bik") ||
+                    lower.endsWith(".roq") ||
+                    lower.endsWith(".mp4") ||
+                    lower.endsWith(".avi")
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* ============================================================
+           ZIP LOCAL HEADER
+           ============================================================ */
+
+        async function getCompressedDataPosition(
+            zip,
+            entry
+        ) {
+
+            const header =
+                await zip.read(
+                    entry.localOffset,
+                    30
+                );
+
+
+            if (
+                u32(header, 0) !==
+                0x04034b50
+            ) {
+
+                throw new Error(
+                    "Invalid local ZIP header for " +
+                    entry.name
+                );
+
+            }
+
+
+            const nameLength =
+                u16(
+                    header,
+                    26
+                );
+
+
+            const extraLength =
+                u16(
+                    header,
+                    28
+                );
+
+
+            return (
+                entry.localOffset +
+                30 +
+                nameLength +
+                extraLength
+            );
+
+        }
+
+
+        /* ============================================================
+           EXTRACTION
+           ============================================================ */
+
+        async function extractEntry(
+            zip,
+            root,
+            entry
+        ) {
+
+            const path =
+                getGamePath(entry);
+
+
+            if (!path)
+                return;
+
+
+            try {
+
+                if (entry.directory) {
+
+                    await ensureOPFSDirectory(
+                        root,
+                        path
+                    );
+
+                    return;
+
+                }
+
+
+                const slash =
+                    path.lastIndexOf("/");
+
+
+                if (slash >= 0) {
+
+                    await ensureOPFSDirectory(
+                        root,
+                        path.slice(
+                            0,
+                            slash
+                        )
+                    );
+
+                }
+
+
+                const dataPosition =
+                    await getCompressedDataPosition(
+                        zip,
+                        entry
+                    );
+
+
+                const compressed =
+                    await zip.stream(
+                        dataPosition,
+                        entry.compressedSize
+                    );
+
+
+                let outputStream;
+
+
+                if (
+                    entry.method === 0
+                ) {
+
+                    outputStream =
+                        compressed;
+
+                } else if (
+                    entry.method === 8
+                ) {
+
+                    if (
+                        !(
+                            "DecompressionStream"
+                            in window
+                        )
+                    ) {
+
+                        throw new Error(
+                            "This browser does not support DecompressionStream."
+                        );
+
+                    }
+
+
+                    outputStream =
+                        compressed.pipeThrough(
+                            new DecompressionStream(
+                                "deflate-raw"
+                            )
+                        );
+
+                } else {
+
+                    throw new Error(
+                        `Unsupported ZIP compression method ${entry.method} for ${path}`
+                    );
+
+                }
+
+
+                await writeStreamToOPFS(
+                    root,
+                    path,
+                    outputStream
+                );
+
+            } catch (error) {
+
+                throw new Error(
+                    `Failed extracting "${path}": ${
+                        error?.message ||
+                        error
+                    }`
+                );
+
+            }
+
+        }
+
+
+        /* ============================================================
+           INSTALL
+           ============================================================ */
+
+        let installing = false;
+
+
+        async function installGame() {
+
+            if (installing)
+                return;
+
+
+            installing = true;
+
+            installButton.disabled = true;
+            playButton.disabled = true;
+            wipeButton.disabled = true;
+
+            installOptions.hidden = false;
+
+            installLog.textContent = "";
+
+
+            setProgress(
+                0,
+                "Preparing..."
+            );
+
+
+            setDownloadUI(
+                "Preparing COD4 installation...",
+                ""
+            );
+
+
+            try {
+
+                log(
+                    "Preparing split ZIP..."
+                );
+
+
+                log(
+                    `Archive parts: ${PART_COUNT}`
+                );
+
+
+                const zip =
+                    new SplitZipReader(
+                        PART_COUNT,
+                        PART_PREFIX
+                    );
+
+
+                await zip.initialize();
+
+
+                status(
+                    "Reading ZIP directory..."
+                );
+
+
+                const entries =
+                    await readZipDirectory(
+                        zip
+                    );
+
+
+                const files =
+                    entries.filter(
+                        shouldExtract
+                    );
+
+
+                if (!files.length) {
+
+                    throw new Error(
+                        "No usable files were found in the ZIP."
+                    );
+
+                }
+
+
+                let totalOutput = 0;
+
+
+                for (
+                    const entry of files
+                ) {
+
+                    totalOutput +=
+                        entry.uncompressedSize;
+
+                }
+
+
+                installCopySize.textContent =
+                    files.length.toLocaleString() +
+                    " files selected • " +
+                    formatBytes(
+                        totalOutput
+                    ) +
+                    " extracted size";
+
+
+                log(
+                    "Files selected: " +
+                    files.length.toLocaleString()
+                );
+
+
+                log(
+                    "Extracted size: " +
+                    formatBytes(totalOutput)
+                );
+
+
+                log(
+                    "Clearing old game data..."
+                );
+
+
+                const root =
+                    await getFreshCod4Directory();
+
+
+                let completedBytes = 0;
+                let completedFiles = 0;
+
+
+                setDownloadUI(
+                    "Installing game files...",
+                    ""
+                );
+
+
+                for (
+                    const entry of files
+                ) {
+
+                    const path =
+                        getGamePath(entry);
+
+
+                    status(
+                        "Extracting " +
+                        path
+                    );
+
+
+                    setDownloadUI(
+                        `Extracting ${completedFiles + 1} / ${files.length}`,
+                        path
+                    );
+
+
+                    await extractEntry(
+                        zip,
+                        root,
+                        entry
+                    );
+
+
+                    completedBytes +=
+                        entry.uncompressedSize;
+
+
+                    completedFiles++;
+
+
+                    const extractionProgress =
+                        totalOutput > 0
+                            ? completedBytes /
+                              totalOutput
+                            : completedFiles /
+                              files.length;
+
+
+                    const displayed =
+                        0.65 +
+                        extractionProgress *
+                        0.35;
+
+
+                    setProgress(
+                        displayed,
+                        `Extracting ${completedFiles.toLocaleString()} / ${files.length.toLocaleString()} — ${formatBytes(completedBytes)} / ${formatBytes(totalOutput)}`
+                    );
+
+
+                    if (
+                        completedFiles % 16 ===
+                        0
+                    ) {
+
+                        await new Promise(
+                            resolve =>
+                                setTimeout(
+                                    resolve,
+                                    0
+                                )
+                        );
+
+                    }
+
+                }
+
+
+                await root.getFileHandle(
+                    "localization.txt"
+                );
+
+
+                localStorage.setItem(
+                    "kisak_opfs_ready",
+                    "1"
+                );
+
+
+                window.__kisakOpfsReady =
+                    true;
+
+
+                if (
+                    window.__kisakOpfsDependencyHeld &&
+                    typeof removeRunDependency ===
+                    "function"
+                ) {
+
+                    window.__kisakOpfsDependencyHeld =
+                        false;
+
+
+                    removeRunDependency(
+                        "kisak-opfs"
+                    );
+
+                }
+
+
+                setProgress(
+                    1,
+                    "Installation complete."
+                );
+
+
+                setDownloadUI(
+                    "COD4 installation complete.",
+                    `${files.length.toLocaleString()} files extracted • ${formatBytes(totalOutput)}`
+                );
+
+
+                status(
+                    "Game installed successfully."
+                );
+
+
+                log("");
+                log(
+                    "Installation complete."
+                );
+
+
+                playButton.disabled =
+                    false;
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                status(
+                    "Installation failed."
+                );
+
+
+                log("");
+                log(
+                    "ERROR: " +
+                    (
+                        error?.stack ||
+                        error?.message ||
+                        error
+                    )
+                );
+
+
+                setDownloadUI(
+                    "Installation failed.",
+                    error?.message ||
+                    String(error)
+                );
+
+
+                installButton.disabled =
+                    false;
+
+            } finally {
+
+                wipeButton.disabled =
+                    false;
+
+                installing =
+                    false;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           WIPE DATA
+           ============================================================ */
+
+        async function wipeGame() {
+
+            if (
+                !confirm(
+                    "Delete all locally stored KisakCOD game data?"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const root =
+                    await getOPFSRoot();
+
+
+                try {
+
+                    await root.removeEntry(
+                        "cod4",
+                        {
+                            recursive: true
+                        }
+                    );
+
+                } catch (error) {
+
+                    if (
+                        error?.name !==
+                        "NotFoundError"
+                    ) {
+
+                        if (
+                            error?.name ===
+                            "TypeMismatchError"
+                        ) {
+
+                            await root.removeEntry(
+                                "cod4"
+                            );
+
+                        } else {
+
+                            throw error;
+
+                        }
+
+                    }
+
+                }
+
+
+                localStorage.removeItem(
+                    "kisak_opfs_ready"
+                );
+
+
+                window.__kisakOpfsReady =
+                    false;
+
+
+                playButton.disabled =
+                    true;
+
+
+                status(
+                    "Game data deleted."
+                );
+
+
+                log(
+                    "OPFS /cod4 deleted."
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                status(
+                    "Could not delete game data."
+                );
+
+
+                log(
+                    "ERROR: " +
+                    (
+                        error?.message ||
+                        error
+                    )
+                );
+
+            }
+
+        }
+
+
+        /* ============================================================
+           PLAY
+           ============================================================ */
+
+        function playGame() {
+
+            if (
+                !window.__kisakOpfsReady
+            ) {
+
+                status(
+                    "The game files are not installed yet."
+                );
+
+                return;
+
+            }
+
+
+            installerPanel.style.display =
+                "none";
+
+
+            document.body.classList.add(
+                "game-running"
+            );
+
+
+            resizeGameCanvas();
+
+
+            try {
+
+                canvas.focus({
+                    preventScroll: true
+                });
+
+            } catch {
+
+                try {
+                    canvas.focus();
+                } catch {}
+
+            }
+
+        }
+
+
+        /* ============================================================
+           INITIAL STATE
+           ============================================================ */
+
+        async function initializeInstaller() {
+
+            try {
+
+                const installed =
+                    await hasInstalledGame();
+
+
+                if (installed) {
+
+                    window.__kisakOpfsReady =
+                        true;
+
+
+                    localStorage.setItem(
+                        "kisak_opfs_ready",
+                        "1"
+                    );
+
+
+                    status(
+                        "Game data is already installed."
+                    );
+
+
+                    playButton.disabled =
+                        false;
+
+
+                    log(
+                        "Existing /cod4 installation found."
+                    );
+
+                } else {
+
+                    window.__kisakOpfsReady =
+                        false;
+
+
+                    status(
+                        "Game files are not installed."
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                status(
+                    "Unable to inspect browser storage."
+                );
+
+
+                log(
+                    "ERROR: " +
+                    (
+                        error?.message ||
+                        error
+                    )
+                );
+
+            }
+
+        }
+
+
+        /* ============================================================
+           FORMAT BYTES
+           ============================================================ */
+
+        function formatBytes(bytes) {
+
+            if (
+                !Number.isFinite(bytes)
+            ) {
+
+                return "unknown size";
+
+            }
+
+
+            if (
+                bytes < 1024
+            ) {
+
+                return bytes + " B";
+
+            }
+
+
+            if (
+                bytes < 1024 ** 2
+            ) {
+
+                return (
+                    bytes / 1024
+                ).toFixed(1) +
+                " KiB";
+
+            }
+
+
+            if (
+                bytes < 1024 ** 3
+            ) {
+
+                return (
+                    bytes / 1024 ** 2
+                ).toFixed(1) +
+                " MiB";
+
+            }
+
+
+            return (
+                bytes / 1024 ** 3
+            ).toFixed(2) +
+                " GiB";
+
+        }
+
+
+        /* ============================================================
+           EVENTS
+           ============================================================ */
+
+        installButton.addEventListener(
+            "click",
+            installGame
+        );
+
+
+        playButton.addEventListener(
+            "click",
+            playGame
+        );
+
+
+        wipeButton.addEventListener(
+            "click",
+            wipeGame
+        );
+
+
+        /* ============================================================
+           START
+           ============================================================ */
+
+        initializeInstaller();
+
+
+        /* ============================================================
+           LOAD KISAKCOD SCRIPT
+           ============================================================ */
+
+        const gameScript =
+            document
+                .getElementById(
+                    "module-script-template"
+                )
+                .content
+                .querySelector(
+                    "script"
+                );
+
+
+        document.body.appendChild(
+            gameScript
+        );
+
+    </script>
+
+</body>
+
+</html>

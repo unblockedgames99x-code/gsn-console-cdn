@@ -1,0 +1,469 @@
+<html>
+  <head>
+    <base href="https://cdn.jsdelivr.net/gh/yksoft1/yksoft1.github.io@master/emularity/">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+    <meta name="HandheldFriendly" content="true" />
+    <title>Touhou 1: Touhou Reiiden by ZUNSOFT/Touhou Project</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#controls {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 90vw;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+#controls input,
+#controls button {
+  padding: 8px 12px;
+  font-size: clamp(11px, 1.5vw, 14px);
+  cursor: pointer;
+  border: 1px solid #666;
+  background: #444;
+  color: white;
+  border-radius: 4px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+#controls input:hover,
+#controls button:hover {
+  background: #666;
+}
+
+#controls input:active,
+#controls button:active {
+  background: #888;
+}
+
+#scaleDisplay {
+  color: white;
+  padding: 8px 12px;
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: bold;
+  align-self: center;
+  min-width: 60px;
+}
+
+div.emumain {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 200px);
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#canvasContainer {
+  transform-origin: center center;
+  transition: transform 0.1s ease-out;
+}
+
+#canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  object-fit: contain;
+}
+
+div.softkbd {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0);
+  padding: clamp(5px, 2vh, 15px);
+  overflow-x: auto;
+}
+
+table {
+  border: none;
+  margin: auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+td {
+  padding: clamp(2px, 1vw, 8px);
+}
+
+td.button_td,
+td.button_td1,
+td.button_td2 {
+  width: auto;
+  height: auto;
+}
+
+/* Direction pad buttons */
+input.inputbutton1 {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(30px, 6vh, 60px);
+  min-width: clamp(30px, 8vw, 80px);
+  font-size: clamp(14px, 2.5vw, 24px);
+  padding: clamp(3px, 1vw, 8px);
+  cursor: pointer;
+  font-weight: bold;
+  background: #333;
+  border: 2px solid #555;
+  color: white;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+input.inputbutton1:active {
+  background: #222;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.5);
+  transform: translateY(1px);
+}
+
+/* Xbox A button (green) */
+input.inputbutton2[value="Z"] {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(30px, 6vh, 60px);
+  min-width: clamp(30px, 8vw, 80px);
+  font-size: clamp(14px, 2.5vw, 24px);
+  padding: clamp(3px, 1vw, 8px);
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 8px 12px rgba(0, 0, 0, 0.3);
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input.inputbutton2[value="Z"]:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4), 0 10px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+input.inputbutton2[value="Z"]:active {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(2px);
+}
+
+/* Xbox X button (blue) */
+input.inputbutton2[value="X"] {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(30px, 6vh, 60px);
+  min-width: clamp(30px, 8vw, 80px);
+  font-size: clamp(14px, 2.5vw, 24px);
+  padding: clamp(3px, 1vw, 8px);
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 8px 12px rgba(0, 0, 0, 0.3);
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input.inputbutton2[value="X"]:hover {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4), 0 10px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+input.inputbutton2[value="X"]:active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(2px);
+}
+
+/* Xbox utility buttons */
+input.inputbutton3 {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(30px, 6vh, 60px);
+  min-width: clamp(30px, 8vw, 80px);
+  font-size: clamp(12px, 1.8vw, 16px);
+  padding: clamp(3px, 1vw, 8px);
+  cursor: pointer;
+  font-weight: bold;
+  background: #2a2a2a;
+  border: 2px solid #444;
+  color: #aaa;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.5);
+}
+
+input.inputbutton3:hover {
+  background: #3a3a3a;
+  color: #ddd;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.5);
+}
+
+input.inputbutton3:active {
+  background: #1a1a1a;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.5);
+  transform: translateY(1px);
+}
+
+/* Mobile optimization */
+@media (max-width: 600px) {
+  div.emumain {
+    height: calc(100vh - 180px);
+  }
+
+  #controls {
+    top: 5px;
+    right: 5px;
+    padding: 8px;
+    gap: 5px;
+  }
+
+  #controls input,
+  #controls button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  input.inputbutton1,
+  input.inputbutton2,
+  input.inputbutton3 {
+    min-height: clamp(40px, 8vh, 70px);
+    min-width: clamp(40px, 10vw, 70px);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  div.emumain {
+    height: calc(100vh - 150px);
+  }
+
+  div.softkbd {
+    padding: 5px;
+  }
+
+  input.inputbutton1,
+  input.inputbutton2,
+  input.inputbutton3 {
+    min-height: 35px;
+  }
+
+  #controls {
+    padding: 6px;
+    gap: 4px;
+  }
+
+  #controls input,
+  #controls button {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+</style>
+  </head>
+  <body>
+    <div id='controls'>
+      <button onclick="setScale(0.75)">75%</button>
+      <button onclick="setScale(1)">100%</button>
+      <button onclick="setScale(1.25)">125%</button>
+      <button onclick="setScale(1.5)">150%</button>
+      <button onclick="zoomOut()">−</button>
+      <button onclick="zoomIn()">+</button>
+      <button onclick="fitToScreen()">Fit</button>
+      <span id="scaleDisplay">100%</span>
+      <input type="button" value="Fullscreen" onclick="Module.requestFullscreen(true, false)">
+    </div>
+
+    <div class="emumain">
+      <div id="canvasContainer">
+        <canvas id="canvas" />
+      </div>
+    </div>
+
+    <div id="softkbd" class="softkbd">
+      <table>
+        <tr>
+          <td class='button_td'></td>
+          <td class='button_td'><input class='inputbutton1' type="button" value="^" onpointerdown='kd(this, 38);' onpointerup='ku(this, 38);' /></td>
+          <td class="button_td"></td>
+          <td class="button_td1"></td>
+          <td class="button_td2"><input class='inputbutton3' type="button" value="Esc" onpointerdown='kd(this, 27);' onpointerup='ku(this, 27);' /></td>
+          <td class="button_td2"><input class='inputbutton3' type="button" value="Shift" onpointerdown='kd(this, 16);' onpointerup='ku(this, 16);' /></td>
+        </tr>
+        <tr>
+          <td><input class='inputbutton1' type="button" value="<" onpointerdown='kd(this, 37);' onpointerup='ku(this, 37);' /></td>
+          <td></td>
+          <td><input class='inputbutton1' type="button" value=">" onpointerdown='kd(this, 39);' onpointerup='ku(this, 39);' /></td>
+          <td></td>
+          <td class="button_td2"><input class='inputbutton3' type="button" value="Space" onpointerdown='kd(this, 32);' onpointerup='ku(this, 32);' /></td>
+          <td class="button_td2"><input class='inputbutton3' type="button" value="Return" onpointerdown='kd(this, 13);' onpointerup='ku(this, 13);' /></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><input class='inputbutton1' type="button" value="v" onpointerdown='kd(this, 40);' onpointerup='ku(this, 40);' /></td>
+          <td></td>
+          <td></td>
+          <td class="button_td"><input class='inputbutton2' type="button" value="X" onpointerdown='kd(this, 88);' onpointerup='ku(this, 88);' /></td>
+          <td class="button_td"><input class='inputbutton2' type="button" value="Z" onpointerdown='kd(this, 90);' onpointerup='ku(this, 90);' /></td>
+        </tr>
+      </table>
+    </div>
+
+    <script type="text/javascript" src="es6-promise.js"></script>
+    <script type="text/javascript" src="browserfs.min.js"></script>
+    <script type="text/javascript" src="loader.js"></script>
+    <script type="text/javascript">
+let currentScale = 1;
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 2;
+const ZOOM_STEP = 0.1;
+
+function setScale(scale) {
+  currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
+  document.getElementById('canvasContainer').style.transform = `scale(${currentScale})`;
+  updateScaleDisplay();
+  localStorage.setItem('emulatorScale', currentScale);
+}
+
+function zoomIn() {
+  setScale(currentScale + ZOOM_STEP);
+}
+
+function zoomOut() {
+  setScale(currentScale - ZOOM_STEP);
+}
+
+function fitToScreen() {
+  setScale(1);
+}
+
+function updateScaleDisplay() {
+  const percentage = Math.round(currentScale * 100);
+  document.getElementById('scaleDisplay').textContent = percentage + '%';
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomIn();
+    } else if (e.key === '-') {
+      e.preventDefault();
+      zoomOut();
+    } else if (e.key === '0') {
+      e.preventDefault();
+      fitToScreen();
+    }
+  }
+});
+
+// Load saved scale on page load
+const savedScale = localStorage.getItem('emulatorScale');
+if (savedScale) {
+  setScale(parseFloat(savedScale));
+} else {
+  updateScaleDisplay();
+}
+
+var emulator = new Emulator(document.querySelector("#canvas"),
+  null,
+  new PC98DosBoxLoader(PC98DosBoxLoader.emulatorJS("dosbox-x-sdl1.js"),
+    PC98DosBoxLoader.emulatorWASM("dosbox-x-sdl1.wasm"),
+    PC98DosBoxLoader.locateAdditionalEmulatorJS(locateAdditionalFiles),
+    PC98DosBoxLoader.aspectRatio(1.33),
+    PC98DosBoxLoader.mountZip("c",
+      PC98DosBoxLoader.fetchFile("Game File",
+        "REII.zip")),
+    PC98DosBoxLoader.mountZip("pc98bios",
+      PC98DosBoxLoader.fetchFile("PC-98 font/FM BIOS File",
+        "pc98bios.zip")),
+    PC98DosBoxLoader.startExe("game.com")))
+emulator.start({ waitAfterDownloading: true });
+
+function locateAdditionalFiles(filename) {
+  if (filename === "dosbox.html.mem") {
+    return "emulators/em-dosbox/dosbox-sync.mem";
+  }
+  return "emulators/dosbox-x/"+ filename;
+}
+
+var oldBkColor = null;
+function kd(e, keyCode) {
+  if (oldBkColor == null)
+    oldBkColor = e.style.background;
+  e.style.background="red";
+  __triggerEvent(document.getElementById("canvas"), "keydown", keyCode);
+}
+
+function ku(e, keyCode) {
+  e.style.background=oldBkColor;
+  __triggerEvent(document.getElementById("canvas"), "keyup", keyCode);
+}
+
+function __triggerEvent(el, evname, keyCode) {
+  var eventObj = document.createEventObject ?
+    document.createEventObject() : document.createEvent("Events");
+
+  if(eventObj.initEvent){
+    eventObj.initEvent(evname, true, true);
+  }
+
+  eventObj.keyCode = keyCode;
+  eventObj.which = keyCode;
+
+  el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj);
+}
+
+document.getElementById('softkbd').addEventListener("touchstart", function(e){
+  e.preventDefault();
+},{passive: false});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+  if (emulator && emulator.canvas) {
+    emulator.canvas.width = window.innerWidth;
+    emulator.canvas.height = window.innerHeight - 200;
+  }
+});
+</script>
+  </body>
+</html>

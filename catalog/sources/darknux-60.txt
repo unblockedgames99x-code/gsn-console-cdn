@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+<head>
+  <base href="https://cdn.jsdelivr.net/gh/iamthegamesofsprunk/brainrot@main/save-p-diddy-from-prison/">
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>PRISON ESCAPE PLAN</title>
+<link rel="stylesheet" href="TemplateData/style.css"/>
+<script>
+    const overlayBackgroundColor = "";
+    const progressBarFillColor = "";
+    const progressBarBackgroundColor = "";
+    const progressBarBorderColor = "";
+  </script>
+</head>
+<body class="dark">
+<div id="unity-container" class="unity-desktop">
+<canvas id="unity-canvas"></canvas>
+</div>
+<div id="loading-cover" style="display:none;">
+<div id="unity-loading-bar">
+<div id="unity-logo"><img src="logo.png"/></div>
+<div id="unity-progress-bar-empty" style="display: none;">
+<div id="unity-progress-bar-full"></div>
+</div>
+<div class="spinner"></div>
+</div>
+</div>
+<script>
+    const buildUrl = "Build";
+    const loaderUrl = buildUrl + "/5336a4b2c43054286fd70b1faa467eee.loader.js";
+    const config = {
+      dataUrl: buildUrl + "/d95339b7d6cb9e5ab03e63de868fbe70.data.unityweb",
+      frameworkUrl: buildUrl + "/d05026802cc6459b81361f657a30048f.framework.js.unityweb",
+      codeUrl: buildUrl + "/3036ad4f6b2ad36579767f4f3fc44a4e.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Shared By LuxuryPanda",
+      productName: "PRISON ESCAPE PLAN",
+      productVersion: "1.0.4",
+    };
+
+    const container = document.querySelector("#unity-container");
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingCover = document.querySelector("#loading-cover");
+    const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+    const progressBarFull = document.querySelector("#unity-progress-bar-full");
+    const spinner = document.querySelector('.spinner');
+
+    if (overlayBackgroundColor !== "-" && overlayBackgroundColor !== " " && overlayBackgroundColor !== "")
+      canvas.style.background = overlayBackgroundColor;
+
+    if (progressBarFillColor !== "-" && progressBarFillColor !== " " && progressBarFillColor !== "")
+      progressBarFull.style.background = progressBarFillColor;
+
+    if (progressBarBackgroundColor !== "-" && progressBarBackgroundColor !== " " && progressBarBackgroundColor !== "")
+      progressBarEmpty.style.background = progressBarBackgroundColor;
+
+    if (progressBarBorderColor !== "-" && progressBarBorderColor !== " " && progressBarBorderColor !== "")
+      progressBarEmpty.style.border.color = progressBarBorderColor;
+
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      container.className = "unity-mobile";
+    }
+
+    loadingCover.style.display = "";
+
+    const unityLoader = document.createElement("script");
+    unityLoader.src = loaderUrl;
+    unityLoader.onload = async () => {
+      //await _gpAwaiter.ready;
+      createUnityInstance(canvas, config, (progress) => {
+        spinner.style.display = "none";
+        progressBarEmpty.style.display = "";
+        progressBarFull.style.width = `${100 * progress}%`;
+      }).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+        //_unityAwaiter.done(unityInstance);
+        loadingCover.style.display = "none";
+      }).catch((message) => {
+        //_unityAwaiter.abort(message);
+        alert(message);
+      });
+    };
+    document.body.appendChild(unityLoader);
+
+    document.addEventListener("pointerdown", () => {
+      container.focus();
+      window.focus();
+      canvas.focus();
+    });
+
+  </script>
+</body>
+</html>

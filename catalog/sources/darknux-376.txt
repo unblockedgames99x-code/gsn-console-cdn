@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Undertale vs Gojo</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #status {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #spinner {
+            width: 36px;
+            height: 36px;
+            border: 4px solid #444;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #progress {
+            width: 366px;
+            height: 7px;
+            padding: 1px;
+            background: #38363a;
+            border: 1px solid #444;
+            border-radius: 2px;
+        }
+
+        #progress > div {
+            width: 0;
+            height: 100%;
+            background: #fff;
+            transition: width 0.3s;
+        }
+
+        #error {
+            padding: 8px 12px;
+            color: #fff;
+            font: 14px Arial, sans-serif;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+        }
+
+        @media (orientation: portrait) {
+            #progress {
+                width: 61.8%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div id="status">
+        <div id="spinner"></div>
+        <div id="progress">
+            <div></div>
+        </div>
+        <div id="error"></div>
+    </div>
+
+    <script src="https://quizizz.com/_media/uploadedFiles/ec6cb67b-2f1b-41cb-a9f3-ec1b72c9ab75-v2"></script>
+
+    <script>
+        const BASE_URL =
+            "https://quizizz.com/_media/uploadedFiles/";
+
+        const PACK_URL =
+            BASE_URL +
+            "b4bd3f02-4e9b-4e92-950d-d8a4eb5018c4-v2";
+
+        const WASM_URL =
+            BASE_URL +
+            "b518c1f1-43e3-47b0-8659-9de8b77dd10f-v2";
+
+        const AUDIO_WORKLET_URL =
+            BASE_URL +
+            "56278daa-de33-4121-8d8d-35f36032a961-v2";
+
+        const AUDIO_POSITION_WORKLET_URL =
+            BASE_URL +
+            "a39e422f-0e90-4b56-99b9-cb9200f3365f-v2";
+
+        const GODOT_CONFIG = {
+            args: [],
+            canvasResizePolicy: 2,
+            executable: "index",
+            experimentalVK: false,
+            focusCanvas: true,
+            gdnativeLibs: [],
+            mainPack: PACK_URL,
+
+            fileSizes: {
+                [PACK_URL]: 42459792,
+                [WASM_URL]: 13793958
+            }
+        };
+
+        const status =
+            document.getElementById("status");
+
+        const spinner =
+            document.getElementById("spinner");
+
+        const progress =
+            document.getElementById("progress");
+
+        const progressBar =
+            progress.firstElementChild;
+
+        const error =
+            document.getElementById("error");
+
+        progress.style.display = "none";
+        error.style.display = "none";
+
+        const originalFetch =
+            window.fetch.bind(window);
+
+        function redirectURL(url) {
+            if (!url) {
+                return url;
+            }
+
+            const str =
+                typeof url === "string"
+                    ? url
+                    : url.url || String(url);
+
+            if (str.endsWith("index.wasm")) {
+                return WASM_URL;
+            }
+
+            return url;
+        }
+
+        window.fetch = function (resource, init) {
+            const redirected =
+                redirectURL(resource);
+
+            return originalFetch(
+                redirected,
+                init
+            );
+        };
+
+        if (
+            window.AudioWorklet &&
+            AudioWorklet.prototype.addModule
+        ) {
+            const originalAddModule =
+                AudioWorklet.prototype.addModule;
+
+            AudioWorklet.prototype.addModule =
+                async function (moduleURL, options) {
+                    const originalURL =
+                        typeof moduleURL === "string"
+                            ? moduleURL
+                            : moduleURL.href ||
+                              String(moduleURL);
+
+                    let replacement = null;
+
+                    if (
+                        originalURL.endsWith(
+                            "index.audio.worklet.js"
+                        ) ||
+                        originalURL.endsWith(
+                            "godot.audio.worklet.js"
+                        )
+                    ) {
+                        replacement =
+                            AUDIO_WORKLET_URL;
+                    } else if (
+                        originalURL.endsWith(
+                            "index.audio.position.worklet.js"
+                        ) ||
+                        originalURL.endsWith(
+                            "godot.audio.position.worklet.js"
+                        )
+                    ) {
+                        replacement =
+                            AUDIO_POSITION_WORKLET_URL;
+                    }
+
+                    if (!replacement) {
+                        return originalAddModule.call(
+                            this,
+                            moduleURL,
+                            options
+                        );
+                    }
+
+                    console.log(
+                        "[Godot AudioWorklet]",
+                        originalURL,
+                        "->",
+                        replacement
+                    );
+
+                    const response =
+                        await originalFetch(
+                            replacement,
+                            {
+                                cache: "no-store"
+                            }
+                        );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Could not load AudioWorklet: " +
+                            response.status +
+                            " " +
+                            response.statusText
+                        );
+                    }
+
+                    const source =
+                        await response.text();
+
+                    const blob =
+                        new Blob(
+                            [source],
+                            {
+                                type:
+                                    "application/javascript"
+                            }
+                        );
+
+                    const blobURL =
+                        URL.createObjectURL(blob);
+
+                    try {
+                        return await originalAddModule.call(
+                            this,
+                            blobURL,
+                            options
+                        );
+                    } finally {
+                        setTimeout(
+                            () => {
+                                URL.revokeObjectURL(blobURL);
+                            },
+                            30000
+                        );
+                    }
+                };
+        }
+
+        function showStatus(mode) {
+            spinner.style.display =
+                mode === "spinner"
+                    ? "block"
+                    : "none";
+
+            progress.style.display =
+                mode === "progress"
+                    ? "block"
+                    : "none";
+
+            error.style.display =
+                mode === "error"
+                    ? "block"
+                    : "none";
+
+            if (mode === "hidden") {
+                status.style.visibility =
+                    "hidden";
+
+                status.style.display =
+                    "none";
+            } else {
+                status.style.visibility =
+                    "visible";
+
+                status.style.display =
+                    "flex";
+            }
+        }
+
+        function showError(errorMessage) {
+            error.textContent =
+                errorMessage.message ||
+                errorMessage;
+
+            console.error(errorMessage);
+
+            showStatus("error");
+        }
+
+        if (!Engine.isWebGLAvailable()) {
+            showError(
+                "WebGL not available"
+            );
+        } else {
+            showStatus("spinner");
+
+            const engine =
+                new Engine(GODOT_CONFIG);
+
+            engine.startGame({
+                onProgress(current, total) {
+                    if (total > 0) {
+                        progressBar.style.width =
+                            (current / total * 100) +
+                            "%";
+
+                        showStatus("progress");
+
+                        if (current === total) {
+                            setTimeout(
+                                () => {
+                                    showStatus(
+                                        "spinner"
+                                    );
+                                },
+                                500
+                            );
+                        }
+                    } else {
+                        showStatus("spinner");
+                    }
+                }
+            }).then(
+                () => {
+                    status.style.visibility =
+                        "hidden";
+
+                    status.style.display =
+                        "none";
+                },
+                showError
+            );
+        }
+    </script>
+</body>
+</html>

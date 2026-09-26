@@ -1,0 +1,108 @@
+html
+
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/AndreajnRcm4/b398dl2h74v@9a23fbb2373d743a564873251cbb57736ebc1f73/style.css" type="text/css" />
+    
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        background-color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+    }
+    
+    .controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    button {
+        padding: 10px 15px;
+        background-color: #333;
+        color: white;
+        border: 2px solid #555;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    button:hover {
+        background-color: #555;
+        border-color: #777;
+    }
+    
+    button.active {
+        background-color: #0078d4;
+        border-color: #0078d4;
+    }
+    
+    .game-container {
+        width: 100%;
+        max-width: 900px;
+        aspect-ratio: 900 / 600;
+    }
+    
+    object, embed {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/gh/u-cvlassrom-y/google@main/ruffle.js"></script>
+
+<div class="controls">
+    <button class="aspect-btn active" data-ratio="900/600">16:10</button>
+    <button class="aspect-btn" data-ratio="16/9">16:9</button>
+    <button class="aspect-btn" data-ratio="4/3">4:3</button>
+    <button class="aspect-btn" data-ratio="1/1">1:1 (Square)</button>
+    <button class="aspect-btn" data-ratio="9/16">9:16 (Portrait)</button>
+</div>
+
+<div class="game-container">
+    <object data="https://cdn.jsdelivr.net/gh/ButterToasty/games1@main/flash/games/Cat%20Ninja/catninja.swf" type="application/x-shockwave-flash" width="100%" height="100%">
+        <param name="movie" value="https://cdn.jsdelivr.net/gh/ButterToasty/games1@main/flash/games/Cat%20Ninja/catninja.swf">
+        <embed src="https://cdn.jsdelivr.net/gh/ButterToasty/games1@main/flash/games/Cat%20Ninja/catninja.swf" type="application/x-shockwave-flash" width="100%" height="100%">
+    </object>
+</div>
+
+<script>
+    const buttons = document.querySelectorAll('.aspect-btn');
+    const gameContainer = document.querySelector('.game-container');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update aspect ratio
+            const ratio = this.getAttribute('data-ratio');
+            gameContainer.style.aspectRatio = ratio;
+        });
+    });
+</script>
+
+</body>
+</html>

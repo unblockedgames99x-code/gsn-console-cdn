@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic'9 free 3d first person game</title>
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #unity-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #unity-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #unity-loading-bar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+
+    #unity-logo {
+      width: 154px;
+      height: 130px;
+      background: url("https://quizizz.com/_media/uploads/aef7ba7e-0d92-4e98-bb85-da916f17dc73-v2")
+        no-repeat center;
+    }
+
+    #unity-progress-bar-empty {
+      width: 141px;
+      height: 18px;
+      margin: 10px 0 0 6.5px;
+      background: url("https://quizizz.com/_media/uploads/b1deaef3-8993-4685-897b-c7b561f22d53-v2")
+        no-repeat center;
+    }
+
+    #unity-progress-bar-full {
+      width: 0;
+      height: 18px;
+      margin-top: 10px;
+      background: url("https://quizizz.com/_media/uploads/3f5fc8be-305b-4714-92c4-a0b6956c8fec-v2")
+        no-repeat center;
+    }
+
+    #unity-warning {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      display: none;
+      max-width: 90%;
+      padding: 10px;
+      transform: translateX(-50%);
+      background: #fff;
+      z-index: 10;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+
+    <div id="unity-warning"></div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("unity-canvas");
+    const loadingBar = document.getElementById("unity-loading-bar");
+    const progressBar = document.getElementById("unity-progress-bar-full");
+    const warning = document.getElementById("unity-warning");
+
+    function showBanner(message, type) {
+      warning.innerHTML = message;
+      warning.style.display = "block";
+      warning.style.background = type === "error" ? "red" : "yellow";
+
+      if (type !== "error") {
+        setTimeout(() => {
+          warning.style.display = "none";
+        }, 5000);
+      }
+    }
+
+    const baseUrl = "https://quizizz.com/_media/uploads";
+
+    const config = {
+      dataUrl: `${baseUrl}/ce7debc8-f887-49fa-8b10-789b1b51e533-v2`,
+      frameworkUrl: `${baseUrl}/e3e3363f-492c-48d0-89bb-112648d67fd0-v2`,
+      codeUrl: `${baseUrl}/69140ae8-6c90-4279-90cf-57d1d3b9c8ce-v2`,
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "ReddusGuy",
+      productName: "Basic'9 free 3d first person game",
+      productVersion: "0.1",
+      showBanner
+    };
+
+    loadingBar.style.display = "block";
+
+    const script = document.createElement("script");
+    script.src = `${baseUrl}/de7d8ca6-5c41-4644-b65e-2e980745fabc-v2`;
+
+    script.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        progressBar.style.width = `${progress * 100}%`;
+      })
+        .then(() => {
+          loadingBar.style.display = "none";
+        })
+        .catch(error => {
+          showBanner(error, "error");
+        });
+    };
+
+    script.onerror = () => {
+      showBanner("Failed to load the Unity WebGL loader.", "error");
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

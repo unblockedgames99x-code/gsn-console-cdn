@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <base href="https://cdn.jsdelivr.net/gh/giorgirick2-gif/game-webports-onawebsite@latest/baldi-plus/">
+  <meta charset="utf-8">
+  <title>Unity WebGL Player | Baldi's Basics Plus</title>
+  <link rel="shortcut icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+</head>
+
+<body>
+  <div
+    id="loading-text"
+    style="color: black; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"
+  >
+    LOADING...
+  </div>
+
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" width="960" height="600"></canvas>
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loadingText = document.querySelector("#loading-text");
+    const loadingBar = document.querySelector("#unity-loading-bar");
+    const progressBar = document.querySelector("#unity-progress-bar-full");
+    const canvas = document.querySelector("#unity-canvas");
+
+    const totalBytes = 315673804.8;
+    let loadedBytes = 0;
+
+    const formatSize = bytes =>
+      bytes > 1024 ** 3
+        ? `${(bytes / 1024 ** 3).toFixed(2)} GB`
+        : bytes > 1024 ** 2
+          ? `${(bytes / 1024 ** 2).toFixed(2)} MB`
+          : bytes > 1024
+            ? `${(bytes / 1024).toFixed(2)} KB`
+            : `${bytes} B`;
+
+    async function fetchWithProgress(url) {
+      const reader = (await fetch(url)).body.getReader();
+      const chunks = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        received += value.length;
+        loadedBytes += value.length;
+        chunks.push(value);
+
+        loadingText.textContent =
+          `LOADING... ${formatSize(loadedBytes)} / ${formatSize(totalBytes)} ` +
+          `(${((loadedBytes / totalBytes) * 100).toFixed(1)}%)`;
+      }
+
+      const buffer = new Uint8Array(received);
+      let offset = 0;
+
+      for (const chunk of chunks) {
+        buffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      return buffer.buffer;
+    }
+
+    const getParts = (file, count) =>
+      Array.from({ length: count }, (_, i) => `${file}.part${i + 1}`);
+
+    async function mergeFiles(parts) {
+      return URL.createObjectURL(
+        new Blob(await Promise.all(parts.map(fetchWithProgress)))
+      );
+    }
+
+    (async () => {
+      const dataParts = getParts("Build/BaldiPlusNew.data", 5);
+      const wasmParts = getParts("Build/BaldiPlusNew.wasm", 2);
+
+      const [dataUrl, wasmUrl] = await Promise.all([
+        mergeFiles(dataParts),
+        mergeFiles(wasmParts)
+      ]);
+
+      const buildUrl = "Build";
+      const loaderUrl = `${buildUrl}/BaldiPlusNew.loader.js`;
+
+      const config = {
+        dataUrl,
+        frameworkUrl: `${buildUrl}/BaldiPlusNew.framework.js`,
+        codeUrl: wasmUrl,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Basically Games",
+        productName: "Baldi's Basics Plus",
+        productVersion: "0.12.2a"
+      };
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        const meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content =
+          "width=device-width, height=device-height, initial-scale=1.0, " +
+          "user-scalable=no, shrink-to-fit=yes";
+        document.head.appendChild(meta);
+      }
+
+      loadingBar.style.display = "block";
+
+      const script = document.createElement("script");
+      script.src = loaderUrl;
+
+      script.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          progressBar.style.width = `${progress * 100}%`;
+        })
+          .then(() => {
+            loadingText.remove();
+            loadingBar.style.display = "none";
+          })
+          .catch(alert);
+      };
+
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

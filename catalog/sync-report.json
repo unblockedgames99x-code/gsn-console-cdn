@@ -1,0 +1,25 @@
+{
+  "source": "https://raw.githubusercontent.com/gn-math/assets/main/zones.json",
+  "updatedAt": "2026-09-26T02:12:53.089Z",
+  "games": 836,
+  "covers": 836,
+  "validatedGameFiles": 836,
+  "resolved": [
+    {
+      "id": 114,
+      "original": "114-f.html",
+      "corrected": "114.html"
+    },
+    {
+      "id": 266,
+      "original": "266-a.html",
+      "corrected": "266.html"
+    },
+    {
+      "id": 461,
+      "original": "461.html",
+      "corrected": "461-f.html"
+    }
+  ],
+  "failed": []
+}
