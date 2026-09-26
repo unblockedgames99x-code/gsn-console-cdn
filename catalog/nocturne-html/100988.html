@@ -116,7 +116,7 @@
                     setStatus(
                         `Downloading game content (${i + 1}/${CONTENT_FILES.length})...`,
                         pct,
-                        `${baseName} ï¿½ ${formatSize(f.size)}`
+                        `${baseName} — ${formatSize(f.size)}`
                     );
                     await api.DownloadContentFile(f.url, f.dest);
                     downloaded += f.size;
