@@ -14,7 +14,7 @@ export const deadline = (promise, ms, message) => new Promise((resolve, reject) 
 
 export async function createMovieProxy(connection = 0) {
   if (!navigator.serviceWorker || location.protocol === 'file:') throw new Error('Open Movies from the console on http://127.0.0.1:5176. The web proxy needs a web server and cannot run from a file.');
-  const reg = await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/sw.js', { scope: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/' });
+  const reg = await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/sw.js', { scope: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/' });
   await deadline(navigator.serviceWorker.ready, 10000, 'The movie service worker did not start. Reload Movies.');
   if (!navigator.serviceWorker.controller) await deadline(new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true })), 8000, 'The movie connection did not initialize. Please retry.');
   const transport = new CurlTransport({ wisp: servers[connection % servers.length] });
@@ -25,7 +25,7 @@ export async function createMovieProxy(connection = 0) {
   const controller = new $jetController.Controller({
     serviceworker: reg.active, transport,
     jetConfig: { maskedfiles: ['jet.inject.js', 'jet.wasm.js'] },
-    config: { prefix: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/~/', jetPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/vendor/jet/jet.core.js', injectPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/vendor/jet/jet.inject.js', wasmPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-3/apps/movie-proxy/vendor/jet/jet.wasm' },
+    config: { prefix: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/~/', jetPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/vendor/jet/jet.core.js', injectPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/vendor/jet/jet.inject.js', wasmPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/apps/movie-proxy/vendor/jet/jet.wasm' },
   });
   await deadline(controller.wait(), 12000, 'The streaming connection timed out. Try another connection.');
   // A detached frame owns rewriting for catalogue requests without navigating a page.

@@ -64,20 +64,26 @@
       button.dataset.repeatMode = repeatMode;
       button.setAttribute("aria-label", label);
       button.setAttribute("aria-pressed", String(active));
-      button.title = label;
+      button.title = label + (repeatMode === "off" ? " — repeat this song" : repeatMode === "one" ? " — repeat the queue" : " — turn repeat off");
     }
     localStorage.setItem("music-repeat-mode", repeatMode);
     localStorage.setItem("music-autoplay", String(repeatMode !== "off"));
   }
 
   function setRepeatMode(value) {
+    var wasEnded = Boolean(audioEl && audioEl.ended);
     repeatMode = /^(?:off|all|one)$/.test(String(value || "")) ? String(value) : "off";
     syncRepeatMode();
+    // Enabling repeat after the last note should restart the existing audio.
+    if (repeatMode !== "off" && audioEl && wasEnded) {
+      audioEl.currentTime = 0;
+      audioEl.play().catch(function () { window.dispatchEvent(new Event("music-playback-error")); });
+    }
     emitState();
   }
 
   function cycleRepeatMode() {
-    setRepeatMode(repeatMode === "off" ? "all" : repeatMode === "all" ? "one" : "off");
+    setRepeatMode(repeatMode === "off" ? "one" : repeatMode === "one" ? "all" : "off");
   }
 
   var originalRenderCard = renderCard;
@@ -117,7 +123,7 @@
     audioEl.addEventListener("ended", function () {
       if (repeatMode === "one") {
         audioEl.currentTime = 0;
-        audioEl.play().catch(function () {});
+        audioEl.play().catch(function () { window.dispatchEvent(new Event("music-playback-error")); });
       } else if (queueIndex < playQueue.length - 1 || repeatMode === "all") {
         playNext();
       }

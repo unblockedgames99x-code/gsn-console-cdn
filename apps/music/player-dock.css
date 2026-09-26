@@ -100,3 +100,18 @@ body { grid-template-columns: 280px minmax(0, 1fr); grid-template-rows: minmax(0
 @media (max-height: 640px) {
   :root { --music-dock-height: 400px; --music-dock-cover: 96px; }
 }
+
+/* Keep all five transport controls inside the sidebar at every viewport width. */
+#npBar .spotify-transport, #npBar .spotify-buttons, #npBar .np-progress { min-width: 0; max-width: 100%; }
+#npBar .spotify-buttons {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) 60px minmax(0,1fr) minmax(0,1fr);
+  width: 100%; gap: 4px !important; justify-items: center; align-items: center;
+}
+#npBar .spotify-buttons > button { max-width: 100%; }
+#npBar #autoplayBtn[data-repeat-mode="one"], #npBar #autoplayBtn[data-repeat-mode="all"], #npBar #shuffleBtn.active {
+  color: #9acaff !important; background: #9acaff18; border-color: transparent; box-shadow: none;
+}
+#npBar #autoplayBtn[data-repeat-mode="all"]::after {
+  content: ""; position: absolute; bottom: 0; left: calc(50% - 2px); width: 4px; height: 4px; border-radius: 50%; background: currentColor;
+}
+#npBar .np-progress { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }

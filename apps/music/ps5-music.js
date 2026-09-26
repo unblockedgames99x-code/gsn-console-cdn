@@ -166,8 +166,8 @@
   const playerOptions=document.createElement('details');playerOptions.className='player-options';
   const optionsToggle=document.createElement('summary');optionsToggle.setAttribute('aria-label','More playback controls');optionsToggle.title='More playback controls';optionsToggle.innerHTML='<i data-lucide="more-horizontal"></i>';
   const optionsPanel=document.createElement('div');optionsPanel.className='player-options-panel';
-  for(const control of [$('autoplayBtn'),shuffle,...right.querySelectorAll('button:not(#muteBtn)')]){
-    const label=document.createElement('span');label.textContent=control===shuffle?'Shuffle':control.id==='autoplayBtn'?'Repeat':control.getAttribute('aria-label');
+  for(const control of right.querySelectorAll('button:not(#muteBtn)')){
+    const label=document.createElement('span');label.textContent=control.getAttribute('aria-label');
     control.append(label);optionsPanel.append(control);
   }
   playerOptions.append(optionsToggle,optionsPanel);$('npBar').append(playerOptions);
