@@ -1,0 +1,1073 @@
+/*
+ * NEO shared theme contract. Apps consume semantic variables from this file;
+ * their own layout CSS remains authoritative. To add a theme later, add the
+ * matching palette here and in neo-desktop-config.js.
+ */
+:root,
+html[data-neo-theme="graphite"] {
+  --desktop-bg: #0a0c0f;
+  --desktop-surface: #15191f;
+  --desktop-text: #f6f8fb;
+  --desktop-muted: #9da6b2;
+  --desktop-line: #2b323c;
+  --desktop-accent: #72d8ff;
+  --desktop-accent-text: #061319;
+}
+
+html[data-neo-theme="oled"] {
+  --desktop-bg: #000000;
+  --desktop-surface: #090a0c;
+  --desktop-text: #ffffff;
+  --desktop-muted: #a6a9ad;
+  --desktop-line: #25282d;
+  --desktop-accent: #ffffff;
+  --desktop-accent-text: #050505;
+}
+
+html[data-neo-theme="midnight"] {
+  --desktop-bg: #060914;
+  --desktop-surface: #11182b;
+  --desktop-text: #f4f7ff;
+  --desktop-muted: #a5b0ca;
+  --desktop-line: #293858;
+  --desktop-accent: #8ca8ff;
+  --desktop-accent-text: #070b16;
+}
+
+html[data-neo-theme="frost"] {
+  --desktop-bg: #edf1f6;
+  --desktop-surface: #ffffff;
+  --desktop-text: #161b24;
+  --desktop-muted: #596579;
+  --desktop-line: #c7cfda;
+  --desktop-accent: #2563eb;
+  --desktop-accent-text: #ffffff;
+}
+
+html[data-neo-theme="ember"] {
+  --desktop-bg: #100c0a;
+  --desktop-surface: #1d1511;
+  --desktop-text: #fff7f2;
+  --desktop-muted: #b9a59a;
+  --desktop-line: #49342a;
+  --desktop-accent: #ff9b68;
+  --desktop-accent-text: #211008;
+}
+
+html[data-neo-theme="contrast"] {
+  --desktop-bg: #000000;
+  --desktop-surface: #080808;
+  --desktop-text: #ffffff;
+  --desktop-muted: #ffffff;
+  --desktop-line: #ffffff;
+  --desktop-accent: #ffeb3b;
+  --desktop-accent-text: #000000;
+}
+
+html[data-neo-theme="crimson"] {
+  --desktop-bg: #12070a; --desktop-surface: #250d13; --desktop-text: #fff1f3;
+  --desktop-muted: #c7a0a7; --desktop-line: #52212c; --desktop-accent: #f15b70; --desktop-accent-text: #22070c;
+}
+
+html[data-neo-theme="ember-dusk"] {
+  --desktop-bg: #120b09; --desktop-surface: #231310; --desktop-text: #fff3ee;
+  --desktop-muted: #c1a29a; --desktop-line: #4c2b24; --desktop-accent: #d87562; --desktop-accent-text: #1f0905;
+}
+
+html[data-neo-theme="terracotta"] {
+  --desktop-bg: #130e0b; --desktop-surface: #241813; --desktop-text: #fff5ef;
+  --desktop-muted: #c1a79c; --desktop-line: #4a342c; --desktop-accent: #cf8a67; --desktop-accent-text: #201008;
+}
+
+html[data-neo-theme="tangerine"] {
+  --desktop-bg: #120d07; --desktop-surface: #23170c; --desktop-text: #fff4e8;
+  --desktop-muted: #bea58c; --desktop-line: #4b3520; --desktop-accent: #f39a45; --desktop-accent-text: #241002;
+}
+
+html[data-neo-theme="amber-haze"] {
+  --desktop-bg: #121007; --desktop-surface: #221a0d; --desktop-text: #fff7e6;
+  --desktop-muted: #bcaa88; --desktop-line: #493b20; --desktop-accent: #e5ad5e; --desktop-accent-text: #211400;
+}
+
+html[data-neo-theme="marigold"] {
+  --desktop-bg: #121106; --desktop-surface: #22200c; --desktop-text: #fffbe8;
+  --desktop-muted: #bbb28a; --desktop-line: #464221; --desktop-accent: #edc742; --desktop-accent-text: #201a00;
+}
+
+html[data-neo-theme="citron"] {
+  --desktop-bg: #0f1306; --desktop-surface: #1c240d; --desktop-text: #f8ffe7;
+  --desktop-muted: #aeb98a; --desktop-line: #3a4720; --desktop-accent: #aac342; --desktop-accent-text: #151c00;
+}
+
+html[data-neo-theme="olive-grove"] {
+  --desktop-bg: #0c1008; --desktop-surface: #181d10; --desktop-text: #f5f8e8;
+  --desktop-muted: #a8ad92; --desktop-line: #383d2a; --desktop-accent: #a9b685; --desktop-accent-text: #15190e;
+}
+
+html[data-neo-theme="clover"] {
+  --desktop-bg: #071309; --desktop-surface: #0e2414; --desktop-text: #effff2;
+  --desktop-muted: #92b59a; --desktop-line: #285032; --desktop-accent: #57c66b; --desktop-accent-text: #051b09;
+}
+
+html[data-neo-theme="fern-hollow"] {
+  --desktop-bg: #09110b; --desktop-surface: #131e16; --desktop-text: #f0f8f1;
+  --desktop-muted: #9aaf9d; --desktop-line: #304436; --desktop-accent: #7ba381; --desktop-accent-text: #0c180e;
+}
+
+html[data-neo-theme="emerald"] {
+  --desktop-bg: #06130d; --desktop-surface: #0d2318; --desktop-text: #edfff6;
+  --desktop-muted: #8fb7a5; --desktop-line: #24503a; --desktop-accent: #5bc495; --desktop-accent-text: #041b10;
+}
+
+html[data-neo-theme="eucalyptus"] {
+  --desktop-bg: #081210; --desktop-surface: #111e1b; --desktop-text: #eff9f6;
+  --desktop-muted: #99ada7; --desktop-line: #30433e; --desktop-accent: #81b8a7; --desktop-accent-text: #0a1815;
+}
+
+html[data-neo-theme="aqua"] {
+  --desktop-bg: #061215; --desktop-surface: #0d2328; --desktop-text: #edfcff;
+  --desktop-muted: #8fb3ba; --desktop-line: #26505a; --desktop-accent: #54c8dc; --desktop-accent-text: #031b20;
+}
+
+html[data-neo-theme="glacier"] {
+  --desktop-bg: #0a1013; --desktop-surface: #152026; --desktop-text: #f2fbff;
+  --desktop-muted: #9dafb6; --desktop-line: #34454c; --desktop-accent: #75a5b2; --desktop-accent-text: #0c171b;
+}
+
+html[data-neo-theme="azure"] {
+  --desktop-bg: #07101d; --desktop-surface: #0f1c2b; --desktop-text: #f1f7ff;
+  --desktop-muted: #96aac3; --desktop-line: #2c425d; --desktop-accent: #5797e8; --desktop-accent-text: #061326;
+}
+
+html[data-neo-theme="indigo-veil"] {
+  --desktop-bg: #0b0a18; --desktop-surface: #17152a; --desktop-text: #f5f3ff;
+  --desktop-muted: #a19dbd; --desktop-line: #373452; --desktop-accent: #807ac8; --desktop-accent-text: #0d0b21;
+}
+
+html[data-neo-theme="violet"] {
+  --desktop-bg: #0d0717; --desktop-surface: #1c102b; --desktop-text: #fbf2ff;
+  --desktop-muted: #b19ac1; --desktop-line: #44275f; --desktop-accent: #925ede; --desktop-accent-text: #16052a;
+}
+
+html[data-neo-theme="amethyst-smoke"] {
+  --desktop-bg: #100c16; --desktop-surface: #201725; --desktop-text: #f9f4fb;
+  --desktop-muted: #b2a4b6; --desktop-line: #49394e; --desktop-accent: #ad84bd; --desktop-accent-text: #190e1e;
+}
+
+html[data-neo-theme="plum-velvet"] {
+  --desktop-bg: #120a16; --desktop-surface: #25122b; --desktop-text: #fff1ff;
+  --desktop-muted: #b99cbd; --desktop-line: #542d5b; --desktop-accent: #bf8ccc; --desktop-accent-text: #1c0b20;
+}
+
+html[data-neo-theme="fuchsia"] {
+  --desktop-bg: #150914; --desktop-surface: #2b1026; --desktop-text: #fff0fb;
+  --desktop-muted: #c09bb6; --desktop-line: #5c2a50; --desktop-accent: #cf4dab; --desktop-accent-text: #23051b;
+}
+
+html[data-neo-theme="orchid-smoke"] {
+  --desktop-bg: #120d14; --desktop-surface: #241a25; --desktop-text: #fbf5fb;
+  --desktop-muted: #b4a4b5; --desktop-line: #4e3d50; --desktop-accent: #bd86ab; --desktop-accent-text: #1d1019;
+}
+
+html[data-neo-theme="rosewood"] {
+  --desktop-bg: #140c0e; --desktop-surface: #28171a; --desktop-text: #fff3f4;
+  --desktop-muted: #bea0a3; --desktop-line: #57363b; --desktop-accent: #c88490; --desktop-accent-text: #220e12;
+}
+
+html[data-neo-theme="default"] {
+  --desktop-bg: #0b0c0e; --desktop-surface: #17191c; --desktop-text: #f5f6f7;
+  --desktop-muted: #a3a7ad; --desktop-line: #32363c; --desktop-accent: #e4e7eb; --desktop-accent-text: #111315;
+}
+
+html[data-neo-theme="glass"] {
+  --desktop-bg: #07090d; --desktop-surface: #111722; --desktop-text: #f5f8fc;
+  --desktop-muted: #a1adbc; --desktop-line: #344253; --desktop-accent: #dceaff; --desktop-accent-text: #0b111a;
+}
+
+html[data-neo-theme="acrylic"] {
+  --desktop-bg: rgba(8, 13, 21, .70) !important;
+  --desktop-surface: rgba(24, 34, 49, .76) !important;
+  --desktop-text: #f7fbff !important;
+  --desktop-muted: #b8c4d4 !important;
+  --desktop-line: rgba(154, 181, 214, .42) !important;
+  --desktop-accent: #8bd8ff !important;
+  --desktop-accent-text: #06141d;
+  --neo-acrylic-canvas: rgba(8, 13, 21, .70);
+  --neo-acrylic-surface: rgba(24, 34, 49, .76);
+  --neo-acrylic-surface-strong: rgba(18, 27, 40, .88);
+  --neo-acrylic-solid-bg: #080d15;
+  --neo-acrylic-solid-surface: #182231;
+  --neo-acrylic-backdrop: blur(26px) saturate(145%);
+  --neo-theme-raised: rgba(42, 56, 76, .84);
+  --neo-theme-soft: rgba(21, 31, 46, .72);
+  --neo-theme-hover: rgba(67, 86, 111, .72);
+  --desktop-surface-2: rgba(45, 60, 81, .76);
+  --neo-theme-control: rgba(28, 40, 58, .78);
+  --neo-theme-control-hover: rgba(66, 86, 112, .76);
+  --neo-theme-selected: color-mix(in srgb, var(--desktop-accent) 24%, rgba(24, 34, 49, .84));
+  --neo-theme-glass: rgba(20, 29, 43, .72);
+  --neo-theme-overlay: rgba(3, 7, 13, .68);
+  --neo-theme-shadow: rgba(0, 0, 0, .48);
+}
+
+html[data-neo-theme="coral"] {
+  --desktop-bg: #120a0b; --desktop-surface: #241214; --desktop-text: #fff3f0;
+  --desktop-muted: #c2a09c; --desktop-line: #523036; --desktop-accent: #ff7a70; --desktop-accent-text: #240a08;
+}
+
+html[data-neo-theme="copper"] {
+  --desktop-bg: #110d0a; --desktop-surface: #211711; --desktop-text: #fff4e9;
+  --desktop-muted: #baa693; --desktop-line: #4b3829; --desktop-accent: #d9925b; --desktop-accent-text: #211006;
+}
+
+html[data-neo-theme="moss"] {
+  --desktop-bg: #0b0f08; --desktop-surface: #161e10; --desktop-text: #f2f7e9;
+  --desktop-muted: #a4af97; --desktop-line: #34412a; --desktop-accent: #9dc45f; --desktop-accent-text: #121b07;
+}
+
+html[data-neo-theme="teal"] {
+  --desktop-bg: #06100f; --desktop-surface: #0d211e; --desktop-text: #ecfffb;
+  --desktop-muted: #91b8b2; --desktop-line: #28514b; --desktop-accent: #42d2bd; --desktop-accent-text: #031b17;
+}
+
+html[data-neo-theme="ocean"] {
+  --desktop-bg: #07101a; --desktop-surface: #0d2031; --desktop-text: #eef8ff;
+  --desktop-muted: #90aabe; --desktop-line: #284764; --desktop-accent: #4bb9ff; --desktop-accent-text: #031827;
+}
+
+html[data-neo-theme="cobalt"] {
+  --desktop-bg: #080d1e; --desktop-surface: #101b3a; --desktop-text: #f1f5ff;
+  --desktop-muted: #9aa9cf; --desktop-line: #2e4072; --desktop-accent: #668cff; --desktop-accent-text: #07122f;
+}
+
+html[data-neo-theme="lavender-night"] {
+  --desktop-bg: #0e0b18; --desktop-surface: #1c162d; --desktop-text: #faf5ff;
+  --desktop-muted: #b2a2c7; --desktop-line: #45365d; --desktop-accent: #bd92ff; --desktop-accent-text: #160d28;
+}
+
+html[data-neo-theme="sakura"] {
+  --desktop-bg: #140c10; --desktop-surface: #28151e; --desktop-text: #fff3f8;
+  --desktop-muted: #c3a0af; --desktop-line: #563344; --desktop-accent: #ff8fbd; --desktop-accent-text: #260b17;
+}
+
+html[data-neo-theme="slate"] {
+  --desktop-bg: #0b0e12; --desktop-surface: #171c23; --desktop-text: #f2f5f8;
+  --desktop-muted: #9da6b2; --desktop-line: #343d49; --desktop-accent: #9fb7d1; --desktop-accent-text: #10161e;
+}
+
+html[data-neo-theme="obsidian"] {
+  --desktop-bg: #020304; --desktop-surface: #0a0d10; --desktop-text: #f7f8fa;
+  --desktop-muted: #969ca4; --desktop-line: #242a31; --desktop-accent: #9aa4af; --desktop-accent-text: #0d1014;
+}
+
+html[data-neo-theme] {
+  --neo-theme-bg: var(--desktop-bg);
+  --neo-theme-surface: var(--desktop-surface);
+  --neo-theme-raised: color-mix(in srgb, var(--desktop-surface) 84%, var(--desktop-text) 16%);
+  --neo-theme-soft: color-mix(in srgb, var(--desktop-surface) 88%, var(--desktop-bg) 12%);
+  --neo-theme-hover: color-mix(in srgb, var(--desktop-surface) 78%, var(--desktop-text) 22%);
+  --desktop-surface-2: color-mix(in srgb, var(--desktop-surface) 88%, var(--desktop-text) 12%);
+  --neo-theme-control: color-mix(in srgb, var(--desktop-surface) 86%, var(--desktop-bg) 14%);
+  --neo-theme-control-hover: color-mix(in srgb, var(--desktop-surface) 76%, var(--desktop-text) 24%);
+  --neo-theme-selected: color-mix(in srgb, var(--desktop-accent) 16%, var(--desktop-surface));
+  --neo-theme-glass: color-mix(in srgb, var(--desktop-surface) 86%, transparent);
+  --neo-theme-overlay: color-mix(in srgb, var(--desktop-bg) 72%, transparent);
+  --neo-theme-shadow: rgba(0, 0, 0, .34);
+  --neo-theme-success: #4fd38a;
+  --neo-theme-warning: #ffbd59;
+  --neo-theme-danger: #ff6b75;
+  --neo-theme-transition: 220ms cubic-bezier(.2, .8, .2, 1);
+  --neo-theme-accent-soft: color-mix(in srgb, var(--desktop-accent) 18%, transparent);
+  --neo-panel-solid: var(--desktop-bg);
+  --neo-panel: var(--desktop-surface);
+  --neo-text: var(--desktop-text);
+  --neo-muted: var(--desktop-muted);
+  --neo-border: var(--desktop-line);
+  --neo-accent: var(--desktop-accent);
+  --background: var(--desktop-bg);
+  --panel: var(--desktop-surface);
+  --panel-soft: var(--neo-theme-soft);
+  --ink: var(--desktop-text);
+  --text: var(--desktop-text);
+  --muted: var(--desktop-muted);
+  --line: var(--desktop-line);
+  --accent: var(--desktop-accent);
+  --accent-contrast: var(--desktop-accent-text);
+  accent-color: var(--desktop-accent);
+}
+
+html[data-neo-theme],
+html[data-neo-theme] body {
+  background-color: var(--desktop-bg);
+  color: var(--desktop-text);
+}
+
+/* Shared finish for every first-party app. This intentionally stays limited to
+   browser-native affordances so each app keeps ownership of its layout. */
+html[data-neo-app] {
+  color-scheme: dark;
+  scrollbar-color: color-mix(in srgb, var(--desktop-text) 28%, transparent) transparent;
+  scrollbar-width: thin;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-neo-app][data-neo-theme="frost"] { color-scheme: light; }
+
+html[data-neo-app] ::selection {
+  color: var(--desktop-text);
+  background: color-mix(in srgb, var(--desktop-accent) 32%, transparent);
+}
+
+html[data-neo-app] :where(button, a, input, select, textarea) {
+  transition:
+    color 160ms cubic-bezier(.2, .8, .2, 1),
+    background-color 160ms cubic-bezier(.2, .8, .2, 1),
+    border-color 160ms cubic-bezier(.2, .8, .2, 1),
+    box-shadow 160ms cubic-bezier(.2, .8, .2, 1),
+    opacity 160ms cubic-bezier(.2, .8, .2, 1),
+    transform 160ms cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Theme changes should feel like one OS-wide transition, including local
+   iframe apps. Limit this to structural surfaces so artwork and video never
+   fade or become recolored. */
+html[data-neo-app] :where(
+  body, header, nav, aside, main, section, article, form, dialog,
+  .neo-window, .window-chrome, .window-body,
+  [class*="sidebar"], [class*="toolbar"], [class*="panel"],
+  [class*="composer"], [class*="commandbar"]
+) {
+  transition:
+    color var(--neo-theme-transition),
+    background-color var(--neo-theme-transition),
+    border-color var(--neo-theme-transition),
+    box-shadow var(--neo-theme-transition);
+}
+
+html[data-neo-app] :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--desktop-accent);
+  outline-offset: 2px;
+}
+
+html[data-neo-app] :where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+/* Desktop chrome: themed surfaces without flattening the app content. */
+html[data-neo-theme] .neo-window {
+  color: var(--desktop-text);
+  border-color: color-mix(in srgb, var(--desktop-line) 78%, var(--desktop-text) 22%);
+  background: color-mix(in srgb, var(--desktop-bg) 94%, transparent);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .38), inset 0 1px color-mix(in srgb, var(--desktop-text) 14%, transparent);
+}
+
+html[data-neo-theme] .window-chrome {
+  color: var(--desktop-text);
+  border-color: var(--desktop-line);
+  background: color-mix(in srgb, var(--desktop-surface) 92%, transparent);
+}
+
+html[data-neo-theme] .window-body {
+  color: var(--desktop-text);
+  border-color: var(--desktop-line);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(.desktop-app,.control-app,.neo-utility,.arcade-app,.native-app,.messages-app) {
+  color: var(--desktop-text);
+  background-color: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(.messages-sidebar,.queue-panel,.player,.desktop-section,.control-card,.settings-card) {
+  color: var(--desktop-text);
+  border-color: var(--desktop-line);
+  background-color: var(--desktop-surface);
+}
+
+html[data-neo-theme] :is(.messages-main,.topbar) {
+  color: var(--desktop-text);
+  border-color: var(--desktop-line);
+  background-color: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(input,textarea,select) {
+  color: var(--desktop-text);
+  border-color: var(--desktop-line);
+  background-color: var(--neo-theme-soft);
+}
+
+html[data-neo-theme] :is(input,textarea)::placeholder { color: var(--desktop-muted); }
+html[data-neo-theme] :focus-visible { outline-color: var(--desktop-accent); }
+
+/* Theme chooser uses a real palette preview instead of six identical boxes. */
+.theme-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.desktop-app .theme-choice {
+  min-height: 76px;
+  padding: 42px 12px 10px;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  color: var(--theme-preview-text) !important;
+  border-color: var(--theme-preview-line) !important;
+  background: var(--theme-preview-bg) !important;
+  text-align: left;
+  font-weight: 720;
+}
+
+.desktop-app .theme-choice::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 31px;
+  background:
+    radial-gradient(circle at 78% 24%, var(--theme-preview-accent) 0 8%, transparent 9%),
+    linear-gradient(135deg, var(--theme-preview-surface) 0 48%, var(--theme-preview-bg) 49% 100%);
+}
+
+.desktop-app .theme-choice[aria-pressed="true"] {
+  border-color: var(--theme-preview-accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-preview-accent) 35%, transparent);
+}
+
+/* Music consumes its existing semantic variable API. */
+html[data-neo-app="music"] {
+  --background: var(--desktop-bg);
+  --panel: var(--desktop-surface);
+  --panel-hover: var(--neo-theme-hover);
+  --line: var(--desktop-line);
+  --muted: var(--desktop-muted);
+  --ink: var(--desktop-text);
+  --accent: var(--desktop-accent);
+}
+
+/* Local browser. Its stylesheet predates semantic variables, so only chrome
+   and content cards are mapped; media previews retain their own colors. */
+html[data-neo-app="local-browser"] header,
+html[data-neo-app="local-browser"] .viewer-heading { background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-app="local-browser"] :is(button,input,.card,#viewer-content pre) { color: var(--desktop-text); background: var(--neo-theme-soft); border-color: var(--desktop-line); }
+html[data-neo-app="local-browser"] :is(.intro p:not(.eyebrow),.note,#status,.card small) { color: var(--desktop-muted); }
+
+/* Full browser chrome variables. Proxied pages inside #frame remain untouched. */
+html[data-neo-app="browser"] {
+  --bg0: var(--desktop-bg);
+  --bg1: var(--desktop-surface);
+  --bg2: var(--neo-theme-raised);
+  --bg3: var(--neo-theme-soft);
+  --bg-elevated: var(--neo-theme-raised);
+  --surface: color-mix(in srgb, var(--desktop-text) 8%, transparent);
+  --surface2: color-mix(in srgb, var(--desktop-text) 15%, transparent);
+  --bd: var(--desktop-line);
+  --bd2: color-mix(in srgb, var(--desktop-line) 65%, var(--desktop-text) 35%);
+  --tx: var(--desktop-text);
+  --tx2: color-mix(in srgb, var(--desktop-text) 78%, var(--desktop-muted) 22%);
+  --tx3: var(--desktop-muted);
+  --ac: var(--desktop-accent);
+  --ac2: color-mix(in srgb, var(--desktop-accent) 68%, var(--desktop-text) 32%);
+}
+
+/* NEO Cloud already uses tokens; bind those to the system palette. */
+html[data-neo-app="cloud"] {
+  --bg: var(--desktop-bg);
+  --panel: var(--desktop-surface);
+  --panel-raised: var(--neo-theme-raised);
+  --panel-soft: var(--neo-theme-soft);
+  --line: var(--desktop-line);
+  --line-strong: color-mix(in srgb, var(--desktop-line) 65%, var(--desktop-text) 35%);
+  --text: var(--desktop-text);
+  --muted: var(--desktop-muted);
+  --quiet: color-mix(in srgb, var(--desktop-muted) 68%, var(--desktop-bg) 32%);
+  --white: var(--desktop-text);
+  --black: var(--desktop-bg);
+}
+
+/* TV keeps artwork in full colour while matching its shell to NEO OS. */
+html[data-neo-app="tv"] {
+  --neo-black: var(--desktop-bg);
+  --neo-panel: var(--desktop-surface);
+  --neo-line: var(--desktop-line);
+  --neo-muted: var(--desktop-muted);
+}
+html[data-neo-app="tv"],
+html[data-neo-app="tv"] body,
+html[data-neo-app="tv"] #root { background: var(--desktop-bg) !important; color: var(--desktop-text); }
+html[data-neo-app="tv"] .neo-shell-header { background: color-mix(in srgb, var(--desktop-surface) 92%, transparent) !important; border-color: var(--desktop-line) !important; }
+
+/* Shared live-theme motion. Layout and media never animate here; only UI
+   surfaces cross-fade when the user switches palettes. */
+html[data-neo-theme] :where(
+  .neo-window,.window-chrome,.window-body,.app-launcher,.notification-center,
+  .desktop-context-menu,.context-submenu,.desktop-palette,.neo-toast,
+  .native-app,.desktop-app,.neo-utility,.neo-files,.neo-library,.neo-messages,
+  .wallpaper-studio,.control-card,.settings-card,.desktop-section
+) {
+  transition:
+    color var(--neo-theme-transition),
+    background-color var(--neo-theme-transition),
+    border-color var(--neo-theme-transition),
+    box-shadow var(--neo-theme-transition);
+}
+
+/* Shell, menus, and shared controls. */
+html[data-neo-theme] :is(.app-launcher,.notification-center,.desktop-context-menu,.context-submenu,.desktop-palette,.neo-toast) {
+  color: var(--desktop-text);
+  background-color: var(--neo-theme-glass);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.launcher-search,.launcher-app,.notification-action,.context-submenu button,.desktop-context-menu button) {
+  color: var(--desktop-text);
+  border-color: transparent;
+}
+
+html[data-neo-theme] :is(.launcher-search,.launcher-app:hover,.notification-action:hover,.context-submenu button:hover,.desktop-context-menu button:hover) {
+  background-color: var(--neo-theme-control);
+}
+
+html[data-neo-theme] :is(.desktop-app,.native-app,.control-center,.system-search) {
+  color: var(--desktop-text);
+  background-color: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(.settings-section,.control-card,.settings-card,.desktop-section,.integrated-personalization-settings) {
+  color: var(--desktop-text);
+  background-color: var(--desktop-surface);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.desktop-row,.editor-toolbar,.editor-status,.editor-tabs,.terminal-tabs) {
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.editor-toolbar,.editor-status,.editor-tabs) { background-color: var(--desktop-surface); }
+html[data-neo-theme] :is(.editor-code textarea,.terminal-log,.terminal-composer input) { color: var(--desktop-text); background-color: var(--desktop-bg); border-color: var(--desktop-line); }
+
+/* Chat uses the same contrast model as every other app. */
+html[data-neo-theme] .neo-messages {
+  --messages-blue: var(--desktop-accent);
+  --messages-incoming: var(--desktop-surface-2);
+  --messages-label: var(--desktop-muted);
+  color: var(--desktop-text);
+  color-scheme: inherit;
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] .messages-sidebar {
+  color: var(--desktop-text);
+  background: var(--desktop-surface);
+  border-right-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.messages-conversation,.messages-thread) {
+  color: var(--desktop-text);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(.messages-conversation-heading,.messages-composer) {
+  color: var(--desktop-text);
+  background: var(--neo-theme-glass);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.messages-sidebar-heading h2,.messages-conversation-heading h3,.messages-thread-state strong,.messages-auth-state strong,.messages-profile-copy h3) { color: var(--desktop-text); }
+html[data-neo-theme] :is(.messages-directory h3,.messages-conversation-heading p,.messages-thread-state,.messages-auth-state p,.messages-room-copy small,.messages-room time,.messages-room-empty,.native-message-date,.native-message-author,.native-message-meta,.messages-profile-copy p) { color: var(--desktop-muted); }
+
+html[data-neo-theme] :is(.messages-search,.messages-history-search,.messages-composer-shell) {
+  color: var(--desktop-text);
+  background: var(--neo-theme-control);
+  border-color: var(--desktop-line);
+  box-shadow: none;
+}
+
+html[data-neo-theme] :is(.messages-search,.messages-composer-shell):focus-within,
+html[data-neo-theme] .messages-history-search:focus {
+  border-color: var(--desktop-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--desktop-accent) 14%, transparent);
+}
+
+html[data-neo-theme] :is(.messages-search input,.messages-history-search,.messages-composer textarea) { color: var(--desktop-text); background: transparent; }
+html[data-neo-theme] :is(.messages-search input,.messages-history-search,.messages-composer textarea)::placeholder { color: var(--desktop-muted); opacity: .78; }
+
+html[data-neo-theme] :is(.messages-compose-shortcut,.messages-back,.messages-profile-close) {
+  color: var(--desktop-text);
+  background: var(--neo-theme-control);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.messages-compose-shortcut,.messages-back,.messages-profile-close):hover { color: var(--desktop-accent); background: var(--neo-theme-control-hover); }
+html[data-neo-theme] :is(.messages-pinned-room,.messages-room) { color: var(--desktop-text); }
+html[data-neo-theme] :is(.messages-pinned-room,.messages-room):hover { color: var(--desktop-text); background: var(--neo-theme-control); }
+html[data-neo-theme] :is(.messages-pinned-room,.messages-room).is-active { color: var(--desktop-text); background: var(--neo-theme-selected); border-color: color-mix(in srgb, var(--desktop-accent) 32%, transparent); }
+html[data-neo-theme] .messages-pinned-room.is-global:hover { color: var(--desktop-text); background: var(--neo-theme-control); }
+html[data-neo-theme] .messages-pinned-room.is-global.is-active { color: var(--desktop-text); background: var(--neo-theme-selected); border-color: color-mix(in srgb, var(--desktop-accent) 32%, transparent); }
+html[data-neo-theme] :is(.messages-pinned-room.is-global,.messages-heading-avatar.is-global) .messages-avatar,
+html[data-neo-theme] .messages-heading-avatar.is-global { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: transparent; }
+
+html[data-neo-theme] .messages-connection {
+  color: var(--desktop-text);
+  background: var(--desktop-surface);
+  border-top-color: var(--desktop-line);
+}
+html[data-neo-theme] .messages-connection-copy small { color: var(--desktop-muted); }
+html[data-neo-theme] .messages-connection-dot { background: var(--neo-theme-danger); }
+html[data-neo-theme] .messages-connection-dot.is-online { background: var(--neo-theme-success); }
+html[data-neo-theme] .messages-connection-dot.is-connecting { background: var(--neo-theme-warning); }
+html[data-neo-theme] :is(.messages-connection-actions button,.messages-auth-action,.messages-profile-dm) { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: var(--desktop-accent); }
+html[data-neo-theme] .messages-connection-actions .messages-sign-out { color: var(--desktop-text); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+
+html[data-neo-theme] .native-message-bubble { color: var(--desktop-text); background: var(--messages-incoming); border-color: var(--desktop-line); }
+html[data-neo-theme] .native-message.is-own .native-message-bubble { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: var(--desktop-accent); }
+html[data-neo-theme] .native-message.is-failed .native-message-bubble { color: #fff; background: color-mix(in srgb, var(--neo-theme-danger) 30%, var(--desktop-surface)); border-color: var(--neo-theme-danger); }
+html[data-neo-theme] :is(.native-message.is-failed .native-message-meta,.native-message-retry,.messages-profile-feedback,.messages-composer p) { color: var(--neo-theme-danger); }
+
+html[data-neo-theme] .messages-composer [data-chat-attach] { color: var(--desktop-muted); background: var(--neo-theme-control-hover); border: 1px solid var(--desktop-line); }
+html[data-neo-theme] .messages-composer [data-chat-send] { color: var(--desktop-accent-text); background: var(--desktop-accent); }
+html[data-neo-theme] .messages-composer [data-chat-send]:hover:not(:disabled) { color: var(--desktop-accent-text); background: color-mix(in srgb, var(--desktop-accent) 86%, var(--desktop-text) 14%); }
+html[data-neo-theme] .neo-messages.is-signed-out :is(.messages-search,.messages-composer) { opacity: 1; }
+html[data-neo-theme] .neo-messages.is-signed-out .messages-composer-shell { background: var(--neo-theme-control); border-color: var(--desktop-line); }
+
+html[data-neo-theme] :is(.messages-profile-sheet,.messages-auth-dialog) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.messages-profile-sheet,.messages-auth-dialog)::backdrop { background: var(--neo-theme-overlay); }
+html[data-neo-theme] .messages-auth-dialog-close { color: var(--desktop-muted); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-theme] .messages-auth-dialog-close:hover { color: var(--desktop-text); background: var(--neo-theme-control-hover); }
+html[data-neo-theme] .messages-room-loading span { background: linear-gradient(100deg,var(--neo-theme-control) 20%,var(--neo-theme-control-hover) 42%,var(--neo-theme-control) 64%); background-size: 220% 100%; }
+html[data-neo-theme] .messages-pinned-loading span { background: var(--neo-theme-control-hover); }
+
+/* Files and local workspace apps. */
+html[data-neo-theme] .neo-files {
+  --files-accent: var(--desktop-accent);
+  --files-accent-soft: var(--neo-theme-selected);
+  --files-surface: var(--desktop-surface);
+  --files-surface-2: var(--desktop-surface-2);
+  --files-surface-3: var(--neo-theme-control-hover);
+  color: var(--desktop-text);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] :is(.files-commandbar,.files-sidebar,.files-inspector,.files-dialog,.files-preview-dialog,.files-context-menu,.files-new-popover) {
+  color: var(--desktop-text);
+  background: var(--desktop-surface);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] :is(.files-main,.files-dropzone,.files-preview-stage) { color: var(--desktop-text); background: var(--desktop-bg); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.files-search,.files-breadcrumbs,.files-segmented,.files-item,.files-inspector-actions button) { color: var(--desktop-text); background-color: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.files-item,.files-locations button,.files-toolbar button,.files-history button,.files-context-menu button):hover { color: var(--desktop-text); background-color: var(--neo-theme-control-hover); }
+html[data-neo-theme] :is(.files-item.is-selected,.files-item[aria-selected="true"],.files-locations button.is-active,.files-segmented button.is-active) { color: var(--desktop-text); background-color: var(--neo-theme-selected); border-color: var(--desktop-accent); }
+html[data-neo-theme] :is(.files-item-copy small,.files-item-size,.files-item-date,.files-storage-note,.files-empty p,.files-inspector-empty p,.files-facts dt) { color: var(--desktop-muted); }
+
+html[data-neo-theme] .neo-utility { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-theme] .neo-utility > header { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-theme] .neo-utility .eyebrow,
+html[data-neo-theme] :is(.utility-actions > span,.paint-tools label,.clock-live p,.photos-empty,.photos-viewer figcaption button) { color: var(--desktop-muted); }
+html[data-neo-theme] :is(.utility-actions button,.paint-tools button,.utility-import,.stopwatch button) { color: var(--desktop-text); background: var(--neo-theme-control); border: 1px solid var(--desktop-line); }
+html[data-neo-theme] :is(.utility-actions button,.paint-tools button,.utility-import,.stopwatch button):hover { color: var(--desktop-text); background: var(--neo-theme-control-hover); }
+html[data-neo-theme] .neo-notes-title { color: var(--desktop-text); background: var(--desktop-surface); border-bottom: 1px solid var(--desktop-line); }
+html[data-neo-theme] .neo-notes textarea { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-theme] .calculator-display small { color: var(--desktop-muted); }
+html[data-neo-theme] .calculator-grid button { color: var(--desktop-text); background: var(--neo-theme-control); border: 1px solid var(--desktop-line); }
+html[data-neo-theme] .calculator-grid button:hover { background: var(--neo-theme-control-hover); }
+html[data-neo-theme] .calculator-grid :is(.is-operator,.is-equals) { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: var(--desktop-accent); }
+html[data-neo-theme] :is(.paint-canvas-wrap,.photos-viewer) { background: var(--desktop-bg); }
+html[data-neo-theme] :is(.photos-grid,.photos-viewer figcaption) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+
+/* Games library: theme the portal, preserve cover artwork and the games. */
+html[data-neo-theme] .neo-library { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-theme] :is(.arcade-topbar,.arcade-footer) { color: var(--desktop-text); background: var(--neo-theme-glass); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.arcade-main,.arcade-catalog) { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-theme] :is(.arcade-gateway,.neo-library .arcade-pulse-hero) {
+  color: var(--desktop-text);
+  background:
+    radial-gradient(circle at 50% 18%, color-mix(in srgb, var(--desktop-accent) 14%, transparent), transparent 42%),
+    var(--desktop-bg);
+  border-color: var(--desktop-line);
+}
+html[data-neo-theme] :is(.arcade-settings-panel,.arcade-spotlight,.arcade-filters,.library-state) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.arcade-nav-button,.arcade-icon-button,.arcade-settings-button,.arcade-back-button,.arcade-spotlight-controls button,.arcade-filter-control,.arcade-filters select,.arcade-gateway-search) { color: var(--desktop-text); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.arcade-nav-button,.arcade-icon-button,.arcade-settings-button,.arcade-back-button,.arcade-spotlight-controls button):hover { background: var(--neo-theme-control-hover); }
+html[data-neo-theme] :is(.arcade-nav-button.is-active,.library-favorite.is-favorite) { color: var(--desktop-accent); background: var(--neo-theme-selected); border-color: var(--desktop-accent); }
+html[data-neo-theme] :is(.arcade-gateway p,.arcade-spotlight p,.library-card-copy small,.library-state p,.library-footer) { color: var(--desktop-muted); }
+html[data-neo-theme] .library-cover-fallback { color: var(--desktop-muted); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+
+/* Wallpaper Studio uses the same palette as every other native app. Artwork and
+   previews keep their authored colors; all surrounding chrome follows NEO. */
+html[data-neo-theme] .wallpaper-studio {
+  --wallpaper-success: color-mix(in srgb, #62d895 72%, var(--desktop-text));
+  color: var(--desktop-text);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] .wallpaper-studio .studio-shell {
+  color: var(--desktop-text);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-sidebar,.studio-inspector,.we-source-tabs,.we-playlist-bar) {
+  color: var(--desktop-text);
+  background: var(--desktop-surface);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-library,.studio-library-scroll) {
+  color: var(--desktop-text);
+  background: var(--desktop-bg);
+}
+
+html[data-neo-theme] .wallpaper-studio .studio-toolbar {
+  color: var(--desktop-text);
+  background: transparent;
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio .we-source-tabs {
+  border-bottom-color: var(--desktop-accent) !important;
+}
+
+html[data-neo-theme] .wallpaper-studio :is(
+  .studio-nav button,
+  .we-source-tabs button,
+  .studio-search,
+  .studio-sort select,
+  .wallpaper-card,
+  .wallpaper-control-grid select,
+  .button,
+  .we-filter-toggle,
+  .we-discover-topics button,
+  .we-online-pager,
+  .we-online-pager button,
+  .we-online-pager input,
+  .we-playlist-bar button,
+  .we-add-wallpaper,
+  .we-inspector-meta span,
+  .studio-import-formats span
+) {
+  color: var(--desktop-text);
+  background: var(--neo-theme-control);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(
+  .studio-nav button,
+  .we-source-tabs button,
+  .wallpaper-card,
+  .button,
+  .we-filter-toggle,
+  .we-discover-topics button,
+  .we-online-pager button,
+  .we-playlist-bar button,
+  .we-add-wallpaper
+):hover {
+  color: var(--desktop-text);
+  background-color: var(--neo-theme-control-hover);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(
+  .studio-nav button.is-active,
+  .we-source-tabs button.is-active,
+  .we-discover-topics button.is-active,
+  .wallpaper-card.is-selected
+) {
+  color: var(--desktop-accent-text);
+  background: var(--desktop-accent);
+  border-color: var(--desktop-accent);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-search,.studio-sort select):focus-within,
+html[data-neo-theme] .wallpaper-studio :is(.studio-sort select,.wallpaper-control-grid select):focus-visible {
+  border-color: var(--desktop-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--desktop-accent) 18%, transparent);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-search input,.studio-search button) {
+  color: var(--desktop-text);
+  background: transparent;
+}
+
+html[data-neo-theme] .wallpaper-studio .studio-search input::placeholder {
+  color: var(--desktop-muted);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(
+  .studio-brand small,
+  .studio-nav small,
+  .studio-sidebar-status small,
+  .wallpaper-card-copy small,
+  .wallpaper-runtime-state,
+  .wallpaper-control-grid label,
+  .inspector-heading p,
+  .studio-empty,
+  .studio-create,
+  .studio-create p,
+  .studio-create small,
+  .we-online-pager output
+) {
+  color: var(--desktop-muted);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-brand,.studio-sidebar-status,.inspector-controls,.inspector-controls .toggle-row) {
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-empty,.studio-create,.we-source-intro) {
+  color: var(--desktop-muted);
+  background: var(--desktop-surface);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.studio-empty strong,.studio-create h3,.we-source-intro h3,.inspector-controls h4) {
+  color: var(--desktop-text);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.we-inspector-author,.wallpaper-online-link) {
+  color: var(--desktop-accent);
+}
+
+html[data-neo-theme] .wallpaper-studio :is(.button.primary,.studio-apply,.we-online-icon,.wallpaper-online-install:not(:disabled),.we-add-wallpaper) {
+  color: var(--desktop-accent-text);
+  background: var(--desktop-accent);
+  border-color: var(--desktop-accent);
+}
+
+html[data-neo-theme] .wallpaper-studio .wallpaper-favorite {
+  color: var(--desktop-text);
+  background: var(--neo-theme-overlay);
+  border-color: var(--desktop-line);
+}
+
+html[data-neo-theme] .wallpaper-studio .wallpaper-favorite:is(:hover,:focus-visible,.is-active) {
+  color: var(--desktop-accent-text);
+  background: var(--desktop-accent);
+  border-color: var(--desktop-accent);
+}
+
+html[data-neo-theme] .wallpaper-studio .wallpaper-active-badge {
+  color: var(--wallpaper-success);
+  background: color-mix(in srgb, var(--wallpaper-success) 14%, var(--desktop-surface));
+  border-color: color-mix(in srgb, var(--wallpaper-success) 38%, var(--desktop-line));
+}
+
+/* Sign-in surfaces use theme tokens instead of imposing a second black theme. */
+html[data-neo-theme] :is(.neo-browser-sign-in,.neo-login-gate) { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-theme] :is(.neo-browser-sign-in-card,.neo-login-panel) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-theme] :is(.neo-browser-sign-in-card h2,.neo-login-panel h1) { color: var(--desktop-text); }
+html[data-neo-theme] :is(.neo-browser-sign-in-copy,.neo-browser-sign-in-eyebrow,.neo-login-intro,.neo-login-privacy,.neo-auth-mode,.neo-browser-sign-in-card label) { color: var(--desktop-muted); }
+html[data-neo-theme] :is(.neo-auth-tabs,.neo-login-guest,.neo-auth-password-field button,.neo-saved-account-select,.neo-saved-account-remove) { color: var(--desktop-text); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-theme] .neo-auth-tabs button[aria-selected="true"],
+html[data-neo-theme] .neo-browser-sign-in-card button[type="submit"] { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: var(--desktop-accent); }
+
+/* Local Music. Album artwork remains unchanged; every surrounding control is themed. */
+html[data-neo-app="music"] :is(html,body,.topbar,main) { color: var(--desktop-text); background-color: var(--desktop-bg); }
+html[data-neo-app="music"] :is(.topbar,.player,.queue-panel) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-app="music"] :is(.navigation button,.icon-button,.secondary,.searchbox,.track-row,.playlist-card,.notice,.track-menu,dialog) { color: var(--desktop-text); background-color: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-app="music"] :is(.navigation button,.icon-button,.secondary,.track-row,.playlist-card,.track-menu button):hover { color: var(--desktop-text); background-color: var(--neo-theme-control-hover); }
+html[data-neo-app="music"] :is(.navigation button[aria-current="page"],.track-row.is-current) { color: var(--desktop-text); background-color: var(--neo-theme-selected); }
+html[data-neo-app="music"] :is(.wordmark span,#view-description,.section-heading > span,.featured-meta p,.track-artist,.track-album,.track-time,.now-copy > span,.timeline span,.queue-track span,.muted,dialog p) { color: var(--desktop-muted); }
+html[data-neo-app="music"] :is(.primary,.featured-play,.play-button,.toast) { color: var(--desktop-accent-text); background: var(--desktop-accent); border-color: var(--desktop-accent); }
+html[data-neo-app="music"] input[type="range"] { background: linear-gradient(to right,var(--desktop-accent) 0%,var(--desktop-accent) var(--fill,0%),var(--desktop-line) var(--fill,0%),var(--desktop-line) 100%); }
+html[data-neo-app="music"] input[type="range"]::-webkit-slider-thumb { background: var(--desktop-text); }
+html[data-neo-app="music"] input[type="range"]::-moz-range-thumb { background: var(--desktop-text); }
+
+/* Local Browser and full Browser chrome. Loaded documents keep their own design. */
+html[data-neo-app="local-browser"] :is(html,body,main,#viewer-content,.unavailable) { color: var(--desktop-text); background-color: var(--desktop-bg); }
+html[data-neo-app="local-browser"] :is(header,.viewer-heading) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-app="local-browser"] :is(button,input,.card,#viewer-content pre,.badge) { color: var(--desktop-text); background: var(--neo-theme-control); border-color: var(--desktop-line); }
+html[data-neo-app="local-browser"] :is(button,.card):hover { background: var(--neo-theme-control-hover); }
+html[data-neo-app="browser-newtab"] :is(body,main) { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-app="browser-newtab"] form { color: var(--desktop-muted); background: var(--desktop-surface); border: 1px solid var(--desktop-line); }
+html[data-neo-app="browser-newtab"] form:focus-within { color: var(--desktop-text); background: var(--neo-theme-control-hover); border-color: var(--desktop-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--desktop-accent) 14%, transparent); }
+html[data-neo-app="browser-newtab"] input { color: var(--desktop-text); }
+html[data-neo-app="browser-newtab"] input::placeholder { color: var(--desktop-muted); }
+html[data-neo-app="browser"] :is(.neo-browser-runtime,.neo-browser-pages) { color: var(--desktop-text); background: var(--desktop-bg); }
+html[data-neo-app="browser"] :is(.neo-browser-tabbar,.neo-browser-toolbar) { color: var(--desktop-text); background: var(--desktop-surface); border-color: var(--desktop-line); }
+html[data-neo-app="browser"] :is(.neo-browser-tab-shell:hover,.neo-browser-tab-shell.is-active) { color: var(--desktop-text); background: var(--neo-theme-control-hover); }
+
+/* Cloud and TV expose a themed shell while keeping game/poster imagery intact. */
+html[data-neo-app="cloud"] :is(body,main,.app-shell,.cloud-shell) { color: var(--desktop-text); background-color: var(--desktop-bg); }
+html[data-neo-app="cloud"] :is(header,aside,.panel,.card,dialog) { border-color: var(--desktop-line); }
+html[data-neo-app="tv"] :is(button,input,select,textarea,svg,.neo-shell-header) { filter: none !important; }
+html[data-neo-app="tv"] .neo-shell-brand { color: var(--desktop-text); }
+html[data-neo-app="tv"] .neo-shell-brand span { color: var(--desktop-muted); }
+html[data-neo-app="tv"] .neo-shell-nav { color: var(--desktop-text); background: var(--neo-theme-glass); border-color: var(--desktop-line); }
+html[data-neo-app="tv"] .neo-shell-nav a:hover { color: var(--desktop-text); background: var(--neo-theme-control-hover); }
+
+/* Acrylic is an opt-in, structural treatment. It changes app/chrome surfaces,
+   never image, video, canvas, poster, cover, or artwork rendering. */
+html[data-neo-theme="acrylic"] body {
+  color: var(--desktop-text);
+  background-color: var(--neo-acrylic-canvas) !important;
+}
+
+html[data-neo-theme="acrylic"][data-neo-app="shell"] .neo-window {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .065), transparent 38%),
+    var(--neo-acrylic-canvas) !important;
+  border-color: var(--desktop-line) !important;
+  box-shadow:
+    0 28px 84px rgba(0, 0, 0, .48),
+    inset 0 1px rgba(255, 255, 255, .13) !important;
+  -webkit-backdrop-filter: var(--neo-acrylic-backdrop);
+  backdrop-filter: var(--neo-acrylic-backdrop);
+}
+
+html[data-neo-theme="acrylic"][data-neo-app="shell"] :is(.window-chrome,.window-body) {
+  color: var(--desktop-text);
+  background-color: var(--neo-acrylic-surface) !important;
+  border-color: var(--desktop-line) !important;
+}
+
+html[data-neo-theme="acrylic"][data-neo-app="shell"] .window-body {
+  background-color: var(--neo-acrylic-canvas) !important;
+}
+
+html[data-neo-theme="acrylic"][data-neo-app="shell"] :is(
+  .app-launcher,
+  .notification-center,
+  .desktop-context-menu,
+  .context-submenu,
+  .desktop-palette,
+  .neo-toast,
+  .control-center,
+  .system-search
+) {
+  color: var(--desktop-text);
+  background-color: var(--neo-acrylic-surface-strong) !important;
+  border-color: var(--desktop-line) !important;
+  -webkit-backdrop-filter: var(--neo-acrylic-backdrop);
+  backdrop-filter: var(--neo-acrylic-backdrop);
+}
+
+/* Owned iframe apps receive the same theme name from neo-app-theme.js. Keep
+   only their structural canvas and chrome translucent so authored art stays
+   crisp and colour-correct. */
+html[data-neo-theme="acrylic"][data-neo-app]:not([data-neo-app="shell"]) :is(
+  body,
+  #root,
+  .app-shell,
+  .desktop-app,
+  .native-app,
+  .control-app,
+  .neo-utility,
+  .neo-library,
+  .neo-messages,
+  .neo-browser-runtime,
+  .wallpaper-studio
+) {
+  color: var(--desktop-text);
+  background-color: var(--neo-acrylic-canvas) !important;
+}
+
+html[data-neo-theme="acrylic"][data-neo-app]:not([data-neo-app="shell"]) :is(
+  header,
+  nav,
+  aside,
+  dialog,
+  [class*="sidebar"],
+  [class*="topbar"],
+  [class*="toolbar"],
+  [class*="commandbar"],
+  [class*="composer"],
+  [class*="settings-panel"]
+) {
+  color: var(--desktop-text);
+  background-color: var(--neo-acrylic-surface) !important;
+  border-color: var(--desktop-line) !important;
+}
+
+/* Moving/resizing and lower-work modes retain transparency but stop live blur,
+   which avoids repaint spikes while a window follows the pointer. */
+html[data-neo-theme="acrylic"].is-window-interacting :is(
+  .neo-window,
+  .app-launcher,
+  .notification-center,
+  .desktop-context-menu,
+  .context-submenu,
+  .desktop-palette,
+  .neo-toast,
+  .control-center,
+  .system-search
+),
+html[data-neo-theme="acrylic"] .neo-window:is(.is-dragging,.is-resizing),
+html[data-neo-theme="acrylic"]:is([data-performance-mode="performance"],[data-performance-mode="ultimate"]) :is(
+  .neo-window,
+  .app-launcher,
+  .notification-center,
+  .desktop-context-menu,
+  .context-submenu,
+  .desktop-palette,
+  .neo-toast,
+  .control-center,
+  .system-search,
+  body
+) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Honour both the platform preference and shell-friendly preference hooks.
+   Reduced transparency is intentionally opaque, not merely less blurred. */
+html[data-neo-theme="acrylic"]:is(
+  [data-reduced-transparency="true"],
+  [data-reduce-transparency="true"],
+  [data-transparency="reduced"],
+  [data-desktop-transparency="reduced"]
+) {
+  --desktop-bg: var(--neo-acrylic-solid-bg) !important;
+  --desktop-surface: var(--neo-acrylic-solid-surface) !important;
+  --neo-acrylic-canvas: var(--neo-acrylic-solid-bg);
+  --neo-acrylic-surface: var(--neo-acrylic-solid-surface);
+  --neo-acrylic-surface-strong: #121b28;
+  --neo-theme-glass: var(--neo-acrylic-solid-surface);
+}
+
+html[data-neo-theme="acrylic"]:is(
+  [data-reduced-transparency="true"],
+  [data-reduce-transparency="true"],
+  [data-transparency="reduced"],
+  [data-desktop-transparency="reduced"]
+) :is(.neo-window,.app-launcher,.notification-center,.desktop-context-menu,.context-submenu,.desktop-palette,.neo-toast,.control-center,.system-search,body) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-neo-theme="acrylic"] {
+    --desktop-bg: var(--neo-acrylic-solid-bg) !important;
+    --desktop-surface: var(--neo-acrylic-solid-surface) !important;
+    --neo-acrylic-canvas: var(--neo-acrylic-solid-bg);
+    --neo-acrylic-surface: var(--neo-acrylic-solid-surface);
+    --neo-acrylic-surface-strong: #121b28;
+    --neo-theme-glass: var(--neo-acrylic-solid-surface);
+  }
+
+  html[data-neo-theme="acrylic"] :is(.neo-window,.app-launcher,.notification-center,.desktop-context-menu,.context-submenu,.desktop-palette,.neo-toast,.control-center,.system-search,body) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html[data-neo-theme="acrylic"] {
+    --desktop-bg: var(--neo-acrylic-solid-bg) !important;
+    --desktop-surface: var(--neo-acrylic-solid-surface) !important;
+    --neo-acrylic-canvas: var(--neo-acrylic-solid-bg);
+    --neo-acrylic-surface: var(--neo-acrylic-solid-surface);
+    --neo-acrylic-surface-strong: #121b28;
+  }
+}
+
+@media (max-width: 700px) {
+  .theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-neo-app] :where(
+    button, a, input, select, textarea,
+    body, header, nav, aside, main, section, article, form, dialog,
+    .neo-window, .window-chrome, .window-body,
+    [class*="sidebar"], [class*="toolbar"], [class*="panel"],
+    [class*="composer"], [class*="commandbar"]
+  ) {
+    transition-duration: .01ms !important;
+  }
+}

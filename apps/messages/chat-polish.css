@@ -1,0 +1,70 @@
+/* Readable conversation rhythm and compact, continuous message groups. */
+html[data-neo-app="chat"] .message-scroll {
+  padding: 24px clamp(18px, 4vw, 52px) 22px;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff25 transparent;
+}
+html[data-neo-app="chat"] .day-divider {
+  margin: 14px 0 26px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+html[data-neo-app="chat"] .message-group { margin: 3px 0; gap: 12px; }
+html[data-neo-app="chat"] .message-group.group-start { margin-top: 18px; }
+html[data-neo-app="chat"] .message-stack { min-width: 0; max-width: min(78%, 580px); }
+html[data-neo-app="chat"] .message-avatar {
+  width: 34px; height: 34px; margin-bottom: 22px;
+  font-size: 12px; font-weight: 600;
+  box-shadow: 0 0 0 1px #ffffff12, 0 3px 10px #0002;
+}
+html[data-neo-app="chat"] .avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+html[data-neo-app="chat"] .message-author {
+  margin: 0 13px 6px;
+  font-size: 11px; font-weight: 600; line-height: 1.4;
+  color: var(--muted); letter-spacing: .01em;
+}
+html[data-neo-app="chat"] .message-bubble {
+  min-width: 38px; min-height: 40px; padding: 10px 15px;
+  border-radius: 21px;
+  background: color-mix(in srgb, var(--bg) 84%, var(--text) 16%);
+  color: var(--text);
+  font: 400 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -.01em;
+  box-shadow: inset 0 0 0 1px #ffffff07, 0 2px 5px #0000000c;
+}
+html[data-neo-app="chat"] .message-group.mine .message-bubble {
+  color: white; background: #0a84ff;
+  box-shadow: inset 0 1px 0 #ffffff1c, 0 2px 7px #0071eb1c;
+}
+html[data-neo-app="chat"] .message-group.group-start:not(.mine) .message-bubble { border-top-left-radius: 21px; }
+html[data-neo-app="chat"] .message-group.group-start.mine .message-bubble { border-top-right-radius: 21px; }
+html[data-neo-app="chat"] .message-group:not(.group-start):not(.mine) .message-bubble { border-top-left-radius: 7px; }
+html[data-neo-app="chat"] .message-group:not(.group-end):not(.mine) .message-bubble { border-bottom-left-radius: 7px; }
+html[data-neo-app="chat"] .message-group:not(.group-start).mine .message-bubble { border-top-right-radius: 7px; }
+html[data-neo-app="chat"] .message-group:not(.group-end).mine .message-bubble { border-bottom-right-radius: 7px; }
+html[data-neo-app="chat"] .message-group.group-end:not(.mine) .message-bubble { border-bottom-left-radius: 8px; }
+html[data-neo-app="chat"] .message-group.group-end.mine .message-bubble { border-bottom-right-radius: 8px; }
+html[data-neo-app="chat"] .message-group.group-end:not(.mine) .message-bubble::before,
+html[data-neo-app="chat"] .message-group.group-end:not(.mine) .message-bubble::after,
+html[data-neo-app="chat"] .message-group.group-end.mine .message-bubble::before,
+html[data-neo-app="chat"] .message-group.group-end.mine .message-bubble::after { content: none; display: none; }
+html[data-neo-app="chat"] .message-meta {
+  min-height: 18px; padding: 5px 12px 0;
+  font-size: 10px; line-height: 13px; font-weight: 400;
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+html[data-neo-app="chat"] .message-tools {
+  border-radius: 12px; padding: 3px;
+  background: var(--surface); box-shadow: 0 3px 12px #0003;
+}
+html[data-neo-app="chat"] .message-tools button { min-width: 30px; min-height: 30px; border-radius: 9px; }
+@media(max-width:600px) {
+  html[data-neo-app="chat"] .message-scroll { padding: 18px 14px 20px; }
+  html[data-neo-app="chat"] .message-group { gap: 9px; }
+  html[data-neo-app="chat"] .message-stack { max-width: calc(100% - 64px); }
+  html[data-neo-app="chat"] .message-avatar { width: 30px; height: 30px; }
+  html[data-neo-app="chat"] .message-bubble { padding: 9px 13px; font-size: 15px; }
+  html[data-neo-app="chat"] .message-tools { top: -30px; right: 0; left: auto; z-index: 4; }
+  html[data-neo-app="chat"] .message-group:not(.mine) .message-tools { left: 0; right: auto; }
+}

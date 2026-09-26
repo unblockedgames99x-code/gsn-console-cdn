@@ -1,0 +1,41 @@
+{
+  "source": "https://github.com/TongSherbet/storage",
+  "commit": "9682b1aeab2e0df0daa2a182a8550d9590dc91da",
+  "files": [
+    {
+      "file": "jet/jet.api.js",
+      "sha256": "e7b5d246b0a4ca465e436c10cb7fd8821021bd6c3d4a4c3afc4676d79ba42885",
+      "bytes": 16838
+    },
+    {
+      "file": "jet/jet.core.js",
+      "sha256": "c1731cf3dad3d0e0b64a2140282da20b3e0d4589a90d8b0768a84ec3ab8e98ab",
+      "bytes": 227139
+    },
+    {
+      "file": "jet/jet.inject.js",
+      "sha256": "36f62265b4ac48eafac8daa2fe50def227ec6cc75bd6d6b2a7d3f9e4a5a155dc",
+      "bytes": 6335
+    },
+    {
+      "file": "jet/jet.sw.js",
+      "sha256": "005d8722ccb9e17fc16d4b5dfb9d2259b2ed9488e0447680e57ce3781ae31ca3",
+      "bytes": 4454
+    },
+    {
+      "file": "jet/jet.utils.js",
+      "sha256": "78ccbe86e66ec6bd5a7352b3ccc83362b009e8166493d3040be01dd2b1b73034",
+      "bytes": 10664
+    },
+    {
+      "file": "jet/jet.wasm",
+      "sha256": "3d0eb5a719ae1d41d22786eee4cbd317afe0a65f77ede350face4c19c602aa06",
+      "bytes": 585079
+    },
+    {
+      "file": "curl/index.mjs",
+      "sha256": "f8cbdbba3be880e68be324562517c9d2ccd2535ae57b36b89e818ab9a286e7ed",
+      "bytes": 2110741
+    }
+  ]
+}

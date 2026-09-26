@@ -1,0 +1,102 @@
+/* Console presentation; the supplied browser engine and navigation remain intact. */
+:root {
+  color-scheme: dark;
+  --bg: #080d18; --chrome: #0c1320; --surface: #171f2e; --surface-2: #273449;
+  --text: #f3f5fa; --text-dim: #b9c2d0; --text-faint: #8896aa; --line: #ffffff19;
+  --accent: #9bdcff; --theme-accent-text: #081423;
+}
+html, body, button, input, select { font-family: "Segoe UI", Arial, sans-serif; }
+html, body { color: var(--text); font-size: 14px; }
+.app { padding: 0; background: var(--bg); height: 100dvh; }
+.gsn-heading { display: flex; align-items: center; gap: 18px; height: 76px; flex-shrink: 0; padding: 0 32px; background: #0b111b; }
+.gsn-console { display: grid; place-items: center; width: 48px; height: 44px; border-radius: 8px; }
+.gsn-console img { width: 34px; height: 30px; filter: invert(1); }
+.gsn-heading strong { font-weight: 400; font-size: 21px; letter-spacing: -.4px; }
+.gsn-heading strong small { display: block; color: #a7b4c7; font-size: 14px; margin: 0; }
+.gsn-heading time { margin-left: auto; font-size: 21px; font-weight: 300; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chrome { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; grid-template-rows: 43px 48px; gap: 8px 16px; height: 115px; padding: 0 32px 16px; background: #0b111b; border-bottom: 1px solid #ffffff15; }
+.tabbar { grid-column: 1/-1; grid-row: 1; width: 100%; height: 43px; gap: 8px; padding: 2px; background: transparent; align-items: center; }
+.tab { height: 36px; width: 218px; max-width: 218px; min-width: 100px; border: 1px solid transparent; border-radius: 8px; background: #ffffff05; color: #9faec1; padding: 0 12px; gap: 10px; }
+.tab.active { background: #273142; color: white; border-color: #ffffff22; }
+.tab .ttl { font: 13px "Segoe UI", sans-serif; }
+.tab .tfav { width: 17px; height: 17px; }
+.tab.active .tfav.letter, .tab.active .tx { color: white; }
+.tab .tx { width: 24px; height: 24px; border-radius: 50%; }
+.tab-new { width: 36px; height: 36px; border-radius: 50%; }
+.nav-btns { grid-row: 2; gap: 6px; }
+#b-fwd { order: 0; } #b-reload { order: 0; }
+.cbtn { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #d4deeb; }
+.cbtn i { font-size: 21px; line-height: 1; }
+.cbtn:hover, .gsn-console:hover { background: #ffffff14; }
+.cbtn:disabled { opacity: .3; }
+.url-wrap, .url-wrap:focus-within { grid-row: 2; width: 100%; min-width: 0; height: 42px; border-radius: 24px; padding: 0 20px; background: #1b2534; color: white; border: 1px solid #ffffff12; }
+.url-wrap:focus-within { border-color: #e0efff; box-shadow: 0 0 0 3px #b8dfff16; }
+.url-wrap input { font: 14px "Segoe UI", sans-serif; user-select: text; }
+.url-wrap .star { font-size: 18px; padding: 6px; }
+.menu-btns { grid-row: 2; gap: 6px; }
+#b-wisp { width: 40px; height: 40px; padding: 0; }
+#b-wisp span { display: none; }
+.viewport { border-radius: 0; background: #0b1220; }
+.new-tab {
+  padding: clamp(32px, 7vh, 86px) 32px 100px;
+  background: radial-gradient(ellipse at 80% 80%, #214e7180, transparent 56%), radial-gradient(ellipse at 16% 20%, #17385980, transparent 54%), linear-gradient(125deg, #0b111c, #111c2d 65%, #111f30);
+  isolation: isolate;
+}
+.new-tab::before, .new-tab::after { content: ""; position: absolute; z-index: -1; pointer-events: none; width: 95vw; height: 32vw; border-radius: 50%; transform: rotate(-27deg); right: -42vw; top: 34%; border: 1px solid #aacfe51b; background: linear-gradient(180deg, #9dcced09, transparent); }
+.new-tab::after { right: -45vw; top: 44%; }
+.nt-brand { display: flex; gap: 24px; margin: 0 0 38px; }
+.nt-brand-mark { width: 92px; height: 92px; object-fit: contain; background: transparent; border-radius: 18px; filter: none !important; box-shadow: 0 12px 38px #0004; }
+.nt-logo { font-size: 48px; font-weight: 300; letter-spacing: -1.8px; text-shadow: none; line-height: 1.15; }
+.nt-logo small { display: block; margin-top: 9px; font-size: 16px; letter-spacing: .1px; color: #abbdd1; font-weight: 400; }
+.nt-search, .nt-search:hover, .nt-search:focus-within { width: min(720px, 100%); height: 60px; padding: 0 20px; gap: 14px; border-radius: 32px; border: 1px solid #ffffff27; background: #233146ba; backdrop-filter: blur(20px); color: white; margin-bottom: 38px; }
+.nt-search:focus-within { border-color: #e4f4ff; box-shadow: 0 0 0 4px #d1eaff12, 0 14px 35px #0002; }
+.nt-search input { font: 16px "Segoe UI", sans-serif; }
+.nt-search input::placeholder { color: #aabacf; }
+#b-engine { width: 34px; height: 34px; flex-basis: 34px; border-radius: 50%; }
+.nt-section-title { display: flex; width: min(720px, 100%); font-size: 12px; font-weight: 400; letter-spacing: .8px; text-transform: none; color: #b4c3d5; margin-bottom: 16px; }
+.nt-grid { width: min(720px, 100%); gap: 16px; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+.nt-grid:has(.nt-tile:only-child) { display: grid; }
+.nt-grid .nt-tile.add { display: flex; }
+.nt-tile { background: #ffffff08; border: 1px solid #ffffff14; border-radius: 13px; padding: 20px 10px 16px; }
+.nt-tile:hover { background: #ffffff12; border-color: #d6ebff; transform: translateY(-3px); }
+.nt-tile .fav { background: #ffffff08; box-shadow: none; }
+.nt-tile .lbl { font-size: 13px; font-weight: 400; }
+.nt-tile:focus-within .del { display: flex; }
+.start-actions { position: relative; left: auto; bottom: auto; transform: none; background: #ffffff08; border: 1px solid #ffffff1c; border-radius: 24px; overflow: visible; flex-shrink: 0; }
+.start-actions button { color: #e2eaf5; height: 40px; padding: 0 22px; font: 13px "Segoe UI", sans-serif; border-radius: 24px; }
+.start-actions button + button { border-color: #ffffff16; }
+.start-actions button:hover { background: #ffffff12; }
+.start-settings-button { right: 28px; top: 20px; }
+.start-settings, .wisp-panel, .clock-widget, .engine-menu { color: #f2f6fc; background: #1a2333f5; backdrop-filter: blur(24px); border: 1px solid #ffffff24; border-radius: 16px; box-shadow: 0 20px 50px #0005; }
+.engine-menu p, .engine-menu kbd { color: #a7b7cc; }
+.engine-menu { padding: 14px; }
+.engine-menu button { height: 42px; padding: 0 12px; border-radius: 8px; font: 14px "Segoe UI", sans-serif; }
+.engine-menu button:hover, .engine-menu button:focus-visible { background: #ffffff16; }
+.engine-menu .selected-check { color: #b3e2ff; }
+.start-settings { top: 65px; right: 28px; }
+.wisp-panel { top: 182px; right: 28px; padding: 22px; }
+.wisp-panel select, .wisp-panel input { color: #f2f6fc; background: #0e1624; border-color: #ffffff22; }
+.wisp-apply { background: #edf5ff; color: #121a27; border-radius: 22px; font-weight: 500; }
+.clock-widget { background: #ffffff08; border-radius: 18px; margin: 0 0 24px; }
+.new-tab.no-wallpaper { background: #0b1220; }
+button:focus-visible, [tabindex]:focus-visible, .cbtn:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.neo-bookmark-card { background: #172132 !important; border-radius: 20px !important; }
+.neo-bookmark-field input { background: #0d1625 !important; }
+@media (max-width: 760px) {
+  .gsn-heading { padding: 0 16px; height: 62px; gap: 10px; }
+  .gsn-heading strong { font-size: 18px; } .gsn-heading time { font-size: 16px; }
+  .chrome { padding: 0 12px 12px; gap: 6px; height: 108px; }
+  .nav-btns { gap: 0; } .cbtn { width: 32px; height: 36px; }
+  .url-wrap { padding: 0 12px; } .url-wrap input { font-size: 13px; }
+  .new-tab { padding: 42px 22px 85px; }
+  .nt-logo { font-size: 38px; } .nt-brand-mark { width: 76px; height: 76px; }
+  .nt-search { height: 54px; padding: 0 14px; } .nt-search input { font-size: 14px; }
+  .wisp-panel { top: 164px; right: 12px; }
+  .start-settings-button { right: 10px; top: 8px; }
+}
+@media (max-width: 440px) {
+  .gsn-heading strong small { display: block; margin: 0; font-size: 11px; }
+  .gsn-console { width: 34px; } .gsn-console img { width: 29px; }
+  #b-fwd { display: none; } .nt-brand { gap: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

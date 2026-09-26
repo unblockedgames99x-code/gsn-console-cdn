@@ -1,0 +1,317 @@
+/* ==================================================================
+   krypton glass — shared translucent + blur treatment
+   Linked by every internal page so the whole app is frosted glass
+   over the animated background.
+   ================================================================== */
+
+/* ---------- top bars (games / cloud / movies / music) ---------- */
+.top-bar {
+    background:rgba(0,0,0,0.45);
+    background:color-mix(in srgb, #000 45%, transparent);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+/* ---------- search pills (games / cloud / movies / music) ---------- */
+.search-wpr {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.search-wpr:focus-within {
+    background:rgba(10,10,10,0.7);
+}
+
+/* ---------- prompt input bars (ai / chat) ---------- */
+.text-wpr {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.text-wpr:focus-within {
+    background:rgba(10,10,10,0.7);
+}
+
+/* ---------- content cards (games / cloud / movies) ---------- */
+.game-card,
+.movie-card {
+    background:rgba(17,17,17,0.5);
+    backdrop-filter:blur(12px) saturate(1.2);
+    -webkit-backdrop-filter:blur(12px) saturate(1.2);
+}
+
+/* ---------- games: provider select + dropdown ---------- */
+.provider-btn {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.provider-btn:hover {
+    background:rgba(255,255,255,0.07);
+}
+
+.provider-dr {
+    background:rgba(10,10,10,0.92);
+    background:color-mix(in srgb, #0a0a0a 92%, transparent);
+    backdrop-filter:blur(20px) saturate(1.2);
+    -webkit-backdrop-filter:blur(20px) saturate(1.2);
+    z-index:9999;
+}
+
+.provider-opt:hover {
+    background:rgba(255,255,255,0.08);
+}
+
+/* ---------- movies: category buttons + player overlay ---------- */
+.cat-btn {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.cat-btn:hover {
+    background:rgba(255,255,255,0.07);
+}
+
+.cat-btn.active {
+    background:rgba(16,18,24,0.65);
+}
+
+.ep-ovr-box,
+.ep-sel {
+    background:rgba(8,8,8,0.55);
+    backdrop-filter:blur(16px) saturate(1.2);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);
+}
+
+
+/* ---------- music (l) ---------- */
+.sidebar {
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+.sb-item:hover,
+.sb-fav-item:hover,
+.sb-fav-header:hover {
+    background:rgba(255,255,255,0.06);
+}
+
+.sb-item.active {
+    background:rgba(20,20,20,0.6);
+}
+
+.np-inline {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.np-view {
+    background:rgba(10,10,10,0.5);
+    backdrop-filter:blur(16px) saturate(1.2);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);
+}
+
+/* ---------- ai (a) ---------- */
+.chat-btn {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.chat-btn:hover {
+    background:rgba(255,255,255,0.07);
+}
+
+.chat-dr {
+    background:rgba(10,10,10,0.92);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    z-index:9999;
+}
+
+.example-card {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(12px) saturate(1.2);
+    -webkit-backdrop-filter:blur(12px) saturate(1.2);
+}
+
+.example-card:hover {
+    background:rgba(255,255,255,0.06);
+}
+
+.msg-ai {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(12px) saturate(1.2);
+    -webkit-backdrop-filter:blur(12px) saturate(1.2);
+}
+
+/* ---------- chat (t) ---------- */
+.topbar {
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+.topbar-search {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.topbar-search:focus-within {
+    background:rgba(10,10,10,0.7);
+}
+
+.members-sidebar {
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+.sidebar-hdr:hover,
+.channel-item:hover,
+.member-item:hover,
+.user-bar:hover,
+.dm-item:hover,
+.modal-btn:hover,
+.mod-action-btn:hover,
+.modal-mutual-item:hover {
+    background:rgba(255,255,255,0.06);
+}
+
+.channel-item.active,
+.dm-item.active {
+    background:rgba(20,20,20,0.6);
+}
+
+.view-dr {
+    background:rgba(10,10,10,0.6);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    z-index:9999;
+}
+
+.reaction-pill {
+    background:rgba(16,16,16,0.55);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+.reaction-pill:hover {
+    background:rgba(22,22,22,0.7);
+}
+
+.msg-edit-input,
+.dm-add-input {
+    background:rgba(8,8,8,0.5);
+}
+
+.emoji-picker {
+    background:rgba(13,13,13,0.7);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+.modal-card,
+.mod-panel {
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(24px) saturate(1.3);
+    -webkit-backdrop-filter:blur(24px) saturate(1.3);
+}
+
+.modal-left {
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+}
+
+.modal-banner-card {
+    background:rgba(13,13,13,0.6);
+}
+
+.modal-btn {
+    background:rgba(0,0,0,0.55);
+}
+
+.modal-input,
+.modal-textarea,
+.mod-role-select,
+.mod-form-row input,
+.mod-form-row select,
+.mod-warning-item,
+.mod-action-btn,
+.settings-preview {
+    background:rgba(0,0,0,0.55);
+}
+
+.settings-preview-card {
+    background:rgba(10,10,10,0.55);
+}
+
+.settings-preview-banner {
+    background:rgba(13,13,13,0.55);
+}
+
+/* ---------- auth (u) ---------- */
+.field-wpr {
+    background:rgba(8,8,8,0.5);
+    backdrop-filter:blur(14px) saturate(1.2);
+    -webkit-backdrop-filter:blur(14px) saturate(1.2);
+}
+
+.field-wpr:focus-within {
+    background:rgba(10,10,10,0.7);
+}
+
+/* ---------- settings (s) ---------- */
+.s-card {
+    background:rgba(10,10,10,0.5);
+    background:color-mix(in srgb, var(--surface) 50%, transparent);
+    backdrop-filter:blur(16px) saturate(1.2);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);
+}
+
+.s-chip,
+.s-seg-btn {
+    background:rgba(20,20,20,0.55);
+    background:color-mix(in srgb, var(--surface-2) 55%, transparent);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+.s-chip:hover,
+.s-seg-btn:hover {
+    background:rgba(255,255,255,0.07);
+    background:color-mix(in srgb, var(--surface-2) 78%, transparent);
+}
+
+.s-chip.active,
+.s-seg-btn.active {
+    background:rgba(96,165,250,0.22);
+    background:color-mix(in srgb, var(--acc) 22%, transparent);
+}
+
+.s-inputs input {
+    background:rgba(8,8,8,0.55);
+    background:color-mix(in srgb, var(--surface-3) 55%, transparent);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+.s-btn {
+    background:rgba(20,20,20,0.6);
+    background:color-mix(in srgb, var(--surface-2) 60%, transparent);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+.s-btn:hover {
+    background:rgba(255,255,255,0.08);
+    background:color-mix(in srgb, var(--surface-2) 82%, transparent);
+}

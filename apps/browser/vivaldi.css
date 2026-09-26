@@ -1,0 +1,95 @@
+/* Compact, single-row browser chrome, matched to the supplied reference. */
+:root { color-scheme: dark; --bg:#211b18; --chrome:#292320; --surface:#252525; --surface-2:#3d3d3d; --text:#ddd; --text-dim:#aaa; --text-faint:#969696; --line:#48413c; --accent:#7798f5; --theme-accent-text:#fff; }
+html, body { font-family:Arial,'Segoe UI',sans-serif; font-size:12px; }
+.app { height:100dvh; padding:0 4px 4px; background:#292320; }
+.chrome { height:34px; padding:0 5px; gap:8px; border:0; background:#292320; }
+.nav-btns { gap:1px; flex-shrink:0; }
+.cbtn { width:27px; height:27px; border-radius:4px; color:#bbb; }
+.cbtn i { font-size:17px; }
+.cbtn:focus-visible, button:focus-visible { outline:2px solid #8aaaff; outline-offset:2px; }
+#b-home, #b-devtools { display:none; }
+#b-fwd { order:3; }
+#b-reload { order:2; }
+.url-wrap { flex:0 1 300px; min-width:150px; height:26px; border:1px solid #645b55; border-radius:5px; padding:0 7px; gap:7px; background:#242323; }
+.url-wrap:focus-within { background:#242323; border-color:#8aaaff; box-shadow:0 0 0 1px #7694e7; }
+.url-wrap input { font:12px Arial,sans-serif; }
+.url-wrap .star { font-size:13px; }
+.tabbar { flex:1 1 auto; min-width:0; height:30px; padding:0; gap:3px; align-items:center; background:transparent; }
+.tab { min-width:95px; width:177px; max-width:177px; height:27px; border-radius:6px; background:#211a17; padding:0 8px; gap:6px; }
+.tab.active { background:#cecece; color:#292929; }
+.tab .ttl { font:12px Arial,sans-serif; }
+.tab .tfav { width:13px; height:13px; border-radius:0; background:transparent; }
+.tab.active .tfav.letter, .tab.active .tx { color:#333; }
+.tab .tx { width:15px; height:15px; }
+.tab-new { height:26px; width:26px; }
+.menu-btns { display:flex; margin-left:auto; flex-shrink:0; }
+#b-wisp { width:auto; padding:0 8px; gap:6px; font-size:11px; }
+.viewport { border-radius:5px; min-height:0; background:#171310; }
+.new-tab { padding:48px 22px 80px; background:#e6e3ef url('./assets/vivaldi-default.webp') center/100% 100% no-repeat; }
+.nt-brand, .nt-section-title { display:none; }
+.nt-search { position:relative; flex-shrink:0; width:min(728px,70%); height:44px; margin:0 0 24px; padding:0 12px; gap:8px; border:1px solid transparent; border-radius:15px; background:#242424; }
+.nt-search:hover, .nt-search:focus-within { background:#242424; border-color:#646464; box-shadow:none; }
+.nt-search input { min-width:0; font:12px Arial,sans-serif; height:100%; }
+#b-engine { width:28px; height:28px; flex:0 0 28px; display:grid; place-items:center; padding:0; border-radius:4px; }
+.engine-logo { display:block; width:24px; height:24px; flex-shrink:0; object-fit:contain; }
+.engine-menu .engine-logo { width:20px; height:20px; }
+.engine-icon { display:grid; place-items:center; width:16px; height:16px; flex-shrink:0; font:bold 12px Arial,sans-serif; border-radius:50%; background:#fff; }
+.engine-icon[data-engine='duckduckgo'] { background:#e76a37; color:#fff; border:1px solid white; }
+.engine-icon[data-engine='google'] { color:#4285f4; }
+.engine-icon[data-engine='bing'] { color:#16b9d1; background:transparent; font-size:18px; }
+.engine-icon[data-engine='startpage'] { color:#4267c5; border-radius:3px; }
+.engine-menu { position:fixed; z-index:10000; width: min(728px,calc(100vw - 24px)); background:#3c3c3c; color:#ddd; border:1px solid #414141; border-radius:8px; padding:10px 8px; box-shadow:0 12px 30px #0005; }
+.engine-menu[hidden], .start-settings[hidden], .clock-widget[hidden] { display:none; }
+.engine-menu p { margin:5px 30px 10px; color:#aaa; font-size:12px; }
+.engine-menu button { width:100%; display:flex; align-items:center; gap:9px; height:29px; padding:0 9px; border-radius:3px; text-align:left; font-size:13px; }
+.engine-menu button:hover, .engine-menu button:focus-visible { background:#555; }
+.engine-menu kbd { margin-left:auto; color:#aaa; font:12px Arial,sans-serif; }
+.engine-menu .selected-check { color:#ccc; margin-left:3px; }
+.nt-grid { width:min(728px,85%); grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
+.nt-grid:has(.nt-tile:only-child) { display:none; }
+.nt-grid .nt-tile.add { display:none; }
+.nt-tile { background:#242424e8; border-radius:7px; }
+.start-actions { position:absolute; bottom:48px; left:50%; transform:translateX(-50%); display:flex; border-radius:7px; overflow:hidden; background:#a76022; }
+.start-actions button { height:28px; padding:0 12px; font:12px Arial,sans-serif; color:#fff; }
+.start-actions button+button { border-left:1px solid #d58a47; }
+.start-actions button:hover { background:#bd7735; }
+.start-settings-button { position:absolute; right:12px; top:10px; }
+.start-settings { position:absolute; right:12px; top:44px; z-index:10; width:230px; padding:16px; border:1px solid #555; border-radius:8px; background:#333; }
+.start-settings strong { display:block; margin-bottom:12px; }
+.start-settings label { display:flex; align-items:center; gap:8px; margin:12px 0; }
+.clock-widget { margin-top:10px; padding:20px 30px; border-radius:8px; background:#242424df; text-align:center; }
+.clock-widget time { display:block; font-size:40px; font-variant-numeric:tabular-nums; }
+.new-tab.no-wallpaper { background:#232323; }
+.wisp-panel { top:39px; background:#333; color:#ddd; border-radius:8px; box-shadow:0 12px 30px #0005; z-index:10001; }
+.wisp-panel select, .wisp-panel input { background:#222; color:#eee; }
+.wisp-apply { background:#a76022; color:white; }
+.wisp-field[hidden] { display:none; }
+@media(max-width:800px) { .chrome { flex-wrap:wrap; height:68px; gap:5px; } .tabbar { order:5; flex-basis:100%; height:29px; } .url-wrap { flex:1; } .nt-search { width:min(728px,95%); } .wisp-panel { top:72px; } }
+@media(prefers-reduced-motion:reduce) { *, *::before, *::after { transition:none!important; animation:none!important; } }
+/* Stock Vivaldi 8.2 "Vivaldi" theme, read from its shipped defaults. */
+:root { color-scheme:light; --bg:#f5f5f5; --chrome:#f5f5f5; --surface:#fff; --surface-2:#e6e6e6; --text:#383838; --text-dim:#686868; --text-faint:#777; --line:#ddd; --accent:#5d7aee; }
+.app, .chrome { background:#f5f5f5; }
+.cbtn { color:#686868; }
+.url-wrap, .url-wrap:focus-within { background:#fff; color:#383838; border-color:#d1d1d1; }
+.url-wrap:focus-within { border-color:#5d7aee; }
+.tab { background:#e8e8e8; color:#666; }
+.tab.active { background:#fff; color:#383838; }
+.nt-search, .nt-search:hover, .nt-search:focus-within { background:#fff; color:#383838; }
+.nt-search:focus-within { border-color:#5d7aee; }
+.engine-menu { background:#fff; color:#383838; border-color:#ddd; }
+.engine-menu p, .engine-menu kbd { color:#777; }
+.engine-menu button:hover, .engine-menu button:focus-visible { background:#e6eaff; }
+.engine-menu .selected-check { color:#5d7aee; }
+.engine-icon[data-engine='duckduckgo'], .engine-icon[data-engine='startpage'], .engine-icon[data-engine='google'] { font-size:0; border:0; background:transparent center/contain no-repeat; }
+.engine-icon[data-engine='duckduckgo'] { background-image:url('./assets/search-duckduckgo.svg'); }
+.engine-icon[data-engine='startpage'] { background-image:url('./assets/search-startpage.svg'); }
+.engine-icon[data-engine='google'] { background-image:url('./assets/search-google.png'); }
+.start-actions { background:#ffffffb8; border:1px solid #d6d5dd; }
+.start-actions button { color:#383838; }
+.start-actions button+button { border-color:#d6d5dd; }
+.start-actions button:hover { background:white; }
+.start-settings, .wisp-panel, .clock-widget { background:#fff; color:#383838; border-color:#ddd; }
+.wisp-panel select, .wisp-panel input { background:#f5f5f5; color:#383838; }
+.wisp-apply { background:#5d7aee; }
+.new-tab.no-wallpaper { background:#f5f5f5; }
+.nt-tile { background:#ffffffbd; }

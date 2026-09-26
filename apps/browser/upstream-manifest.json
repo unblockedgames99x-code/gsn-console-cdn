@@ -1,0 +1,78 @@
+{
+  "upstream": "https://nextnode9124.b-cdn.net/",
+  "syncedAt": "2026-09-13T05:45:39.095Z",
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 77383,
+      "sha256": "14e7e6b562e11d8d3f3cd99fcdd2ca24808e62401708bb7f499f80b7d62d5f63",
+      "upstream": "https://nextnode9124.b-cdn.net/modules/browser/index.html"
+    },
+    {
+      "path": "assets/remixicon/remixicon.css",
+      "bytes": 148827,
+      "sha256": "98ff40ffca2cc16d829430eb1e358e090dbb1010f0a382b684ebcca025e52e68",
+      "upstream": "https://nextnode9124.b-cdn.net/assets/remixicon/remixicon.css"
+    },
+    {
+      "path": "assets/remixicon/remixicon.woff2",
+      "bytes": 176812,
+      "sha256": "7ea90bbc7c505b98dd7d3a089a6fa32067e353150192951cedb05e26820936cf",
+      "upstream": "https://nextnode9124.b-cdn.net/assets/remixicon/remixicon.woff2"
+    },
+    {
+      "path": "browser-vendor/eruda.min.js",
+      "bytes": 474800,
+      "sha256": "6df3805da066f2dbaeaa547b4ca83fa5c7c10ca8b6ba4357b0897bf3cc3b9a1f",
+      "upstream": "https://nextnode9124.b-cdn.net/browser-vendor/eruda.min.js"
+    },
+    {
+      "path": "study/libcurl.js",
+      "bytes": 2112269,
+      "sha256": "bbcc91982ee9e25bea3491500ab2ecba54098b5e08f3aba827b1c775f5654806",
+      "upstream": "https://nextnode9124.b-cdn.net/study/libcurl.js"
+    },
+    {
+      "path": "study/sf-ctl-sw.js",
+      "bytes": 4576,
+      "sha256": "e730f5cd559a9b63a8ddff988f57c0e44e8ed143a99e238c80b41bfe9c1715f0",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-ctl-sw.js"
+    },
+    {
+      "path": "study/sf-ctl.js",
+      "bytes": 17158,
+      "sha256": "70779548da7f122069c84b68dfd3a71cdac46de428727480e64bb5c0167a00a4",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-ctl.js"
+    },
+    {
+      "path": "study/sf-engine.js",
+      "bytes": 227109,
+      "sha256": "2029bc025dc2fa4617f63f08d5512fec7d75fd99768f9d5a738157fb09a15998",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-engine.js"
+    },
+    {
+      "path": "study/sf-engine.wasm",
+      "bytes": 586279,
+      "sha256": "b5d400216a7aed3219ace3aae3654661ff04276f91d3dae44d8cb4d780b86339",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-engine.wasm"
+    },
+    {
+      "path": "study/sf-inject.js",
+      "bytes": 6436,
+      "sha256": "b5d6cdf880756af9d92f5f6f1e10d4cd09b61c33f1f02ef97fc7b7bd4e03b458",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-inject.js"
+    },
+    {
+      "path": "study/sf-sw.js",
+      "bytes": 347,
+      "sha256": "4fe53f888713eb7408fd42e2846fc70e4772b2ac095366abb8a835d46ae4b5a3",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-sw.js"
+    },
+    {
+      "path": "study/sf-utils.js",
+      "bytes": 10847,
+      "sha256": "564c23364a8194c7f35f6ab79a3b4078e2113b66b78b22a925fdfb8e3082b08a",
+      "upstream": "https://nextnode9124.b-cdn.net/study/sf-utils.js"
+    }
+  ]
+}

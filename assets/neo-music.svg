@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NEO Music">
+  <defs>
+    <linearGradient id="shell" x1="8" y1="4" x2="55" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#242426"/>
+      <stop offset="1" stop-color="#080809"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="38" y1="3" x2="56" y2="22" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe27a"/>
+      <stop offset="1" stop-color="#f0ae2e"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#shell)" stroke="#fff" stroke-opacity=".16"/>
+  <path d="M15 47V18h7.4l19.2 19.1V18H49v29h-7.3L22.4 27.8V47H15Z" fill="#f7f7f5"/>
+  <path d="M41 17.5V7.8L54 5v9.6M41 11l13-2.8" fill="none" stroke="url(#signal)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="38.3" cy="18" rx="4.3" ry="3.2" fill="#f7c74b" transform="rotate(-13 38.3 18)"/>
+  <ellipse cx="51.4" cy="15.2" rx="4.3" ry="3.2" fill="#f0ae2e" transform="rotate(-13 51.4 15.2)"/>
+</svg>

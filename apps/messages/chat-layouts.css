@@ -1,0 +1,96 @@
+.layout-switcher{flex-shrink:0;padding:12px 16px 16px;border-top:1px solid #ffffff0d;color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.layout-switcher>div{display:flex;background:#ffffff08;padding:3px;border:1px solid #ffffff0d;border-radius:9px}
+.layout-switcher button{border:0;background:none;color:var(--muted);padding:7px 10px;font:500 12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;border-radius:6px;cursor:pointer}
+.layout-switcher button[aria-pressed=true]{background:#ffffff18;color:var(--text);box-shadow:0 1px 4px #0002}
+.layout-switcher button:focus-visible{outline:2px solid #7bbdff;outline-offset:2px}
+/* Keep long channel lists and messages inside their own scroll areas. */
+.app{grid-template-rows:minmax(0,1fr)}
+.sidebar{min-height:0;overflow:hidden}
+.sidebar-content{flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+.sidebar>.sidebar-title,.sidebar>.account-bar,.sidebar>.view-tabs,.sidebar>.search-box{flex-shrink:0}
+.chat-view{position:absolute;inset:0;min-height:0;overflow:hidden}
+.message-scroll{flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+.chat-header,.composer,.typing-line,.reply-strip,.attachment-strip{flex-shrink:0}
+.message-reply-preview{display:flex;align-items:center;gap:5px;max-width:100%;min-width:0;margin:0 0 3px;color:var(--muted);font-size:11px;line-height:16px;white-space:nowrap}
+.reply-preview-arrow{flex:none;font-size:13px;line-height:16px}
+.reply-preview-author{flex:0 1 auto;max-width:40%;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.reply-preview-text{min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:400}
+.new-messages-button{position:absolute;z-index:9;bottom:92px;left:50%;transform:translateX(-50%);padding:10px 18px;border:1px solid #ffffff25;border-radius:30px;background:#0a84ff;color:#fff;font:600 12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 5px 22px #0005;cursor:pointer;white-space:nowrap}
+.new-messages-button:hover{filter:brightness(1.12)}
+html[data-chat-layout=imessage] .message-group.mine>.message-avatar,html[data-chat-layout=imessage] .message-group.mine .message-author{display:none}
+html[data-chat-layout=imessage] .message-group .message-author{margin-bottom:6px}
+html[data-chat-layout=discord]{color-scheme:dark;--bg:#313338;--surface:#2b2d31;--text:#dbdee1;--muted:#949ba4;--accent:#5865f2;--line:#3f4147}
+html[data-chat-layout=discord] .app{background:#313338;color:#dbdee1;font-family:'Segoe UI',Arial,sans-serif}
+html[data-chat-layout=discord] .sidebar{background:#2b2d31;border-color:#232428;width:260px}
+html[data-chat-layout=discord] .sidebar-title{min-height:56px;border-bottom:1px solid #1e1f22;box-shadow:0 1px 2px #0003}
+html[data-chat-layout=discord] .sidebar-title h1{font-size:17px}
+html[data-chat-layout=discord] .account-bar{background:#232428;border-radius:8px;margin:10px 12px;padding:10px}
+html[data-chat-layout=discord] .view-tabs{gap:3px;padding:0 10px;flex-direction:column}
+html[data-chat-layout=discord] .view-tabs button{justify-content:flex-start;gap:14px;padding:10px 13px;border-radius:4px;background:none;border:0;color:#b5bac1;font-size:14px}
+html[data-chat-layout=discord] .view-tabs button.active{background:#404249;color:#f2f3f5}
+html[data-chat-layout=discord] .search-box{background:#1e1f22;border-radius:4px;border:0;margin:12px}
+html[data-chat-layout=discord] .conversation,html[data-chat-layout=discord] .chat-view{background:#313338}
+html[data-chat-layout=discord] .chat-header{min-height:56px;height:56px;background:#313338;border-bottom:1px solid #26272b;box-shadow:0 1px 3px #0002}
+html[data-chat-layout=discord] .chat-header .avatar{width:27px;height:27px}
+html[data-chat-layout=discord] .header-person strong{font-size:16px}
+html[data-chat-layout=discord] .header-person small{font-size:11px;color:#949ba4}
+html[data-neo-app=chat][data-chat-layout=discord] .message-scroll{padding:12px 0 20px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group,html[data-neo-app=chat][data-chat-layout=discord] .message-group.mine{justify-content:flex-start;align-items:flex-start;gap:16px;margin:0;padding:2px 24px 2px 16px;position:relative}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group.group-start{margin-top:17px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group:hover{background:#2e3035}
+html[data-neo-app=chat][data-chat-layout=discord] .message-avatar{display:flex;width:40px;height:40px;flex:0 0 40px;margin:0;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group:not(.group-start)>.message-avatar{visibility:hidden;height:0}
+html[data-neo-app=chat][data-chat-layout=discord] .message-stack{max-width:calc(100% - 56px);align-items:flex-start;width:auto}
+html[data-neo-app=chat][data-chat-layout=discord] .message-author{display:block;font-size:14px;line-height:20px;font-weight:600;color:#f2f3f5;margin:0 0 2px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-bubble,html[data-neo-app=chat][data-chat-layout=discord] .message-group.mine .message-bubble{background:none;color:#dbdee1;box-shadow:none;border:0;border-radius:0;padding:0;min-height:22px;min-width:0;font:400 16px/1.375 'Segoe UI',Arial,sans-serif;letter-spacing:normal}
+html[data-neo-app=chat][data-chat-layout=discord] .message-meta{font-size:10px;padding:3px 0;color:#949ba4;line-height:14px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-tools{background:#313338;border:1px solid #232428;border-radius:4px}
+html[data-chat-layout=discord] .composer{margin:0 16px 20px;padding:0 12px;background:#383a40;border:0;border-radius:8px;min-height:54px;gap:8px}
+html[data-chat-layout=discord] .composer-field{border:0;background:none;box-shadow:none}
+html[data-chat-layout=discord] #messageInput{color:#dbdee1;font-size:15px;background:none}
+html[data-chat-layout=discord] .send-button{background:#5865f2;width:32px;height:32px;border-radius:8px}
+html[data-chat-layout=discord] .new-messages-button{background:#5865f2;bottom:98px}
+html[data-chat-layout=discord] .layout-switcher{background:#232428}
+html[data-chat-layout=discord] .layout-switcher button[aria-pressed=true]{background:#5865f2;color:white}
+.message-attachment img{max-width:min(320px,100%);max-height:300px;object-fit:contain;border-radius:12px}
+.gif-picker{max-height:min(520px,70vh)}
+.gif-fallback-note{grid-column:1/-1;margin:0 0 6px;font-size:11px;line-height:1.45;color:var(--muted)}
+@media(max-width:600px){html[data-chat-layout=discord] .sidebar{width:100%}.layout-switcher{padding-bottom:calc(12px + env(safe-area-inset-bottom))}html[data-neo-app=chat][data-chat-layout=discord] .message-group{padding-left:12px;gap:12px}html[data-chat-layout=discord] .composer{margin:0 10px 12px}}
+.discord-rail{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .app{grid-template-columns:72px 240px minmax(0,1fr)}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar{width:auto;background:#2b2d31}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail{display:flex;flex-direction:column;align-items:center;gap:9px;background:#1e1f22;padding:12px 0}
+.discord-rail button{width:48px;height:48px;border:0;border-radius:16px;background:#313338;color:white;display:grid;place-items:center;cursor:pointer;font-size:24px}
+.discord-rail button:first-child{background:#5865f2}.discord-rail img{width:28px;filter:invert(1)}.discord-rail hr{width:32px;margin:0;border:0;border-top:2px solid #35363c}
+html[data-neo-app=chat][data-chat-layout=discord] .view-tabs{display:flex;flex-direction:column;height:auto;min-height:112px;background:none;border:0;margin:8px;padding:0}
+html[data-neo-app=chat][data-chat-layout=discord] .view-tabs button{display:flex;justify-content:flex-start;font-size:14px;height:34px;border:0;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title{min-height:56px;padding:12px 16px}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title h1{font-size:17px}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-content{order:2;flex:1}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar{order:3;min-height:58px;margin:0;padding:8px 10px;border-radius:0;border:0;background:#232428}
+html[data-neo-app=chat][data-chat-layout=discord] .layout-switcher{order:4;padding:8px;font-size:10px;gap:4px}
+html[data-neo-app=chat][data-chat-layout=discord] .layout-switcher button{padding:6px 8px;font-size:11px}
+html[data-neo-app=chat][data-chat-layout=discord] .search-box{order:1}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row{min-height:34px;height:34px;border-radius:4px;padding:6px 9px;margin:3px 4px;width:calc(100% - 8px);gap:8px}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row .avatar{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row::before{content:'#';font-size:23px;color:#949ba4}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row .row-copy small,html[data-neo-app=chat][data-chat-layout=discord] .conversation-row .row-meta{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row .row-copy strong{font-size:15px;font-weight:500}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row.active{background:#404249}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation-shelf{display:flex;flex-direction:column;padding:0;margin:0;gap:2px}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation{width:calc(100% - 8px);min-height:34px;height:34px;display:flex;flex-direction:row;align-items:center;padding:6px 9px;gap:8px;margin:0 4px;border-radius:4px}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation.active{background:#404249}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation-artwork{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation::before{content:'#';font-size:23px;color:#949ba4}
+html[data-neo-app=chat][data-chat-layout=discord] .pinned-conversation-name{font-size:15px;width:auto;font-weight:500;text-align:left}
+html[data-neo-app=chat][data-chat-layout=discord] .section-label{font-size:11px;text-transform:uppercase;margin:16px 12px 7px;color:#949ba4}
+html[data-neo-app=chat][data-chat-layout=discord] .chat-header{display:flex;align-items:center;justify-content:space-between;height:56px;min-height:56px;padding:0 20px;background:#313338}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:flex-start;text-align:left}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person strong::after{content:none}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person::before{content:'#';font-size:26px;font-weight:400;color:#949ba4}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person .avatar,html[data-neo-app=chat][data-chat-layout=discord] .header-person small{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person strong{font-size:16px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-scroll{background:#313338}
+html[data-neo-app=chat][data-chat-layout=discord] .message-avatar{display:grid;place-items:center;visibility:visible}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group:not(.group-start) .message-avatar{visibility:hidden}
+@media(max-width:600px){html[data-neo-app=chat][data-chat-layout=discord] .app{grid-template-columns:1fr}html[data-neo-app=chat][data-chat-layout=discord] .discord-rail{display:none}html[data-neo-app=chat][data-chat-layout=discord] .sidebar{width:100%}html[data-neo-app=chat][data-chat-layout=discord] .back-button{display:flex}}

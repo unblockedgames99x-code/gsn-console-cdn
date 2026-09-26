@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en" data-neo-app="chat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Chat</title>
+  <link rel="icon" href="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/chat-icon.png?v=20260908-imessage-logo-v2">
+  <link rel="apple-touch-icon" href="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/chat-icon.png?v=20260908-imessage-logo-v2">
+  <link rel="stylesheet" href="./neo-theme-system.css?v=20260919-neo-sync-v1">
+  <link rel="stylesheet" href="./styles.css?v=20260921-no-call-buttons-v1&amp;gifs=multi-provider-v1&amp;gif-reliability=relay-v2&amp;pinned-badge=corner-v1">
+  
+<link rel="stylesheet" href="calls.css"><link rel="stylesheet" href="chat-polish.css"><link rel="stylesheet" href="chat-layouts.css"><link rel="stylesheet" href="reactions.css"></head>
+<body>
+  <svg class="svg-defs" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H6.4A3.4 3.4 0 0 0 3 18.4V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M17 11a3 3 0 1 0-2.1-5.1M17 15a4 4 0 0 1 4 4v1"></path></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 14a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"></path></symbol>
+    <symbol id="i-bell-off" viewBox="0 0 24 24"><path d="M13.7 21h-3.4M18 8a6 6 0 0 0-9.7-4.7M6.3 6.3A6 6 0 0 0 6 8c0 7-3 7-3 9h14M3 3l18 18"></path></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 5v14"></path></symbol>
+    <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.4 11.6-8.9 8.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4 4 0 0 1 5.7 5.7L9.7 17.7a2 2 0 0 1-2.8-2.8l8.9-8.9"></path></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path></symbol>
+    <symbol id="i-compose" viewBox="0 0 24 24"><path d="M13.5 5H6a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7.5"></path><path d="m10 14 1.2-4.1L18.6 2.5a2.1 2.1 0 1 1 3 3l-7.5 7.4L10 14Z"></path></symbol>
+  </svg>
+
+  <main class="app" id="app" aria-busy="true">
+    <nav class="discord-rail" aria-label="Servers"><button type="button" id="discordHome" title="Friends"><img src="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/discord.svg" alt="Discord"></button><hr><button type="button" id="discordCommunity" title="Community"><span>🍒</span></button></nav><aside class="sidebar" aria-label="Chat navigation">
+      <header class="sidebar-title">
+        <h1>Chat</h1>
+        <span class="sidebar-title-actions"><span class="connection-label" id="connectionLabel" role="status" aria-live="polite">Connecting</span><button class="icon-button compose-button" id="composeButton" type="button" aria-label="New message"><svg><use href="#i-compose"></use></svg></button></span>
+      </header>
+
+      <header class="account-bar">
+        <button class="avatar-button" id="profileButton" type="button" aria-label="Edit profile">
+          <span class="avatar avatar-me" id="myAvatar">N</span><span class="presence online" id="myPresence"></span>
+        </button>
+        <span class="account-copy"><strong id="myDisplayName">Your profile</strong><small id="myUsername">Offline</small></span>
+      </header>
+
+      <nav class="view-tabs" aria-label="Message sections">
+        <button class="active" type="button" data-view="chats"><svg><use href="#i-chat"></use></svg><span>Chats</span></button>
+        <button type="button" data-view="friends"><svg><use href="#i-users"></use></svg><span>Friends</span></button>
+        <button type="button" data-view="requests"><svg><use href="#i-bell"></use></svg><span>Requests</span><b class="tab-badge" id="requestBadge" hidden>0</b></button>
+      </nav>
+
+      <label class="search-box">
+        <svg><use href="#i-search"></use></svg>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Search conversations">
+      </label>
+
+      <div class="sidebar-content" id="sidebarContent" aria-live="polite">
+        <div class="skeleton-list" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <footer class="layout-switcher" aria-label="Chat appearance"><span>Appearance</span><div><button type="button" data-chat-layout="imessage">iMessage</button><button type="button" data-chat-layout="discord">Discord</button></div></footer>
+    </aside>
+
+    <section class="conversation" id="conversation">
+      <div class="empty-state" id="emptyState">
+        <span class="empty-orb"><svg><use href="#i-chat"></use></svg></span>
+        <h2>Your messages</h2>
+        <p>Choose Global Chat or start a conversation with a friend.</p>
+        <button class="primary-button" id="emptyStartButton" type="button">Start a message</button>
+      </div>
+
+      <div class="chat-view" id="chatView" hidden>
+        <header class="chat-header">
+          <button class="icon-button back-button" id="backButton" type="button" aria-label="Back"><svg><use href="#i-chevron"></use></svg></button>
+          <button class="header-person" id="headerPerson" type="button">
+            <span class="avatar is-global" id="chatAvatar"><svg aria-hidden="true"><use href="#i-globe"></use></svg></span>
+            <span><strong id="chatTitle">Global Chat</strong><small id="chatSubtitle">Everyone in the community</small></span>
+          </button>
+          <div class="header-actions"><button class="icon-button" id="audioCall" aria-label="Start audio call" title="Audio call" hidden><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-3 2a16 16 0 0 0 6 6l2-3 5 2v4c0 2-2 3-4 2A22 22 0 0 1 3 7C2 5 3 3 5 3Z"/></svg></button><button class="icon-button" id="videoCall" aria-label="Start video call" title="Video call" hidden><svg viewBox="0 0 24 24"><rect x="2" y="5" width="13" height="14" rx="4"/><path d="m15 9 7-4v14l-7-4"/></svg></button>
+            <button class="icon-button" id="infoButton" type="button" aria-label="Conversation information"><svg><use href="#i-info"></use></svg></button>
+          </div>
+        </header>
+
+        <div class="message-scroll" id="messageScroll" role="log" aria-live="polite" aria-label="Messages">
+          <div class="thread-loading"><span></span><p>Loading messages…</p></div>
+        </div>
+        <button id="newMessagesButton" class="new-messages-button" type="button" hidden aria-live="polite"></button>
+        <div class="typing-line" id="typingLine" aria-live="polite"></div>
+
+        <div class="reply-strip" id="replyStrip" hidden>
+          <span><small>Replying to</small><strong id="replyLabel"></strong></span>
+          <button class="icon-button" id="cancelReplyButton" type="button" aria-label="Cancel reply"><svg><use href="#i-close"></use></svg></button>
+        </div>
+        <div class="attachment-strip" id="attachmentStrip" hidden>
+          <span id="attachmentPreview"></span>
+          <span><strong id="attachmentName"></strong><small id="attachmentSize"></small></span>
+          <button class="icon-button" id="cancelAttachmentButton" type="button" aria-label="Remove attachment"><svg><use href="#i-close"></use></svg></button>
+        </div>
+
+        <form class="composer" id="composer">
+          <input id="fileInput" type="file" accept="image/*,.pdf,.txt,.zip" hidden>
+          <button class="composer-tool" id="attachButton" type="button" aria-label="Add an attachment" aria-haspopup="menu" aria-controls="attachmentMenu" aria-expanded="false"><svg><use href="#i-plus"></use></svg></button>
+          <div class="composer-field">
+            <textarea id="messageInput" rows="1" maxlength="4000" placeholder="Message" aria-label="Message"></textarea>
+            <button class="composer-tool emoji-button" id="emojiButton" type="button" aria-label="Choose emoji"><svg><use href="#i-smile"></use></svg></button>
+          </div>
+          <button class="send-button" id="sendButton" type="submit" aria-label="Send message" disabled><svg><use href="#i-send"></use></svg></button>
+        </form>
+        <div class="attachment-menu" id="attachmentMenu" role="menu" aria-label="Add to message" hidden>
+          <button id="attachFileButton" type="button" role="menuitem">
+            <span class="attachment-menu-icon"><svg><use href="#i-paperclip"></use></svg></span>
+            <span><strong>Photos &amp; Files</strong><small>Choose something from this device</small></span>
+          </button>
+          <button id="attachGifButton" type="button" role="menuitem">
+            <span class="attachment-menu-icon gif-mark">GIF</span>
+            <span><strong>Search GIFs</strong><small>Search providers or paste any GIF link</small></span>
+          </button>
+        </div>
+        <section class="gif-picker" id="gifPicker" aria-label="GIF picker" hidden>
+          <header class="gif-picker-header">
+            <span><strong>GIFs</strong><small>Find the perfect reaction</small></span>
+            <button class="icon-button" id="gifCloseButton" type="button" aria-label="Close GIF picker"><svg><use href="#i-close"></use></svg></button>
+          </header>
+          <form class="gif-search" id="gifSearchForm" role="search">
+            <svg><use href="#i-search"></use></svg>
+            <input id="gifSearchInput" type="search" autocomplete="off" placeholder="Search GIFs" aria-label="Search GIFs">
+          </form>
+          <div class="gif-provider-tabs" id="gifProviderTabs" aria-label="GIF sources">
+            <button class="active" type="button" data-gif-provider="giphy" aria-pressed="true">GIPHY</button><button type="button" data-gif-provider="all" aria-pressed="false">All sources</button>
+            <button type="button" data-gif-provider="gifsnap" aria-pressed="false">GIF search</button>
+            <button type="button" data-gif-provider="commons" aria-pressed="false">Commons</button>
+          </div>
+          <div class="gif-results" id="gifResults" aria-live="polite"></div>
+          <form class="gif-url-form" id="gifUrlForm">
+            <input id="gifUrlInput" type="url" inputmode="url" autocomplete="off" placeholder="Paste a GIF link from any provider" aria-label="GIF URL">
+            <button type="submit">Add</button>
+          </form>
+          <small class="gif-picker-note">Searches multiple GIF sources. Direct links work with any HTTPS provider that allows media downloads.</small>
+        </section>
+        <div class="emoji-popover" id="emojiPopover" hidden aria-label="Emoji picker"></div>
+      </div>
+    </section>
+
+    <aside class="details-panel" id="detailsPanel" hidden>
+      <button class="icon-button details-close" id="detailsClose" type="button" aria-label="Close details"><svg><use href="#i-close"></use></svg></button>
+      <span class="avatar details-avatar is-global" id="detailsAvatar"><svg aria-hidden="true"><use href="#i-globe"></use></svg></span>
+      <h2 id="detailsName">Global Chat</h2>
+      <p id="detailsStatus">Public room</p>
+      <div class="details-actions" id="detailsActions"></div>
+    </aside>
+  </main>
+
+  <section class="overlay auth-overlay" id="authOverlay" aria-labelledby="authTitle">
+    <div class="auth-brand"><span class="brand-mark"><img src="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/chat-icon.png" alt="Chat"></span><strong>Chat</strong></div>
+    <form class="modal auth-card" id="authForm">
+      <div class="modal-heading"><div><span class="eyebrow">WELCOME</span><h2 id="authTitle">Sign in</h2></div><div class="step-dots"><i class="active"></i><i></i></div></div>
+      <div class="auth-tabs"><button class="active" type="button" data-auth-mode="login">Sign in</button><button type="button" data-auth-mode="register">Create account</button></div>
+      <label>Username<input id="authUsername" required minlength="2" maxlength="24" pattern="[A-Za-z0-9_.-]+" autocomplete="username" placeholder="Username"></label>
+      <p class="server-note">Sign in to join global chat and send messages.</p><label>Password<input id="authPassword" required minlength="8" maxlength="72" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+      <p class="form-feedback" id="authFeedback" role="status"></p>
+      <button class="primary-button full" id="authSubmit" type="submit">Continue</button>
+    </form>
+  </section>
+
+  <section class="overlay" id="profileOverlay" hidden aria-labelledby="profileTitle">
+    <form class="modal profile-card" id="profileForm">
+      <div class="modal-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2 id="profileTitle">Set up profile</h2></div><div class="step-dots"><i class="active"></i><i></i><i></i></div></div>
+      <p class="modal-intro">Choose an Apple-style Memoji portrait or use your own picture.</p>
+      <div class="memoji-studio" id="memojiPersonalizer">
+        <div class="memoji-stage"><span class="memoji-preview" id="memojiPreview" aria-label="Avatar preview"></span></div>
+        <div class="memoji-library-heading"><strong>Complete Memoji collection</strong></div>
+        <div class="memoji-option-grid" id="memojiOptionGrid" role="radiogroup" aria-label="Apple-style avatar choices"></div>
+      </div>
+      <label class="upload-card" for="profileFile"><span class="upload-icon"><svg><use href="#i-plus"></use></svg></span><span><strong>Custom picture</strong><small>Upload and crop a photo</small></span></label>
+      <input id="profileFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+      <label class="profile-name-label">Display name<input id="profileDisplayName" maxlength="32" required placeholder="Your name"></label>
+      <p class="form-feedback" id="profileFeedback" role="status"></p>
+      <div class="modal-actions"><button class="danger-link" id="logoutButton" type="button">Sign out</button><span class="modal-action-spacer"></span><button class="ghost-button" id="profileCancel" type="button">Not now</button><button class="primary-button" type="submit">Save profile</button></div>
+    </form>
+  </section>
+
+  <section class="overlay" id="newChatOverlay" hidden aria-labelledby="newChatTitle">
+    <div class="modal new-chat-card">
+      <header class="sheet-heading"><div><span class="eyebrow">NEW MESSAGE</span><h2 id="newChatTitle">Choose someone</h2></div><button class="icon-button" type="button" data-close-overlay="newChatOverlay"><svg><use href="#i-close"></use></svg></button></header>
+      <label class="search-box large"><svg><use href="#i-search"></use></svg><input id="peopleSearch" type="search" autocomplete="off" placeholder="Search members"></label>
+      <div class="people-list" id="peopleList"></div>
+    </div>
+  </section>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  
+  
+  
+  
+  <script src="reactions.js"></script><script src="chat-layouts.js"></script><script src="./cherri-bridge.js"></script><script src="../shared/console-bridge.js"></script><script src="./app.js?v=20260921-no-call-buttons-v1&amp;gifs=unlimited-v1&amp;actions=shared-message-v1&amp;gif-reliability=relay-v2" defer></script>
+<script src="peerjs.min.js"></script><script src="calls.js"></script></body>
+</html>

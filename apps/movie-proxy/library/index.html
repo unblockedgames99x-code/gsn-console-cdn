@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Movies — a fast, profile-based cinema for your console.">
+  <title>Movies</title>
+  <script>window.movieLibraryReady=new Promise((resolve,reject)=>{window.resolveMovieLibrary=resolve;window.rejectMovieLibrary=reject;});window.movieLibraryReady.catch(()=>{});</script>
+  <link rel="stylesheet" href="./app.css?v=20260919-scholarnook-v1">
+  <script defer src="./catalog.js?v=20260912-open-movies-v2"></script>
+  <script defer src="./offline-catalog.js?v=20260912-library-v1"></script>
+  <script defer src="./offline-series.js?v=20260912-series-v1"></script>
+  <script defer src="./providers.js?v=20260926"></script>
+  <script defer src="./app.js?v=20260926-sources"></script>
+<script src="../vendor/jet/jet.core.js"></script><script src="../vendor/jet/jet.api.js"></script><script src="../vendor/jet/jet.utils.js"></script>
+<script type="module" src="./console-bridge.js"></script>
+<link rel="stylesheet" href="./console.css">
+</head>
+<body>
+  <div class="app-shell" data-app-shell hidden>
+    <aside class="side-nav" aria-label="Movies navigation">
+      <nav>
+        <button class="nav-button is-active" type="button" data-view="home" title="Home" aria-label="Home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>Home</span>
+        </button>
+        <button class="nav-button" type="button" data-view="movies" title="Movies" aria-label="Movies">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v13H4zM7 3v6m5-6v6m5-6v6"/></svg><span>Movies</span>
+        </button>
+        <button class="nav-button" type="button" data-view="series" title="Series" aria-label="Series">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m9 9 6 3-6 3Z"/></svg><span>Series</span>
+        </button>
+        <button class="nav-button" type="button" data-view="list" title="My List" aria-label="My List">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v17l-6-4-6 4Z"/></svg><span>My List</span>
+        </button>
+        <button class="nav-button" type="button" data-video-upload title="Add your video" aria-label="Add your video">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 13v6h14v-6"/></svg><span>Uploads</span>
+        </button>
+      </nav>
+      <button class="nav-button nav-bottom" type="button" data-open-settings title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Settings</span>
+      </button>
+    </aside>
+
+    <main class="content" data-content>
+      <header class="topbar">
+        <div class="wordmark" aria-label="Movies"><img src="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/netflix-icon.webp" alt="" aria-hidden="true"><strong>MOVIES</strong></div>
+        <div class="top-actions">
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input type="search" placeholder="Titles, people, genres" aria-label="Search movies and shows" data-search>
+          </label>
+          <button class="profile-chip" type="button" data-profile-menu aria-label="Switch profile"><span data-profile-avatar>G</span><strong data-profile-name>Guest</strong></button>
+        </div>
+      </header>
+
+      <section class="hero" data-hero aria-label="Featured title">
+        <div class="hero-image" data-hero-image></div><div class="hero-shade"></div>
+        <div class="hero-copy">
+          <span class="eyebrow">FEATURED</span>
+          <h1 data-hero-title></h1>
+          <p class="hero-meta" data-hero-meta></p>
+          <p class="hero-description" data-hero-description></p>
+          <div class="hero-actions">
+            <button class="primary" type="button" data-hero-play><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg><span data-hero-action>Play</span></button>
+            <button class="secondary" type="button" data-hero-details><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg>More info</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="rails" data-rails aria-live="polite"></section>
+      <section class="search-results" data-search-results hidden><h2>Search</h2><div class="search-grid" data-search-grid></div><p class="empty-state" data-search-empty hidden>No titles found.</p><button class="library-more" type="button" data-search-more hidden>Load more results</button></section>
+      <footer><strong>MOVIES</strong><span>Movies, series and your watchlist. Profiles stay on this device.</span></footer>
+    </main>
+  </div>
+
+  <section class="profile-gate" data-profile-gate aria-labelledby="profile-title">
+    <div class="profile-brand" aria-label="Movies"><img src="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/netflix-icon.webp" alt="" aria-hidden="true"><strong>MOVIES</strong></div>
+    <div class="profile-panel">
+      <img class="profile-logo" src="/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/assets/netflix-icon.webp" alt="Movies">
+      <h1 id="profile-title">Who's watching?</h1>
+      <p>No account or sign-in. Profiles stay on this device.</p>
+      <div class="profiles" data-profiles></div>
+      <button class="manage-button" type="button" data-manage-profiles>Manage profiles</button>
+    </div>
+  </section>
+
+  <dialog class="dialog" data-profile-dialog>
+    <form method="dialog" data-profile-form>
+      <button class="close" value="cancel" formnovalidate aria-label="Close">×</button>
+      <span class="eyebrow">PROFILE</span><h2 data-profile-dialog-title>Add profile</h2>
+      <label>Name<input name="name" maxlength="18" autocomplete="off" required placeholder="Profile name"></label>
+      <fieldset class="profile-picture-fieldset"><legend>Profile picture</legend><strong class="profile-picture-collection">The Classics</strong><input type="hidden" name="avatar" value="classic-01"><input type="hidden" name="avatarData" value=""><div class="profile-picture-picker" data-profile-picture-picker role="group" aria-label="Choose a classic Netflix profile picture"></div><label class="avatar-upload">Upload your own<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-avatar-upload></label><p class="upload-note" data-avatar-upload-note>Images are resized and stored only on this device.</p></fieldset>
+      <label>Profile color<select name="color"><option value="#77d5ff">Sky</option><option value="#ff5f75">Coral</option><option value="#b796ff">Violet</option><option value="#62e6a6">Mint</option><option value="#ffc25a">Amber</option></select></label>
+      <label class="check"><input type="checkbox" name="kids"> Kids profile</label>
+      <div class="dialog-actions"><button value="cancel" class="secondary" formnovalidate>Cancel</button><button value="save" class="primary" data-profile-save>Save</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog settings-dialog" data-settings-dialog>
+    <form method="dialog">
+      <button class="close" value="cancel" aria-label="Close">×</button>
+      <span class="eyebrow">MOVIES</span><h2>Playback & data</h2>
+      <label class="check"><input type="checkbox" data-data-saver> Data saver (smaller images)</label>
+      <label class="check"><input type="checkbox" data-autoplay-preview> Autoplay previews</label>
+      <p class="dialog-note">Movie and series discovery is supplied by ScholarNook's Cirrus service. Playback stays inside Movies, and your uploaded videos remain only in this session.</p>
+      <div class="dialog-actions"><button value="cancel" class="primary">Done</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="details-dialog" data-details-dialog>
+    <article data-details-card></article>
+  </dialog>
+
+  <section class="player" data-player hidden aria-label="Video player">
+    <video data-video controls playsinline preload="metadata"></video>
+    <iframe data-vidfast-player title="Movies player" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen hidden></iframe>
+    <div class="player-top"><div class="player-heading"><span class="eyebrow">NOW WATCHING</span><strong data-player-title></strong></div><div class="player-actions"><button type="button" data-close-player aria-label="Close player">Close</button></div></div>
+    <details class="source-panel" data-source-controls>
+      <summary>Playback sources <span aria-hidden="true">⌄</span></summary>
+      <div class="source-panel-body">
+        <label class="player-source">Source<select data-player-source aria-label="Playback source"></select></label>
+        <label class="auto-source"><input type="checkbox" data-auto-source checked> Automatically try another source</label>
+        <p data-source-status role="status" aria-live="polite">Connecting…</p>
+        <button type="button" data-next-source>Try next source <span aria-hidden="true">→</span></button>
+        <small>Flixnet + Aether. Availability varies by title.</small>
+      </div>
+    </details>
+    <div class="popout-controls" data-popout-controls hidden><div class="popout-drag" data-popout-drag title="Drag video" aria-label="Drag popped-out video"><span></span></div><button type="button" data-restore-popout>Restore</button></div>
+    <div class="player-status" data-player-status hidden role="status" aria-live="polite">
+      <p data-player-message></p>
+      <div><button type="button" class="primary" data-retry-player hidden>Retry stream</button><button type="button" class="secondary" data-player-official hidden>Official film page</button></div>
+    </div>
+  </section>
+
+  <input class="visually-hidden" type="file" accept="video/*" data-video-file>
+
+  <section class="manga-reader" data-reader hidden aria-label="Manga reader">
+    <header class="reader-top"><div><span class="eyebrow">NEO MANGA</span><strong data-reader-title></strong><small data-reader-meta></small></div><button type="button" data-close-reader>Close</button></header>
+    <div class="reader-pages" data-reader-pages tabindex="0"></div>
+  </section>
+
+  <template id="card-template"><button class="title-card" type="button"><span class="poster"><img alt="" loading="lazy" decoding="async"><span class="card-progress"></span></span><span class="card-copy"><strong></strong><small></small></span></button></template>
+</body>
+</html>

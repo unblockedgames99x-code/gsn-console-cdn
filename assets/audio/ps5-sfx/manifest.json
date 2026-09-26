@@ -1,0 +1,124 @@
+{
+  "album": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020",
+  "clips": [
+    {
+      "name": "navigate",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/17.%2520Focus%2520Move%2520Psfx%2520Focus%2520Move.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/cvyffmry/17.%20Focus%20Move%20Psfx%20Focus%20Move.mp3",
+      "sha256": "bfb55d99deb43b4aaf0a3a07c59709dbce2d1e1a66a45ac52f8d50ec1668faad",
+      "bytes": 8157
+    },
+    {
+      "name": "select",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/11.%2520Enter%2520Psfx%2520Enter.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/krdprovj/11.%20Enter%20Psfx%20Enter.mp3",
+      "sha256": "1af4a2a42575c5e8452bd3d03aff833778f880454d2d00e6066d8087076019d6",
+      "bytes": 23229
+    },
+    {
+      "name": "back",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/05.%2520Cancel%2520Psfx%2520Cancel.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/qlieziqg/05.%20Cancel%20Psfx%20Cancel.mp3",
+      "sha256": "688cf99d97b18acbdabd0376a415f5c083e7634c10b2ee20c89c797e2ccf6eba",
+      "bytes": 22629
+    },
+    {
+      "name": "panel",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/06.%2520Change%2520Panel%2520Psfx%2520Change%2520Pane.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/kfwsxkik/06.%20Change%20Panel%20Psfx%20Change%20Pane.mp3",
+      "sha256": "4a583ec720b966e49287d58eb9530e2e5d9a284ac54ca7974b7ae6c1912e8cb0",
+      "bytes": 9501
+    },
+    {
+      "name": "controlOpen",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/25.%2520Open%2520Control%2520Center%2520Psfx%2520Open%2520Contro.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/duomsbfy/25.%20Open%20Control%20Center%20Psfx%20Open%20Contro.mp3",
+      "sha256": "798b2a579f5c1ff98f2bf1ebac4ad7015d1d4fa520de4a23097deb6976456eb1",
+      "bytes": 17085
+    },
+    {
+      "name": "controlClose",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/09.%2520Close%2520Control%2520Center%2520Psfx%2520Close%2520Contr.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/rovieydv/09.%20Close%20Control%20Center%20Psfx%20Close%20Contr.mp3",
+      "sha256": "cebf16b3a70ee436cecaa7bf8a67594d4e542fde0e0db29eb91ccbae31b033d6",
+      "bytes": 17085
+    },
+    {
+      "name": "optionsOpen",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/29.%2520Open%2520Option%2520Menu%2520Psfx%2520Open%2520Option.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/zfehufpk/29.%20Open%20Option%20Menu%20Psfx%20Open%20Option.mp3",
+      "sha256": "d947914cf117ef926cbde29bfabd8fdbdd466838a0290c6ed3f7def7a2c51dd2",
+      "bytes": 20877
+    },
+    {
+      "name": "optionsClose",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/10.%2520Close%2520Option%2520Menu%2520Psfx%2520Close%2520Optio.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/ujptauzm/10.%20Close%20Option%20Menu%20Psfx%20Close%20Optio.mp3",
+      "sha256": "572efaf494045be118fb60d1f288bc21207d4d5da83c7a43887a49913d564306",
+      "bytes": 22365
+    },
+    {
+      "name": "dialogOpen",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/26.%2520Open%2520Dialog%2520Psfx%2520Open%2520Dialog.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/afamhcqx/26.%20Open%20Dialog%20Psfx%20Open%20Dialog.mp3",
+      "sha256": "257c3fd4460ba0080974b630a534def6917909b4391dd8735018cef4ce71c40d",
+      "bytes": 17637
+    },
+    {
+      "name": "home",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/28.%2520Open%2520Home%2520Psfx%2520Open%2520Home.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/gwnapwmx/28.%20Open%20Home%20Psfx%20Open%20Home.mp3",
+      "sha256": "73203d99fc76625afdd3097870faf8f291a0fa18f92961a22fcf43bf297c7c09",
+      "bytes": 41277
+    },
+    {
+      "name": "slider",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/34.%2520Slider%2520Level%2520Meter%2520Psfx%2520Slider%2520Leve.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/lzpzeyea/34.%20Slider%20Level%20Meter%20Psfx%20Slider%20Leve.mp3",
+      "sha256": "1704ee4b0f9032d37f8b821b09f698d62424eadfd67215fbccf6607dc4372fd2",
+      "bytes": 5757
+    },
+    {
+      "name": "switchOn",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/36.%2520Switch%2520on%2520Psfx%2520Switch%2520On.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/bzrjwfnx/36.%20Switch%20on%20Psfx%20Switch%20On.mp3",
+      "sha256": "584fecc648acc92e6c839b050f0c0365f704a57a81f69f189adb5a90917d7c0b",
+      "bytes": 8157
+    },
+    {
+      "name": "switchOff",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/35.%2520Switch%2520Off%2520Psfx%2520Switch%2520Off.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/qaeunfkl/35.%20Switch%20Off%20Psfx%20Switch%20Off.mp3",
+      "sha256": "e7333e0668b430fab6f5852350437a51d05b79e19393f6f02bf9fb3186d62401",
+      "bytes": 7869
+    },
+    {
+      "name": "text",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/38.%2520Text%2520Input%2520Psfx%2520Text%2520Input.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/vzjzveid/38.%20Text%20Input%20Psfx%20Text%20Input.mp3",
+      "sha256": "c4425d040be3f34e33dfe49c5297730fd6c7ebf12cc93994d1f054e371574fa8",
+      "bytes": 8277
+    },
+    {
+      "name": "backspace",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/04.%2520Backspace%2520Psfx%2520Backspace.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/vvsbchgh/04.%20Backspace%20Psfx%20Backspace.mp3",
+      "sha256": "ba537dd4ac0caf47f1f79f058b97eb752fc6762a0a8314e210d43cb96b166ea3",
+      "bytes": 8181
+    },
+    {
+      "name": "toast",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/18.%2520Informative%2520Toasts%2520Something%2520to%2520Read%2520Psfx%2520Informative.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/rnoehzyt/18.%20Informative%20Toasts%20Something%20to%20Read%20Psfx%20Informative.mp3",
+      "sha256": "76fb0cfc0a94736ab512abf738b2dbdc1d34cc2e2728afd5779255badd3c98da",
+      "bytes": 35229
+    },
+    {
+      "name": "error",
+      "page": "https://downloads.khinsider.com/game-soundtracks/album/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/13.%2520Error%2520Psfx%2520Error.mp3",
+      "url": "https://jetta.vgmtreasurechest.com/soundtracks/playstation-5-system-software-sounds-effects-ps5-gamerip-2020/rzzwnwul/13.%20Error%20Psfx%20Error.mp3",
+      "sha256": "3133c6f172344c231725e73d540d48a0e621da8f2d759f6e428b1fe6b8b20ce3",
+      "bytes": 18213
+    }
+  ]
+}
