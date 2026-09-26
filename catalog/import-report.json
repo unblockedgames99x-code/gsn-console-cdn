@@ -1,0 +1,700 @@
+{
+  "generatedAt": "2026-09-26T04:49:28.884Z",
+  "sources": {
+    "darknux": "https://cdn.jsdelivr.net/gh/daknux/assets@master/zones.json",
+    "clawed": "https://clawed.catman6112.dev/games.json"
+  },
+  "commits": {
+    "gn": "6717cdda835ee00ecc6a4fafec5059f846659c97",
+    "darknux": "8bdde3dc10d6edcd535954f31696a4a256a4b334"
+  },
+  "input": {
+    "gn": 836,
+    "darknux": 424,
+    "clawed": 130
+  },
+  "total": 1336,
+  "retained": {
+    "gn": 835,
+    "darknux": 371,
+    "clawed": 130
+  },
+  "duplicatePolicy": "Exact bytes only, with matching resource context. No title matching, whitespace normalization, or error-page deduplication.",
+  "duplicates": [
+    {
+      "removed": "gn-212",
+      "kept": "gn-85",
+      "title": "Cut the Rope",
+      "keptTitle": "Cut the Rope",
+      "bytes": 27462,
+      "sha256": "d611d74c614adbc43ffdd315cec32a29d411b8130ec8572dc82cebbbbc6a376a",
+      "removedSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/212-f2.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/85-f2.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-81",
+      "kept": "gn-618",
+      "title": "FNF vs Bob v2.0 (Bob’s Onslaught)",
+      "keptTitle": "FNF vs Bob v2.0 (Bob’s Onslaught)",
+      "bytes": 20484,
+      "sha256": "b57f98ea119089c1ef233082a65a83e651a28bebab6bbbba2351230d90d35657",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/81.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/618.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-82",
+      "kept": "gn-700",
+      "title": "FNF vs Pibby Corrupted",
+      "keptTitle": "FNF vs Pibby Corrupted",
+      "bytes": 21870,
+      "sha256": "0612aac24af8806f7e4eec126a67e4487e111b6d2f32753c66dc20ce6aeca226",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/82.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/700.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-83",
+      "kept": "gn-601",
+      "title": "FNF Vs. Sonic.EXE 3.0/4.0",
+      "keptTitle": "FNF Vs. Sonic.EXE 3.0/4.0",
+      "bytes": 22929,
+      "sha256": "eb1ad831b9bf81e950fcc468fceba3d078d14f3d00ef0b3dc539972dc87f91ef",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/83.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/601.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-84",
+      "kept": "gn-642",
+      "title": "Friday Night Funkin' Sunday Night Suicide: Rookies Edition",
+      "keptTitle": "Friday Night Funkin' Sunday Night Suicide: Rookies Edition",
+      "bytes": 21847,
+      "sha256": "b7f7ca7d0a9a064e34d08855c279a641a4d172a9478b9cd5d554b91501b4f866",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/84.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/642.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-85",
+      "kept": "gn-610",
+      "title": "Friday Night Funkin vs Carol V2",
+      "keptTitle": "Friday Night Funkin vs Carol V2",
+      "bytes": 21501,
+      "sha256": "cd6d61f9a77030a0d00c225eb249b684bea9b71e799531649edd3c00550c34ca",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/85.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/610.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-86",
+      "kept": "gn-639",
+      "title": "Friday Night Funkin' VS Impostor B-Sides",
+      "keptTitle": "Friday Night Funkin' VS Impostor B-Sides",
+      "bytes": 24391,
+      "sha256": "cd1533bdb95e940b3d70c832bf5df02d1ad255d2c421fb5719c6147209f5ef09",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/86.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/639.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-87",
+      "kept": "gn-608",
+      "title": "Friday Night Funkin VS Impostor v4",
+      "keptTitle": "Friday Night Funkin VS Impostor v4",
+      "bytes": 24228,
+      "sha256": "abd0799ac33b987942c116968f209549e56cc6fec9c44245fdfabccfd0728565",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/87.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/608.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-88",
+      "kept": "gn-644",
+      "title": "Friday Night Funkin vs Nonsense",
+      "keptTitle": "Friday Night Funkin vs Nonsense",
+      "bytes": 21411,
+      "sha256": "62505889f8ac64e5be68625b299f4ee2a336782c2932e151f7e4dbeb0cdfca09",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/88.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/644.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-89",
+      "kept": "gn-559",
+      "title": "Friday Night Funkin vs Shaggy",
+      "keptTitle": "Friday Night Funkin vs Shaggy",
+      "bytes": 21217,
+      "sha256": "13c58cbce24648da3cf70e50a271d2d84d969149b69c35514732d0ed6cdeea7e",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/89.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/559.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-90",
+      "kept": "gn-836",
+      "title": "Friday Night Funkin vs Shucks v2",
+      "keptTitle": "Friday Night Funkin vs Shucks v2",
+      "bytes": 3244,
+      "sha256": "5087df20ac6cffe40615dc884bad8365cc9b37c860432f9bdb9012747a3151cf",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/90.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/836.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-91",
+      "kept": "gn-609",
+      "title": "Friday Night Funkin vs Sunday Remastered HD",
+      "keptTitle": "Friday Night Funkin vs Sunday Remastered HD",
+      "bytes": 21702,
+      "sha256": "5095c8ef342ab767a6f4e602f3a4b08fdaee53e64ecb5fad197180868690da89",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/91.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/609-a.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-92",
+      "kept": "gn-714",
+      "title": "Friday Night Funkin vs Tabi",
+      "keptTitle": "Friday Night Funkin vs Tabi",
+      "bytes": 23383,
+      "sha256": "fb346aa08a6457c98b6bd3f690568150d14eb95a4a6d7a73754795a4c09c4852",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/92.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/714.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-93",
+      "kept": "gn-657",
+      "title": "Friday Night Funkin vs Undertale",
+      "keptTitle": "Friday Night Funkin vs Undertale",
+      "bytes": 21265,
+      "sha256": "32ffc73b75fbf2eca6c03d10ea82af06091b38b73fc9a16dfd3328e06721a8c1",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/93.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/657.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-94",
+      "kept": "gn-715",
+      "title": "Friday Night Funkin vs Zardy",
+      "keptTitle": "Friday Night Funkin vs Zardy",
+      "bytes": 22274,
+      "sha256": "e0bd6869ccfbf96fd5d76e50f5eac703fd5b9c0744b00395ae8c2d1d1abd0985",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/94.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/715.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-95",
+      "kept": "gn-558",
+      "title": "Friday Night Funkin Vs. Cyber Sensation",
+      "keptTitle": "Friday Night Funkin Vs. Cyber Sensation",
+      "bytes": 21364,
+      "sha256": "eeb4710e3f1bea1c2134ced52664b4fc4140bd9316f8227c4e947ef6755448cb",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/95.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/558.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-96",
+      "kept": "gn-498",
+      "title": "Friday Night Funkin': 17 Bucks: Floor 1",
+      "keptTitle": "Friday Night Funkin': 17 Bucks: Floor 1",
+      "bytes": 21508,
+      "sha256": "f5431b84dc9a4da4409977027c03df14e0378a156052ab21419695896517ac09",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/96.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/498.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-97",
+      "kept": "gn-690",
+      "title": "Friday Night Funkin': AKAGE",
+      "keptTitle": "Friday Night Funkin': AKAGE",
+      "bytes": 23033,
+      "sha256": "cc4a4f0521ed501f681a2d46ed2f681a994d2f806a574270828e951ad5546514",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/97.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/690.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-98",
+      "kept": "gn-475",
+      "title": "Friday Night Funkin': B-Sides",
+      "keptTitle": "Friday Night Funkin': B-Sides",
+      "bytes": 21217,
+      "sha256": "e1440a31b006b8aa335a62b20e836b4c568194a02ea670eb924fde52f1387bd8",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/98.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/475.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-99",
+      "kept": "gn-634",
+      "title": "Friday Night Funkin': Chaos Nightmare - Sonic Vs. Fleetway",
+      "keptTitle": "Friday Night Funkin': Chaos Nightmare - Sonic Vs. Fleetway",
+      "bytes": 21328,
+      "sha256": "818d8ebf61b71f9c163e46e695a33729b2146eb05e573fc876296597f66a3c26",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/99.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/634.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-100",
+      "kept": "gn-484",
+      "title": "Friday Night Funkin': Creepypasta JP",
+      "keptTitle": "Friday Night Funkin': Creepypasta JP",
+      "bytes": 23042,
+      "sha256": "fc2f859f65143f26b875e7f0c31aea233b592b62e7226cda530517cf8ed39e40",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/100.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/484.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-101",
+      "kept": "gn-525",
+      "title": "Friday Night Funkin': Darkness Takeover",
+      "keptTitle": "Friday Night Funkin': Darkness Takeover",
+      "bytes": 21843,
+      "sha256": "1ef39fc787f55127aaedde9720c163406bb141da208856347f230848537c7b88",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/101.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/525.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-102",
+      "kept": "gn-499",
+      "title": "Friday Night Funkin': FIRE IN THE HOLE: Lobotomy Dash Funkin'",
+      "keptTitle": "Friday Night Funkin': FIRE IN THE HOLE: Lobotomy Dash Funkin'",
+      "bytes": 22165,
+      "sha256": "ef2040d57f45eab2657c5894fe89d3e687bbe55b39a3640189cbd7d16040e510",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/102.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/499.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-103",
+      "kept": "gn-621",
+      "title": "Friday Night Funkin': Gumballs",
+      "keptTitle": "Friday Night Funkin': Gumballs",
+      "bytes": 23027,
+      "sha256": "8816f8235a2129af3a9af2701cfa89ec6ce4ba051dbda5574fd55b9bc42aa921",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/103.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/621.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-104",
+      "kept": "gn-691",
+      "title": "Friday Night Funkin': Heartbreak Havoc [Vs. Sky: REDUX]",
+      "keptTitle": "Friday Night Funkin': Heartbreak Havoc [Vs. Sky: REDUX]",
+      "bytes": 25433,
+      "sha256": "8a4501ea93474b8b9847c950e2ef5d0840a78437d0163d73dce70d872dd3fb30",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/104.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/691.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-105",
+      "kept": "gn-483",
+      "title": "Friday Night Funkin': Hit Single Real",
+      "keptTitle": "Friday Night Funkin': Hit Single Real",
+      "bytes": 22711,
+      "sha256": "485bcd7867fad7e64257f092aa3d34dc2381f3e3b7191b15e1e7966fa9a3667f",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/105.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/483.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-106",
+      "kept": "gn-489",
+      "title": "Friday Night Funkin': Indie Cross",
+      "keptTitle": "Friday Night Funkin': Indie Cross",
+      "bytes": 21575,
+      "sha256": "e0ac99d3fd08d90383f5c3a76a9f923d28a8b769114b0c6f20e521f6c406ce51",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/106.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/489.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-107",
+      "kept": "gn-496",
+      "title": "Friday Night Funkin': Jeffy's Endless Aethos",
+      "keptTitle": "Friday Night Funkin': Jeffy's Endless Aethos",
+      "bytes": 21376,
+      "sha256": "387c5e1bc3244ca8828e96254e359e40b0d12758f1aefe0b0a660deb74963d81",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/107.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/496.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-108",
+      "kept": "gn-488",
+      "title": "Friday Night Funkin': Mistful Crimson Morning Reboot",
+      "keptTitle": "Friday Night Funkin': Mistful Crimson Morning Reboot",
+      "bytes": 23761,
+      "sha256": "84f4f3ca6ac6b8775f7f5fc8794339bff65d5332e0ec1e9dd0bc3451bdcf7bff",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/108.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/488.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-109",
+      "kept": "gn-478",
+      "title": "Friday Night Funkin': Neo",
+      "keptTitle": "Friday Night Funkin': Neo",
+      "bytes": 21215,
+      "sha256": "82dcb567749a01a75a03b64db05965bbf122ed2202fc87d19ecba6f1adee868a",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/109.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/478.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-110",
+      "kept": "gn-541",
+      "title": "Friday Night Funkin': Pibby: Apocalypse",
+      "keptTitle": "Friday Night Funkin': Pibby: Apocalypse",
+      "bytes": 21471,
+      "sha256": "a8f7c951e2ceefdf36a9967750c5c644240c6ada85861081b2cbd5b17a5219dc",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/110.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/541.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-111",
+      "kept": "gn-480",
+      "title": "Friday Night Funkin': Sarvente's Mid-Fight Masses",
+      "keptTitle": "Friday Night Funkin': Sarvente's Mid-Fight Masses",
+      "bytes": 21511,
+      "sha256": "89a25f73a85ad117352c77a6c69e9edfd06b99638fbf2067053ee025485f3fa7",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/111.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/480.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-112",
+      "kept": "gn-486",
+      "title": "Friday Night Funkin': Sonic Legacy",
+      "keptTitle": "Friday Night Funkin': Sonic Legacy",
+      "bytes": 21534,
+      "sha256": "91c2b12ff90ab2f05bc3ea127ce4f25a3110f3de2631ea69c67bc33fd59f40df",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/112.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/486.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-113",
+      "kept": "gn-500",
+      "title": "Friday Night Funkin': TWIDDLEFINGER",
+      "keptTitle": "Friday Night Funkin': TWIDDLEFINGER",
+      "bytes": 22015,
+      "sha256": "9a3c3bd7e42ad1c504e5faf0ad1943e6f2685066a214a1dec8005e2085e2f4bf",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/113.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/500.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-114",
+      "kept": "gn-474",
+      "title": "Friday Night Funkin': V.S. Whitty",
+      "keptTitle": "Friday Night Funkin': V.S. Whitty",
+      "bytes": 21215,
+      "sha256": "74f366cba7185e4f23509db24b0212d2f2cf48c878734f9315d1e60b8469d14e",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/114.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/474.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-115",
+      "kept": "gn-497",
+      "title": "Friday Night Funkin': vs. BOPCITY",
+      "keptTitle": "Friday Night Funkin': vs. BOPCITY",
+      "bytes": 21737,
+      "sha256": "33dd78e6519e306dde6b3ab81f7c26f5dee60a994a356580428137f2b187eff4",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/115.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/497.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-116",
+      "kept": "gn-485",
+      "title": "Friday Night Funkin': vs. Garcello",
+      "keptTitle": "Friday Night Funkin': vs. Garcello",
+      "bytes": 21257,
+      "sha256": "d7a65facb562821623324a21e772f3adcebb93e03057c00baa4cbaecec94e629",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/116.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/485.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-117",
+      "kept": "gn-477",
+      "title": "Friday Night Funkin': Vs. Hatsune Miku",
+      "keptTitle": "Friday Night Funkin': Vs. Hatsune Miku",
+      "bytes": 21233,
+      "sha256": "899aa9e444e3c0521f7dbbb6a71b18c3e43f544cc00216c05470a2821bc28e81",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/117.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/477.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-118",
+      "kept": "gn-476",
+      "title": "Friday Night Funkin': Vs. Hex",
+      "keptTitle": "Friday Night Funkin': Vs. Hex",
+      "bytes": 21215,
+      "sha256": "057774d3df3cc2f65038dea636e4d8065fbb2c01ee77b1131f20b6623a2b9b4f",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/118.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/476.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-119",
+      "kept": "gn-633",
+      "title": "Friday Night Funkin': VS. Impostor: Alternated",
+      "keptTitle": "Friday Night Funkin': VS. Impostor: Alternated",
+      "bytes": 21980,
+      "sha256": "c0447dbcec148aaa79d65c3f4512f5cdb144c04b80df7d090643b84e84d460cf",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/119.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/633.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-120",
+      "kept": "gn-487",
+      "title": "Friday Night Funkin': vs. QT",
+      "keptTitle": "Friday Night Funkin': vs. QT",
+      "bytes": 21456,
+      "sha256": "fe12bfaeaf578f806b8e9edb51f753e8a8183f19353f783fa613547a4de4d462",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/120.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/487.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-121",
+      "kept": "gn-481",
+      "title": "Friday Night Funkin': vs. Tricky",
+      "keptTitle": "Friday Night Funkin': vs. Tricky",
+      "bytes": 22510,
+      "sha256": "fe5c4f62a8316f599149b1caf41405e697cd46e2fd42bcb400d445a2ebdefd3d",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/121.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/481.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-122",
+      "kept": "gn-509",
+      "title": "Friday Night Funkin’ Soft",
+      "keptTitle": "Friday Night Funkin’ Soft",
+      "bytes": 22026,
+      "sha256": "f4f47c19f6d1405543adb42d1df0d27c85b9f3f3d71943744ae088fca175fad7",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/122.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/509.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-123",
+      "kept": "gn-616",
+      "title": "Friday Night Funkin’ Wednesday's Infidelity",
+      "keptTitle": "Friday Night Funkin’ Wednesday's Infidelity",
+      "bytes": 22591,
+      "sha256": "2fcad2024c983e54b1ac7ef0007e84f6c00445a306e7c76fecb4a31f07b02331",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/123.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/616.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-270",
+      "kept": "gn-846",
+      "title": "One Shot: World Machine edition",
+      "keptTitle": "One Shot: World Machine edition",
+      "bytes": 2322,
+      "sha256": "5c528df5f565a8331b81bf5d6b995984bb6d8c40d18fa4db7f2103d5580b0a3d",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/270.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/846.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-271",
+      "kept": "gn-847",
+      "title": "PEAK",
+      "keptTitle": "PEAK",
+      "bytes": 8194,
+      "sha256": "81be3bd592a07e35c3ff269187c367f26ee06f62cc5b177ce272750845601da0",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/271.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/847.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-273",
+      "kept": "gn-849",
+      "title": "Azahar (Emulator)",
+      "keptTitle": "Azahar (Emulator)",
+      "bytes": 28253,
+      "sha256": "0f4fc5e5ca59bce5f4a4f8f9e4da95c21c8346a77ef8bc503961dc7ad79f8d30",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/273.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/849.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-276",
+      "kept": "gn-853",
+      "title": "SCP: Containment Breach",
+      "keptTitle": "SCP: Containment Breach",
+      "bytes": 10960,
+      "sha256": "c277f755f86febd59fa9671020ac5f6f306dc3a895808573107c9ff4ce8aa3f2",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/276.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/853.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-277",
+      "kept": "gn-854",
+      "title": "Ravenfield",
+      "keptTitle": "Ravenfield",
+      "bytes": 9253,
+      "sha256": "f07b0354022f1abcba6fdb52f4773d43dafcbbfd792ed832badbf4c0178a9056",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/277.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/854.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-279",
+      "kept": "gn-856",
+      "title": "PikuNiku",
+      "keptTitle": "PikuNiku",
+      "bytes": 5419,
+      "sha256": "ac7c2e00ece50482728164c56215d71cf0c092b548264d9e68b26777ab31fd70",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/279.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/856.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-280",
+      "kept": "gn-857",
+      "title": "Inscryption",
+      "keptTitle": "Inscryption",
+      "bytes": 10705,
+      "sha256": "947fc3994932b9c406f7cbab4c4aefe6d60ae87e9582ae822e5700cec604490a",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/280.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/857.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-281",
+      "kept": "gn-858",
+      "title": "60 Seconds! Reatomized",
+      "keptTitle": "60 Seconds! Reatomized",
+      "bytes": 4152,
+      "sha256": "f099a6d592c2947268d06ada0999bb4cdb0353aca1a4abbc9151ad51b2938c52",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/281.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/858.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-359",
+      "kept": "darknux-244",
+      "title": "Big Tower Tiny Square",
+      "keptTitle": "Big Tower Tiny Square",
+      "bytes": 4808,
+      "sha256": "198f5b2cf9d5bf72c4058c4ffe0b1bcd5ecaa27fafc85ca9a4c39897238c962e",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/359.html",
+      "keptSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/244.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    },
+    {
+      "removed": "darknux-380",
+      "kept": "gn-256",
+      "title": "Crazy Kitty 3D",
+      "keptTitle": "Crazy Kitty 3D",
+      "bytes": 25801,
+      "sha256": "15fd2685bce26d527d8798ab2cd1bc0e9453e1de243eef973cf2dc1f9ffa4b12",
+      "removedSource": "https://raw.githubusercontent.com/daknux/html/8bdde3dc10d6edcd535954f31696a4a256a4b334/380.html",
+      "keptSource": "https://raw.githubusercontent.com/gn-math/html/6717cdda835ee00ecc6a4fafec5059f846659c97/256.html",
+      "reason": "Byte-for-byte identical game document and matching resource context"
+    }
+  ],
+  "uncertainMatches": [
+    {
+      "a": "gn-183",
+      "b": "gn-298",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-183",
+      "b": "gn-299",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-298",
+      "b": "gn-299",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-183",
+      "b": "gn-300",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-298",
+      "b": "gn-300",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-299",
+      "b": "gn-300",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-183",
+      "b": "gn-301",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-298",
+      "b": "gn-301",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-299",
+      "b": "gn-301",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-300",
+      "b": "gn-301",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    },
+    {
+      "a": "gn-848",
+      "b": "darknux-272",
+      "reason": "Kept: placeholder or different/unproven resource context"
+    }
+  ],
+  "missingArtwork": [],
+  "requestErrors": [
+    {
+      "id": "clawed-getting-over-it",
+      "stage": "source",
+      "message": "https://clawed.catman6112.dev/games/getting-over-it/index.html: HTTP 404"
+    },
+    {
+      "id": "clawed-RooftopSnipers",
+      "stage": "source",
+      "message": "https://clawed.catman6112.dev/games/RooftopSnipers/index.html: HTTP 404"
+    },
+    {
+      "id": "clawed-DuckLife4",
+      "stage": "source",
+      "message": "https://clawed.catman6112.dev/games/DuckLife4/index.html: HTTP 404"
+    },
+    {
+      "id": "clawed-deepest-sword",
+      "stage": "source",
+      "message": "https://clawed.catman6112.dev/games/deepest-sword/index.html: HTTP 404"
+    }
+  ],
+  "placeholders": []
+}
