@@ -49,7 +49,7 @@
       local.srcObject=media;local.hidden=!video;
       const recipient=conversation.channel.recipientId;
       const invitation={nonce:current.nonce,peer:peer.id,video,expires:Date.now()+60000};
-      await window.NOCTURNE_CHAT.request('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-1/api/dm/with/'+encodeURIComponent(recipient)+'/send',{text:prefix+JSON.stringify(invitation)});
+      await window.NOCTURNE_CHAT.request('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-2/api/dm/with/'+encodeURIComponent(recipient)+'/send',{text:prefix+JSON.stringify(invitation)});
       if(current!==pendingCall)return;
       status.textContent='Calling…';
       // Let the receiver consume the authenticated invitation before signaling.
