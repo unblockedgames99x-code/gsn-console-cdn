@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breakdi's School</title>
+
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #unity-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        #unity-canvas {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        #unity-loading-bar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: none;
+            transform: translate(-50%, -50%);
+        }
+
+        #unity-logo {
+            width: 154px;
+            height: 130px;
+            background: url("https://quizizz.com/_media/uploads/f0e3acd0-dde3-4c4b-8d02-80cb55ef93cd-v2")
+                no-repeat center;
+        }
+
+        #unity-progress-bar-empty {
+            width: 141px;
+            height: 18px;
+            margin-top: 10px;
+            background: url("https://quizizz.com/_media/uploads/906e8ab2-0045-4fc4-99db-ca55ffc38af8-v2")
+                no-repeat center;
+        }
+
+        #unity-progress-bar-full {
+            width: 0;
+            height: 18px;
+            margin-top: 10px;
+            background: url("https://quizizz.com/_media/uploads/fdcad255-3a15-4ee6-91e3-8b82612108f7-v2")
+                no-repeat center;
+        }
+
+        #unity-mobile-warning {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            display: none;
+            padding: 10px;
+            background: #fff;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="unity-container">
+        <canvas id="unity-canvas"></canvas>
+
+        <div id="unity-loading-bar">
+            <div id="unity-logo"></div>
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+        </div>
+
+        <div id="unity-mobile-warning">
+            WebGL builds are not supported on mobile devices.
+        </div>
+    </div>
+
+    <script>
+        const loaderUrl =
+            "https://quizizz.com/_media/uploads/16324192-7a7b-4430-bae8-156f3887cd7f-v2";
+
+        const config = {
+            dataUrl:
+                "https://quizizz.com/_media/uploads/e2b5120d-6a14-4092-81e4-cf97880610b6-v2",
+
+            frameworkUrl:
+                "https://quizizz.com/_media/uploads/880f506f-797f-49a9-a1b8-3986ab31d8d5-v2",
+
+            codeUrl:
+                "https://quizizz.com/_media/uploads/bd63353b-cdad-48f9-b4d1-b98c7c686049-v2",
+
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "TavBav99Studios",
+            productName: "Breakdi's School",
+            productVersion: "1.7"
+        };
+
+        const canvas = document.getElementById("unity-canvas");
+        const loadingBar = document.getElementById("unity-loading-bar");
+        const progressBar =
+            document.getElementById("unity-progress-bar-full");
+        const mobileWarning =
+            document.getElementById("unity-mobile-warning");
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            mobileWarning.style.display = "block";
+            config.devicePixelRatio = 1;
+
+            setTimeout(() => {
+                mobileWarning.style.display = "none";
+            }, 5000);
+        }
+
+        loadingBar.style.display = "block";
+
+        const script = document.createElement("script");
+        script.src = loaderUrl;
+
+        script.onload = () => {
+            createUnityInstance(canvas, config, progress => {
+                progressBar.style.width = `${progress * 100}%`;
+            })
+                .then(() => {
+                    loadingBar.style.display = "none";
+                })
+                .catch(error => {
+                    alert(error);
+                });
+        };
+
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

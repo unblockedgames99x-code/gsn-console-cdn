@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ladi's Learning</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #231F20;
+    }
+
+    #unityContainer {
+      position: fixed;
+      inset: 0;
+    }
+
+    #unityContainer .logo,
+    #unityContainer .progress {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #unityContainer .logo {
+      width: 154px;
+      height: 130px;
+      background: url("https://quizizz.com/_media/uploads/3815192a-4079-4437-b108-2a476faeb0de-v2")
+        no-repeat center / contain;
+    }
+
+    #unityContainer .progress {
+      width: 141px;
+      height: 18px;
+      margin-top: 90px;
+    }
+
+    #unityContainer .progress .empty {
+      float: right;
+      width: 100%;
+      height: 100%;
+      background: url("https://quizizz.com/_media/uploads/40ba3ae3-9246-4f0f-b850-e1bcbd39cabc-v2")
+        no-repeat right / cover;
+    }
+
+    #unityContainer .progress .full {
+      float: left;
+      width: 0;
+      height: 100%;
+      background: url("https://quizizz.com/_media/uploads/4df249b6-54ba-4991-97b2-b62146bc00f8-v2")
+        no-repeat left / cover;
+    }
+  </style>
+
+  <script>
+    function UnityProgress(unityInstance, progress) {
+      if (!unityInstance.Module) return;
+
+      if (!unityInstance.logo) {
+        unityInstance.logo = document.createElement("div");
+        unityInstance.logo.className =
+          "logo " + unityInstance.Module.splashScreenStyle;
+
+        unityInstance.container.appendChild(unityInstance.logo);
+      }
+
+      if (!unityInstance.progress) {
+        unityInstance.progress = document.createElement("div");
+        unityInstance.progress.className =
+          "progress " + unityInstance.Module.splashScreenStyle;
+
+        unityInstance.progress.empty = document.createElement("div");
+        unityInstance.progress.empty.className = "empty";
+        unityInstance.progress.appendChild(unityInstance.progress.empty);
+
+        unityInstance.progress.full = document.createElement("div");
+        unityInstance.progress.full.className = "full";
+        unityInstance.progress.appendChild(unityInstance.progress.full);
+
+        unityInstance.container.appendChild(unityInstance.progress);
+      }
+
+      unityInstance.progress.full.style.width = `${100 * progress}%`;
+      unityInstance.progress.empty.style.width = `${100 * (1 - progress)}%`;
+
+      if (progress === 1) {
+        unityInstance.logo.style.display = "none";
+        unityInstance.progress.style.display = "none";
+      }
+    }
+  </script>
+
+  <script src="https://quizizz.com/_media/uploads/c2fddb1e-f665-4255-8c02-aebea04628ff-v2"></script>
+</head>
+
+<body>
+  <div id="unityContainer"></div>
+
+  <script>
+    const unityConfig = {
+      companyName: "7gamex7.co",
+      productName: "Maths",
+      productVersion: "1.0",
+
+      dataUrl:
+        "https://quizizz.com/_media/uploads/5231aa59-453d-49e9-8ac0-d726128a07e6-v2",
+      wasmCodeUrl:
+        "https://media.blooket.com/raw/upload/akg7lnxvcnv1aszhlcaq.unityweb",
+      wasmFrameworkUrl:
+        "https://quizizz.com/_media/uploads/ba5705ae-e5ea-463b-9d8a-88f0a69996aa-v2",
+
+      graphicsAPI: [
+        "WebGL 2.0",
+        "WebGL 1.0"
+      ],
+
+      webglContextAttributes: {
+        preserveDrawingBuffer: false
+      },
+
+      splashScreenStyle: "Dark",
+      backgroundColor: "#231F20",
+
+      developmentBuild: false,
+      multithreading: false,
+      unityVersion: "2019.4.31f1"
+    };
+
+    const jsonURL = URL.createObjectURL(
+      new Blob([JSON.stringify(unityConfig)], {
+        type: "application/json"
+      })
+    );
+
+    UnityLoader.instantiate("unityContainer", jsonURL, {
+      onProgress: UnityProgress
+    });
+  </script>
+</body>
+</html>

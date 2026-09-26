@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="https://cdn.jsdelivr.net/gh/BreaddeningBread/games@main/HeavenForDeath/">
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="user-scalable=no">
+    <link rel="icon" href="icon/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon/icon.png">
+    <link rel="stylesheet" type="text/css" href="fonts/gamefont.css">
+    <title>Heaven For Death</title>
+</head>
+
+<body style="background-color: black; user-select: none;">
+    <script type="text/javascript">
+        const _Image = window.Image;
+        window.Image = function(w, h) {
+            const img = new _Image(w, h);
+            img.crossOrigin = "anonymous";
+            return img;
+        };
+    </script>
+    <script type="text/javascript" src="js/libs/pixi.js"></script>
+    <script type="text/javascript" src="js/libs/pixi-tilemap.js"></script>
+    <script type="text/javascript" src="js/libs/pixi-picture.js"></script>
+    <script type="text/javascript" src="js/libs/fpsmeter.js"></script>
+    <script type="text/javascript" src="js/libs/lz-string.js"></script>
+    <script type="text/javascript" src="js/libs/iphone-inline-video.browser.js"></script>
+    <script type="text/javascript" src="js/rpg_core.js"></script>
+    <script type="text/javascript" src="js/rpg_managers.js"></script>
+    <script type="text/javascript" src="js/rpg_objects.js"></script>
+    <script type="text/javascript" src="js/rpg_scenes.js"></script>
+    <script type="text/javascript" src="js/rpg_sprites.js"></script>
+    <script type="text/javascript" src="js/rpg_windows.js"></script>
+    <script type="text/javascript" src="js/plugins.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+    <p id="ErrorPrinter"
+        style="text-align: center; text-shadow: rgb(0, 0, 0) 1px 1px 3px; font-size: 20px; z-index: 99; position: absolute; margin: auto; inset: 0px; width: 734.4px; height: 40px;">
+    </p><canvas id="GameCanvas" width="816" height="624"
+        style="z-index: 1; position: absolute; margin: auto; inset: 0px; width: 816px; height: 624px;"></canvas><video
+        id="GameVideo" width="816" height="624"
+        style="opacity: 0; z-index: 2; position: absolute; margin: auto; inset: 0px; width: 816px; height: 624px;"></video><canvas
+        id="UpperCanvas" width="816" height="624"
+        style="z-index: 3; position: absolute; margin: auto; inset: 0px; width: 816px; height: 624px; opacity: 0;"></canvas>
+    <div
+        style="padding: 0px; min-width: 95px; height: 30px; line-height: 30px; text-align: right; text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px; color: rgb(255, 255, 255); position: absolute; z-index: 10; inset: 5px auto auto 5px; margin: 0px; display: none;">
+        <div
+            style="position: absolute; top: 0px; right: 0px; padding: 0px 5px; height: 40px; font-size: 24px; font-family: Consolas, &quot;Andale Mono&quot;, monospace; z-index: 2; line-height: 40px;">
+            0</div>
+        <div
+            style="position: absolute; top: 0px; left: 0px; padding: 0px 5px; height: 40px; font-size: 12px; line-height: 42px; font-family: sans-serif; text-align: left; z-index: 2;">
+            FPS</div>
+        <div style="position: relative; height: 40px; z-index: 1; width: 119px;">
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 0px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 6px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 12px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 18px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 24px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 30px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 36px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 42px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 48px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 54px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 60px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 66px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 72px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 78px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 84px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 90px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 96px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 102px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 108px; width: 5px; height: 0px;">
+            </div>
+            <div
+                style="background: rgb(153, 153, 153); opacity: 0.5; position: absolute; bottom: 0px; right: 114px; width: 5px; height: 0px;">
+            </div>
+        </div>
+    </div>
+    <div id="modeTextBack"
+        style="position: absolute; left: 5px; top: 5px; width: 119px; height: 58px; background: rgba(0, 0, 0, 0.2); z-index: 9; opacity: 0;">
+        <div id="modeText"
+            style="position: absolute; left: 0px; top: 41px; width: 119px; font-size: 12px; font-family: monospace; color: white; text-align: center; text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px;">
+            WebGL mode</div>
+    </div>
+    <div
+        style="font-family: GameFont; font-size: 0px; color: transparent; position: absolute; margin: auto; top: 0px; left: 0px; width: 1px; height: 1px;">
+        .</div>
+</body>
+
+</html>

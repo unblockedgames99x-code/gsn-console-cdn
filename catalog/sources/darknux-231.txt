@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <base href="https://cdn.jsdelivr.net/gh/giorgirick2-gif/game-webports-onawebsite@main/deltatraveler/">
+    <meta charset="utf-8">
+    <title>Unity Web Player | DELTATRAVELER</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+        #unity-canvas {
+            display: block;
+            background: #000000;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            outline: none;
+            cursor: default;
+        }
+        #loading-text {
+            color: white;
+            font-size: 48px;
+            font-family: cursive;
+            text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-text">LOADING...</div>
+    <canvas id="unity-canvas" tabindex="0"></canvas>
+
+    <script src="Build/DELTAWEBGL.loader.js"></script>
+    <script>
+        const canvas = document.querySelector("#unity-canvas");
+        const loadingText = document.querySelector("#loading-text");
+        const GAME_WIDTH = 640;
+        const GAME_HEIGHT = 480;
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
+
+        function resizeCanvas() {
+            const scaleX = window.innerWidth / GAME_WIDTH;
+            const scaleY = window.innerHeight / GAME_HEIGHT;
+            const scale = Math.min(scaleX, scaleY);
+
+            canvas.style.width = (GAME_WIDTH * scale) + 'px';
+            canvas.style.height = (GAME_HEIGHT * scale) + 'px';
+        }
+
+        function focusCanvas() {
+            canvas.focus({ preventScroll: true });
+        }
+        canvas.addEventListener('click', focusCanvas);
+        canvas.addEventListener('touchstart', focusCanvas);
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', resizeCanvas);
+
+        let totalBytes = 256389429;
+        let loadedBytes = 0;
+
+        function formatSize(bytes) {
+            if (bytes > 1024*1024*1024) return (bytes / (1024*1024*1024)).toFixed(2) + " GB";
+            if (bytes > 1024*1024) return (bytes / (1024*1024)).toFixed(2) + " MB";
+            if (bytes > 1024) return (bytes / 1024).toFixed(2) + " KB";
+            return bytes + " B";
+        }
+
+        async function fetchWithProgress(url) {
+            const response = await fetch(url);
+            const reader = response.body.getReader();
+            let chunks = [], received = 0;
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                received += value.length;
+                loadedBytes += value.length;
+                chunks.push(value);
+                const doneText = formatSize(loadedBytes);
+                const totalText = formatSize(totalBytes);
+                const percent = totalBytes > 0 ? ((loadedBytes / totalBytes) * 100).toFixed(1) : "?";
+                loadingText.textContent = `LOADING... ${doneText} / ${totalText} (${percent}%)`;
+            }
+            let fullBuffer = new Uint8Array(received);
+            let offset = 0;
+            for (let chunk of chunks) {
+                fullBuffer.set(chunk, offset);
+                offset += chunk.length;
+            }
+            return fullBuffer.buffer;
+        }
+
+        async function mergeFiles(parts) {
+            const buffers = await Promise.all(parts.map(fetchWithProgress));
+            return URL.createObjectURL(new Blob(buffers));
+        }
+
+        function getParts(file, count) {
+            let parts = [];
+            for (let i = 1; i <= count; i++) parts.push(file + ".part" + i);
+            return parts;
+        }
+
+        (async () => {
+            const dataParts = getParts("Build/DELTAWEBGL.data.unityweb", 9);
+            const wasmParts = getParts("Build/DELTAWEBGL.wasm.unityweb", 5);
+            const [dataUrl, wasmUrl] = await Promise.all([
+                mergeFiles(dataParts),
+                mergeFiles(wasmParts)
+            ]);
+
+            setInterval(resizeCanvas, 1000);
+
+            createUnityInstance(canvas, {
+                arguments: [],
+                dataUrl: dataUrl,
+                frameworkUrl: "Build/DELTAWEBGL.framework.js.unityweb",
+                codeUrl: wasmUrl,
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "RynoGG",
+                productName: "DELTATRAVELER",
+                productVersion: "3.0.12.0111",
+                matchWebGLToCanvasSize: false
+            }).then(() => {
+                loadingText.remove();
+                resizeCanvas();
+                focusCanvas();
+            });
+        })();
+    </script>
+</body>
+</html>

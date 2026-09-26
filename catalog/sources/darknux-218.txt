@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Google Search</title>
+
+    <!-- Google-style font (Roboto) – falls back to Arial / sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Roboto', Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: #202124;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .search-wrapper {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .logo {
+            display: block;
+            width: 272px;
+            height: 92px;
+            margin-bottom: 24px;
+            background-image: url('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Hide H2 visually but keep for accessibility */
+        .search-wrapper h2 {
+            position: absolute;
+            left: -9999px;
+            font-size: 0;
+        }
+
+        /* Search box container */
+        .gcse-search {
+            width: 100%;
+            max-width: 560px;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 12px;
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.5;
+        }
+
+        .footer a {
+            color: #1a0dab;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="search-wrapper">
+        <!-- Accessible heading -->
+        <h2>GOOGLE SEARCH</h2>
+
+        <!-- Logo -->
+        <span class="logo" aria-label="Google"></span>
+
+        <!-- Custom Search Engine -->
+        <script async src="https://cse.google.com/cse.js?cx=d6d6bfacb44d04cd1"></script>
+        <div class="gcse-search"></div>
+    </div>
+
+    <div class="footer">
+        Made by Martin_MMC. © 2026
+        <a href="https://marty-games.github.io/">Marty Games</a>.
+    </div>
+</body>
+
+</html>

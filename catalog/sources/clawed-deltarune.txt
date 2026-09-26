@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .hidden { display: none !important; }
+    .overlay {
+      position: fixed; inset: 0;
+      display: grid; place-items: center;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+    }
+    .overlay button {
+      font: inherit;
+      padding: .6rem 1.2rem;
+      border: 0;
+      cursor: pointer;
+      border-radius: .25rem;
+      background: #222;
+      color: #fff;
+      box-shadow: 0 0 0 2px #444 inset;
+    }
+
+    .typer-caret::after {
+      content: '';
+      display: inline-block;
+      width: 0.6ch;
+      border-right: 1px solid currentColor;
+      animation: blink 1s steps(1,end) infinite;
+      transform: translateY(0.1em);
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .center-wrap {
+      width: min(90vw, 1000px);
+      text-align: center;
+      margin: 0 auto;
+      line-height: 1.25;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    /* was #continue-hint â€” now class so it styles BOTH hints */
+    .continue-hint {
+      font-size: 0.6em;
+      opacity: 0.65;
+      margin-top: 0.5em;
+      user-select: none;
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0CLMS23HZP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0CLMS23HZP');
+</script></head>
+<body>
+
+  <div class="center-wrap">
+    <p id="type-target" class="typer-caret hidden">:D</p>
+    <!-- both hints use the SAME CLASS, not duplicate IDs -->
+    <div class="continue-hint hidden">Click Z to Continue</div>
+    <div class="continue-hint hidden">(Dont worry, this will only show once.)</div>
+  </div>
+
+  <div id="gate" class="overlay">
+    <button id="startBtn" aria-label="Start">Start</button>
+  </div>
+
+  <script>
+    if (localStorage.getItem('disclaimerSeen')) location.href = 'main.html';
+
+    const SETTINGS = {
+      targetSelector: '#type-target',
+      continueHintSelector: '.continue-hint', // was '#continue-hint'
+      texts: [
+        'Hi. Few things before we start.',
+        'If you are uninformed, Deltarune is a game created by Toby Fox.',
+        'I in no way claim any rights to this work of art (Deltarune)',
+        'Nor did I, developer of Cat-Nitro Games, create it, or claiming to, in any way.',
+        'Deltarune is an AMAZING GAME! And the first 2 chapters are completley free!',
+        'This web port contains chapters 3 and 4, which may be considered piracy',
+        'Please, while playing chapters 3 and 4, remember,',
+        'Deltarune is an indie game and relies off of game purchases for future development.',
+        'It really is a great game and Toby Fox deserves payment.',
+        'This disclaimer will only be shown once, please, really do, support deltarune.',
+        'Click Z to Continue.'
+      ],
+      speeds: { default: 50, space: 20, period: 250 },
+      silentChars: [' ', '.'],
+      audioSrc: 'text.wav',
+      volume: 0.5,
+      waitAfterTextMs: 3000
+    };
+
+    (function boot(cfg){
+      const target = document.querySelector(cfg.targetSelector);
+      const hints = Array.from(document.querySelectorAll(cfg.continueHintSelector)); // <-- ALL hints
+      const gate = document.getElementById('gate');
+      const startBtn = document.getElementById('startBtn');
+      if (!target) { console.error('Typewriter: target not found:', cfg.targetSelector); return; }
+
+      const audioURL = new URL(cfg.audioSrc, window.location.href).href;
+
+      let ac = null, audioBuffer = null, canUseWebAudio = false;
+      let htmlAudio = null, htmlAudioReady = false;
+
+      let textIndex = 0;
+      let typingIndex = 0;
+      let finishedThisText = false;
+      let waitTimer = null;
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.key === 'z' || e.key === 'Z') && finishedThisText) {
+          e.preventDefault();
+          proceedToNextText(true);
+        }
+      });
+
+      startBtn.addEventListener('click', async () => {
+        localStorage.setItem('disclaimerSeen', '1');
+        startBtn.disabled = true;
+        await initAudio();
+        gate.classList.add('hidden');
+
+        target.classList.remove('hidden');
+        // reveal BOTH hints
+        hints.forEach(h => h.classList.remove('hidden'));
+
+        textIndex = 0;
+        runCurrentText();
+      }, { once: true });
+
+      function runCurrentText(){
+        const text = String(cfg.texts[textIndex] ?? '');
+        target.textContent = '';
+        typingIndex = 0;
+        finishedThisText = false;
+        typeStep(text);
+      }
+
+      function typeStep(text){
+        if (typingIndex >= text.length) {
+          finishedThisText = true;
+          const isLast = (textIndex === cfg.texts.length - 1);
+          clearTimeout(waitTimer);
+          if (!isLast) {
+            waitTimer = setTimeout(() => proceedToNextText(false), cfg.waitAfterTextMs);
+          }
+          return;
+        }
+        const ch = text[typingIndex++];
+        target.textContent += ch;
+        playClick(ch);
+        setTimeout(() => typeStep(text), delayFor(ch));
+      }
+
+      function proceedToNextText(){
+        clearTimeout(waitTimer);
+        if (!finishedThisText) return;
+
+        const wasLast = (textIndex === cfg.texts.length - 1);
+        if (wasLast) {
+          location.href = 'main.html';
+          return;
+        }
+        textIndex++;
+        target.textContent = '';
+        finishedThisText = false;
+        runCurrentText();
+      }
+
+      async function initAudio() {
+        try {
+          ac = new (window.AudioContext || window.webkitAudioContext)();
+          if (ac.state === 'suspended') { try { await ac.resume(); } catch {} }
+          const resp = await fetch(audioURL, { cache: 'force-cache' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const buf = await resp.arrayBuffer();
+          audioBuffer = await new Promise(res => ac.decodeAudioData(buf.slice(0), res, () => res(null)));
+          canUseWebAudio = !!audioBuffer;
+        } catch {
+          canUseWebAudio = false;
+        }
+        if (!canUseWebAudio) {
+          htmlAudio = new Audio(audioURL);
+          htmlAudio.volume = clamp(SETTINGS.volume, 0, 1);
+          htmlAudio.preload = 'auto';
+          htmlAudio.addEventListener('canplaythrough', () => { htmlAudioReady = true; }, { once: true });
+          htmlAudio.load();
+        }
+      }
+
+      function playClick(ch){
+        if (SETTINGS.silentChars.includes(ch)) return;
+        if (canUseWebAudio && audioBuffer && ac) {
+          const src = ac.createBufferSource();
+          src.buffer = audioBuffer;
+          const gain = ac.createGain();
+          gain.gain.value = clamp(SETTINGS.volume, 0, 1);
+          src.connect(gain).connect(ac.destination);
+          src.start(0);
+        } else if (htmlAudioReady) {
+          const click = htmlAudio.cloneNode(true);
+          click.volume = clamp(SETTINGS.volume, 0, 1);
+          const p = click.play();
+          if (p && p.catch) p.catch(()=>{});
+        }
+      }
+
+      function delayFor(ch){
+        if (ch === ' ') return SETTINGS.speeds.space ?? SETTINGS.speeds.default;
+        if (ch === '.') return SETTINGS.speeds.period ?? SETTINGS.speeds.default;
+        return SETTINGS.speeds.default;
+      }
+
+      function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
+    })(SETTINGS);
+  </script>
+</body>
+</html>
+
+
+

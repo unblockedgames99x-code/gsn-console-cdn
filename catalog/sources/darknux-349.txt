@@ -1,0 +1,373 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deltarune Frostveil</title>
+
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    #canvas {
+      width: 640px !important;
+      height: 480px !important;
+      max-width: 100vw;
+      max-height: 100vh;
+      border: 0;
+      background: #000;
+      object-fit: contain !important;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    body, #canvas {
+      padding: 0;
+      margin: 0;
+      background-color: #000;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: 100%;
+      height: 100%;
+      border: none;
+      position: absolute;
+      box-sizing: border-box;
+      object-fit: fill !important;
+    }
+
+    canvas:fullscreen {
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    #spinner {
+      box-sizing: border-box;
+      font-size: 10px;
+      left: 50%;
+      top: 50%;
+      margin-left: -64px;
+      margin-top: -64px;
+      position: absolute;
+      text-indent: -9999rem;
+      border: 20px solid rgba(255, 255, 255, 0.2);
+      display: none;
+      z-index: 100;
+    }
+
+    #spinner,
+    #spinner:after {
+      border-radius: 50%;
+      width: 128px;
+      height: 128px;
+    }
+
+    #spinner.pending {
+      animation: pulse 2s infinite linear;
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%   { opacity: 0; }
+      50%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    #spinner.loading {
+      border-left: 20px solid #fff;
+      transform: translateZ(0);
+      animation: spin 1.5s infinite linear;
+      display: block;
+    }
+
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #spinner.error {
+      border: 20px solid #f00;
+      color: #f00;
+      transform: translateZ(0);
+      animation: none;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="spinner" class="pending"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const ASSETS = {
+    "deltarune-frostveil.love.part1":
+      "https://quizizz.com/_media/uploads/f50a883e-99b4-4a1d-b2bf-f332e2a35555-v2",
+
+    "deltarune-frostveil.love.part2":
+      "https://quizizz.com/_media/uploads/b3e008bf-ae71-4f14-b63f-7091dd669278-v2",
+
+    "deltarune-frostveil.love.part3":
+      "https://quizizz.com/_media/uploads/ca1a821b-bbef-43a7-8992-96d7095cc941-v2",
+
+    "lua/normalize1.lua":
+      "https://quizizz.com/_media/uploads/0826bdd8-40dc-4ad1-ab5f-6c78ee7ea702-v2",
+
+    "lua/normalize2.lua":
+      "https://quizizz.com/_media/uploads/7658e6e6-4c7b-4383-bd7b-44cc391756d1-v2",
+
+    "11.5/love.wasm":
+      "https://quizizz.com/_media/uploads/7dab9eb1-0644-481e-9108-c94893a6f2e2-v2",
+
+    "11.5/love.js":
+      "https://quizizz.com/_media/uploads/3d024950-eb29-44df-ae73-25a2fed85541-v2"
+  };
+
+
+  function redirectURL(input) {
+    let raw;
+
+    if (input instanceof Request) {
+      raw = input.url;
+    } else {
+      raw = String(input);
+    }
+
+    let url;
+
+    try {
+      url = new URL(raw, document.baseURI);
+    } catch (e) {
+      return raw;
+    }
+
+    const pathname = url.pathname;
+
+    for (const key in ASSETS) {
+      if (
+        pathname.endsWith("/" + key) ||
+        pathname === key ||
+        pathname.endsWith(key)
+      ) {
+        console.log(
+          "[Frostveil] redirect:",
+          pathname,
+          "=>",
+          ASSETS[key]
+        );
+
+        return ASSETS[key];
+      }
+    }
+
+    return raw;
+  }
+
+
+  const originalFetch = window.fetch;
+
+  window.fetch = function (input, init) {
+
+    if (input instanceof Request) {
+      const redirected = redirectURL(input);
+
+      if (redirected !== input.url) {
+        input = new Request(redirected, input);
+      }
+    } else {
+      input = redirectURL(input);
+    }
+
+    return originalFetch.call(this, input, init);
+  };
+
+
+  const originalXHRopen = XMLHttpRequest.prototype.open;
+
+  XMLHttpRequest.prototype.open = function (
+    method,
+    url,
+    async,
+    user,
+    password
+  ) {
+    url = redirectURL(url);
+
+    return originalXHRopen.call(
+      this,
+      method,
+      url,
+      async,
+      user,
+      password
+    );
+  };
+
+  const scriptSrcDescriptor =
+    Object.getOwnPropertyDescriptor(
+      HTMLScriptElement.prototype,
+      "src"
+    );
+
+  if (
+    scriptSrcDescriptor &&
+    scriptSrcDescriptor.get &&
+    scriptSrcDescriptor.set
+  ) {
+
+    Object.defineProperty(
+      HTMLScriptElement.prototype,
+      "src",
+      {
+        configurable: scriptSrcDescriptor.configurable,
+        enumerable: scriptSrcDescriptor.enumerable,
+
+        get: function () {
+          return scriptSrcDescriptor.get.call(this);
+        },
+
+        set: function (value) {
+          const redirected = redirectURL(value);
+
+          if (redirected !== String(value)) {
+            console.log(
+              "[Frostveil] script:",
+              value,
+              "=>",
+              redirected
+            );
+          }
+
+          return scriptSrcDescriptor.set.call(
+            this,
+            redirected
+          );
+        }
+      }
+    );
+  }
+
+  if (window.Worker) {
+
+    const OriginalWorker = window.Worker;
+
+    window.Worker = function (url, options) {
+      return new OriginalWorker(
+        redirectURL(url),
+        options
+      );
+    };
+
+    window.Worker.prototype =
+      OriginalWorker.prototype;
+  }
+
+  const LOGICAL_WIDTH = 640;
+  const LOGICAL_HEIGHT = 480;
+
+  let canvas;
+
+  function resizeCanvas() {
+
+    if (!canvas) {
+      canvas = document.getElementById("canvas");
+    }
+
+    if (!canvas) return;
+
+    const fit = Math.min(
+      window.innerWidth / LOGICAL_WIDTH,
+      window.innerHeight / LOGICAL_HEIGHT
+    );
+
+    const width = Math.max(
+      1,
+      Math.floor(LOGICAL_WIDTH * fit)
+    );
+
+    const height = Math.max(
+      1,
+      Math.floor(LOGICAL_HEIGHT * fit)
+    );
+
+    canvas.style.setProperty(
+      "width",
+      width + "px",
+      "important"
+    );
+
+    canvas.style.setProperty(
+      "height",
+      height + "px",
+      "important"
+    );
+
+    canvas.style.setProperty(
+      "max-width",
+      "100vw",
+      "important"
+    );
+
+    canvas.style.setProperty(
+      "max-height",
+      "100vh",
+      "important"
+    );
+
+    canvas.style.setProperty(
+      "image-rendering",
+      "pixelated",
+      "important"
+    );
+  }
+
+  window.addEventListener(
+    "resize",
+    resizeCanvas,
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "orientationchange",
+    resizeCanvas,
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    resizeCanvas
+  );
+
+  requestAnimationFrame(resizeCanvas);
+
+})();
+</script>
+
+<script
+  src="https://quizizz.com/_media/uploads/9c2371e2-c405-4fb5-8779-1182dbb3dd1d-v2?v=11.5&n=1&g=deltarune-frostveil.love">
+</script>
+
+<script>
+  alert("Ported by Toby Web http://discord.gg/RjpzzRXNn6");
+</script>
+
+
+</body>
+</html>

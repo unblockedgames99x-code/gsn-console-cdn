@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gate</title>
+  <style>
+    :root{
+      --bg:#050607;
+      --fg:#e8e8ea;
+      --sub:#7a7d81;
+      --maxw: 900px;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      letter-spacing:.2px;
+    }
+    body::after{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background: radial-gradient(100% 120% at 50% 40%, rgba(0,0,0,0) 40%, rgba(0,0,0,.5) 100%);
+    }
+    .wrap{
+      position:relative;
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      text-align:center;
+    }
+    .msg{
+      max-width:var(--maxw);
+      margin:0;
+      line-height:1.5;
+      font-size: clamp(20px, 4.2vw, 34px);
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,.5));
+    }
+    .seg{
+      display:inline;
+      opacity:0;
+      transform: translateY(10px);
+      will-change: opacity, transform;
+    }
+    .seg.show{
+      opacity:1;
+      transform: translateY(0);
+      transition: opacity var(--fade, 600ms) ease, transform var(--fade, 600ms) ease;
+    }
+    .spacer{ height:10px; display:inline-block; }
+    .hint{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:28px;
+      font-size: clamp(12px, 1.8vw, 14px);
+      color:var(--sub);
+      letter-spacing:.6px;
+      text-transform: lowercase;
+      opacity:0;
+      transition: opacity .45s ease;
+      user-select:none;
+    }
+    .hint.show{ opacity:1; }
+
+    @media (prefers-reduced-motion: reduce){
+      .seg{ opacity:1 !important; transform:none !important; transition:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="msg" id="message" aria-live="polite" aria-atomic="true"></p>
+    <div class="hint" id="hint" aria-hidden="true">click z to continue</div>
+  </div>
+
+  <script>
+    // ======= CONFIG =======
+    const TARGET_URL = "main.html";  // destination after Z
+
+    // Each part fades in, then pauses before the next starts.
+    // fadeMs = fade duration for this part
+    // pauseMs = wait time *after* this part has fully faded in
+    const SEGMENTS = [
+    { text: "", fadeMs: 1400, pauseMs: 1200 },
+    { text: "I'm not gonna lie this game was ripped from truffled, and also stolen by gn-math.", fadeMs: 1400, pauseMs: 1200 },
+            { text: " If you wanna visit their sites, go ahead, they will prolly be blocked, tho.", fadeMs: 1400, pauseMs: 1200 },
+                  { text: " As always, please support team cherry for their amazing work on hollow knight. Enjoy.", fadeMs: 1400, pauseMs: 900 },
+    ];
+
+    // If true, cookie applies site-wide. If false, cookie is scoped to this page’s folder.
+    const SITE_WIDE_COOKIE = false;
+    // ======================
+
+    const COOKIE_NAME = "gateSeen::" + (SITE_WIDE_COOKIE ? "sitewide" : encodeURIComponent(location.pathname));
+
+    function setCookie(name, value, days){
+      const maxAge = days * 24 * 60 * 60;
+      const path = SITE_WIDE_COOKIE
+        ? "/"
+        : (location.pathname.endsWith("/") ? location.pathname
+           : (location.pathname.substring(0, location.pathname.lastIndexOf("/")+1) || "/"));
+      const parts = [
+        name + "=" + encodeURIComponent(value),
+        "Max-Age=" + maxAge,
+        "Path=" + path,
+        "SameSite=Lax"
+      ];
+      if (location.protocol === "https:") parts.push("Secure");
+      document.cookie = parts.join("; ");
+    }
+    function getCookie(name){
+      const arr = (document.cookie || "").split("; ");
+      for (let i=0;i<arr.length;i++){
+        const [k,v] = arr[i].split("=");
+        if (k === name) return decodeURIComponent(v || "");
+      }
+      return null;
+    }
+
+    (function maybeSkip(){
+      try{
+        const seen = getCookie(COOKIE_NAME);
+        const dest = new URL(TARGET_URL, location.href).href;
+        if (seen === "1" && location.href !== dest){
+          location.replace(TARGET_URL);
+        }
+      }catch(e){}
+    })();
+
+    (function runSequence(){
+      const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const msg = document.getElementById("message");
+      const hint = document.getElementById("hint");
+
+      // Clear existing content
+      msg.textContent = "";
+
+      // Build spans upfront to avoid layout jank mid-sequence
+      const spans = [];
+      SEGMENTS.forEach((seg, idx) => {
+        const span = document.createElement("span");
+        span.className = "seg";
+        // Per-segment fade duration via CSS var
+        span.style.setProperty("--fade", (seg.fadeMs || 600) + "ms");
+        span.textContent = seg.text;
+        spans.push(span);
+        msg.appendChild(span);
+        if (idx < SEGMENTS.length - 1){
+          // a small non-breaking space to keep spacing tidy
+          const space = document.createElement("span");
+          space.className = "spacer";
+          space.textContent = " ";
+          msg.appendChild(space);
+        }
+      });
+
+      let canContinue = false;
+
+      // Sequencer
+      (async function play(){
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        for (let i = 0; i < spans.length; i++){
+          const fadeMs = Number(SEGMENTS[i].fadeMs || 600);
+          const pauseMs = Number(SEGMENTS[i].pauseMs || 0);
+
+          if (!prefersReduced){
+            // trigger transition
+            // use a microtask tick to ensure initial styles apply
+            await Promise.resolve();
+            spans[i].classList.add("show");
+            await sleep(fadeMs);
+          } else {
+            // with reduced motion, still respect a minimal delay
+            spans[i].classList.add("show");
+            await sleep(Math.min(300, fadeMs));
+          }
+
+          // pause after the segment
+          await sleep(pauseMs);
+        }
+
+        canContinue = true;
+        hint.classList.add("show");
+        hint.setAttribute("aria-hidden", "false");
+      })();
+
+      window.addEventListener("keydown", function(ev){
+        if ((ev.key === "z" || ev.key === "Z") && canContinue){
+          try { setCookie(COOKIE_NAME, "1", 365); } catch(e){}
+          location.replace(TARGET_URL);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

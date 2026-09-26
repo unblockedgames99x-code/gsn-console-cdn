@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Drift Boss Unblocked</title>
+	<meta name="description" content="Drift Boss, Drift Boss Unblocked, Drift Boss Math Playground">
+	<meta property="og:image" content="drift-boss.png" />
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no, minimal-ui" />
+	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="stylesheet" type="text/css" href="game.css">
+	<script type="text/javascript" src="game.js"></script>
+</head>
+
+<body onload="setTimeout(function(){window.scrollTo(0,1)},1);">
+	<div id="ajaxbar">
+		<div id="game"><canvas id="canvas"></canvas></div>
+		<div id="webgl"><canvas id="webglcanvas"></canvas></div>
+		<div id="orientate"><img src="media/graphics/orientate/landscape.jpg" /></div>
+		<div id="play" class="play" onclick=""><img src="media/graphics/splash/mobile/cover-start.jpg" /></div>
+	</div>
+	<script src="cheats.js"></script>
+</body>
+</html>

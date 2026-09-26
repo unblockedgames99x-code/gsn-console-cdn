@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Chess</title>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <main class="menu-container">
+        <h1>Mini Chess</h1>
+        <p>5x5 Strategy Game</p>
+
+        <div class="menu-buttons">
+            <button id="play-ai" class="btn" onclick="window.location.href='play-ai.html'">Play vs AI</button>
+            <button id="play-human" class="btn" onclick="window.location.href='play-human.html'">Play vs Human</button>
+            <button id="ai-ai" class="btn" onclick="window.location.href='ai-ai.html'">AI vs AI</button>
+        </div>
+    </main>
+
+    <footer class="menu-footer">
+        <p>v2.0 • by dig0w</p>
+    </footer>
+
+</body>
+
+</html>

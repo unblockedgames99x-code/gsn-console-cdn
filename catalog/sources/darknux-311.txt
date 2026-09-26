@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Baldi's Basics in Education and Learning Development Build Recreation</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #unity-canvas {
+      display: block;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: url("https://quizizz.com/_media/uploads/fb4cf014-1332-434b-91d8-f49a491302bb-v2")
+        center / cover;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="unity-canvas"></canvas>
+
+  <script src="https://quizizz.com/_media/uploads/3b4acb1c-1a3f-4a81-a344-1a7b96c6f08d-v2"></script>
+
+  <script>
+    createUnityInstance(document.querySelector("#unity-canvas"), {
+      dataUrl:
+        "https://quizizz.com/_media/uploads/8350471c-0685-4010-9f90-ac1336731fe2-v2",
+      frameworkUrl:
+        "https://quizizz.com/_media/uploads/3bdff666-faf8-44af-aa8a-69fb1b5706ed-v2",
+      codeUrl:
+        "https://quizizz.com/_media/uploads/b433a0a2-0737-43b9-9f59-28e5e6fabcb1-v2",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "JohnsterSpaceGames",
+      productName: "Baldi's Basics in Education and Learning Development Build",
+      productVersion: "1.01",
+      matchWebGLToCanvasSize: true
+    });
+  </script>
+</body>
+</html>

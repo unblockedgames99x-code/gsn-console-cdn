@@ -1,0 +1,35 @@
+﻿<!--
+Game Bootstrapper
+
+@author Kasper Mol <kasper@poki.com>
+@copyright Poki 2017
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Crossy Road</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" async href="app-store-interstitial.css" />
+
+    <script src="scripts/extra.min.js"></script>
+    <script src="poki-sdk.js"></script>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0CLMS23HZP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0CLMS23HZP');
+</script></head>
+  <body>
+    <script src="scripts/bootstrap.min.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>
+
+

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Unity Web Player | Baldi's Basics Squared Classic</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #unity-container {
+      position: fixed;
+      inset: 0;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      background: #0B0018;
+    }
+
+    #unity-loading-bar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: none;
+      transform: translate(-50%, -50%);
+    }
+
+    #unity-logo {
+      width: 154px;
+      height: 130px;
+      background: url("https://quizizz.com/_media/uploads/a55e8351-6442-4503-b57f-44cfd71fec48-v2")
+        no-repeat center;
+    }
+
+    #unity-progress-bar-empty {
+      width: 141px;
+      height: 18px;
+      margin-top: 10px;
+      margin-left: 6.5px;
+      background: url("https://quizizz.com/_media/uploads/2377c7a5-ea64-4504-88f5-be3785e29fff-v2")
+        no-repeat center;
+    }
+
+    #unity-progress-bar-full {
+      width: 0;
+      height: 18px;
+      margin-top: 10px;
+      background: url("https://quizizz.com/_media/uploads/b4a3e5ff-6292-4426-951c-22df3d2cb672-v2")
+        no-repeat center;
+    }
+
+    #unity-warning {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      display: none;
+      padding: 10px;
+      transform: translateX(-50%);
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+
+    <div id="unity-warning"></div>
+  </div>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingBar = document.querySelector("#unity-loading-bar");
+    const progressBar = document.querySelector("#unity-progress-bar-full");
+    const warningBanner = document.querySelector("#unity-warning");
+
+    function unityShowBanner(message, type) {
+      const div = document.createElement("div");
+      div.innerHTML = message;
+
+      if (type === "error") {
+        div.style = "background:red;padding:10px;";
+      } else if (type === "warning") {
+        div.style = "background:yellow;padding:10px;";
+
+        setTimeout(() => {
+          div.remove();
+
+          if (!warningBanner.children.length) {
+            warningBanner.style.display = "none";
+          }
+        }, 5000);
+      }
+
+      warningBanner.appendChild(div);
+      warningBanner.style.display = "block";
+    }
+
+    const loaderUrl =
+      "https://quizizz.com/_media/uploads/895a2e42-afde-4f6a-b93c-f51dc8f990d2-v2";
+
+    const config = {
+      arguments: [],
+      dataUrl:
+        "https://quizizz.com/_media/uploads/5cc72d4b-f2b8-440c-8c48-9aea1e11e193-v2",
+      frameworkUrl:
+        "https://quizizz.com/_media/uploads/6ec59cea-b81e-489d-a9dd-b6e5a3dad831-v2",
+      codeUrl:
+        "https://quizizz.com/_media/uploads/894d3770-a98f-4361-a0d0-4a468cd34e4c-v2",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "None",
+      productName: "Baldi's Basics Squared",
+      productVersion: "0.0.7f",
+      showBanner: unityShowBanner
+    };
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      const meta = document.createElement("meta");
+
+      meta.name = "viewport";
+      meta.content =
+        "width=device-width,height=device-height,initial-scale=1.0,user-scalable=no";
+
+      document.head.appendChild(meta);
+
+      document.querySelector("#unity-container").className = "unity-mobile";
+      canvas.className = "unity-mobile";
+    }
+
+    loadingBar.style.display = "block";
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+
+    script.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        progressBar.style.width = `${100 * progress}%`;
+      })
+        .then(() => {
+          loadingBar.style.display = "none";
+        })
+        .catch(error => {
+          alert(error);
+        });
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

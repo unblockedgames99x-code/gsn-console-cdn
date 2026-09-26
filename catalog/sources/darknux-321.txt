@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="https://cdn.jsdelivr.net/gh/BreaddeningBread/games@main/DEVICEKNIGHT/">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>DEVICE_KNIGHT</title>
+<meta name="description" content="A frame-accurate browser recreation of the Roaring Knight fight from DELTARUNE Chapter 3. Free, non-commercial, keyboard-first.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="THE DEVICE">
+<meta property="og:title" content="DEVICE_KNIGHT">
+<meta property="og:description" content="Fight the Roaring Knight in your browser. Frame-accurate, free, no download.">
+<meta property="og:url" content="https://shadowcrystal.dev/DEVICE_KNIGHT/">
+<meta property="og:image" content="https://shadowcrystal.dev/og/knight.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DEVICE_KNIGHT">
+<meta name="twitter:description" content="Fight the Roaring Knight in your browser.">
+<meta name="twitter:image" content="https://shadowcrystal.dev/og/knight.png">
+
+<!-- The <base href="./web/"> workaround is GONE: knight-sim 4911a09 made
+     the sim's asset loaders module-relative (import.meta.url), so the page
+     no longer has to impersonate web/index.html's URL position. Paths in
+     this page are plain document-relative. -->
+
+<!-- PWA install (mirrored from upstream f28...: the manifest and icons are
+     vendored under web/, and the manifest's relative start_url/scope keep
+     the installed app inside web/'s standalone page). The tab keeps the
+     site's own SOUL favicon; the home-screen icon is the game's. -->
+<link rel="manifest" href="web/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BlackKnife">
+<link rel="apple-touch-icon" href="web/icon-180.png">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  /* The letterbox, verbatim from the sim's own web/index.html: the game is
+     640x480 centred in whatever it is given, and fitCanvas() in main.js
+     overrides both axes with an integer-multiple size after boot. */
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    color: #ccc;
+    font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  #game {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(100vw, calc(100vh * 4 / 3));
+    height: min(100vh, calc(100vw * 3 / 4));
+    background: #000;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+  }
+  #hud {
+    display: none;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 4px 8px;
+    text-align: center;
+    background: rgba(0, 0, 0, .6);
+    opacity: .75;
+  }
+  body.hud #hud { display: block; }
+
+  /* Hub chrome lives in the letterbox margins: faint, functional, and never
+     between the player and the game. The sim listens on window, so focus on
+     these controls cannot steal its keys. */
+  .chrome {
+    position: fixed;
+    z-index: 10;
+    color: #4a4a4a;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 6px 8px;
+  }
+  .chrome:hover, .chrome:focus-visible { color: #ffff00; outline: none; }
+  #back { top: 6px; left: 8px; }
+  #mute { top: 6px; right: 8px; }
+  #legal {
+    position: fixed;
+    bottom: 4px;
+    left: 0; right: 0;
+    text-align: center;
+    color: #2e2e2e;
+    font-size: 10px;
+    letter-spacing: .08em;
+    /* Above the not-connected overlay too: the legal line is on every page
+       of this site in every state. */
+    z-index: 25;
+    pointer-events: none;
+  }
+  #legal a { color: #4a4a4a; pointer-events: auto; text-decoration: none; }
+
+  /* Shown only when the vendored sim is absent — the pre-merge state. */
+  #notconnected {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: #000;
+    color: #fff;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 17px;
+    line-height: 1.9;
+  }
+  #notconnected .hint { color: #5a5a5a; font-size: 12px; text-transform: none; }
+  #notconnected a { color: #5a5a5a; text-decoration: none; }
+  #notconnected a:hover, #notconnected a:focus-visible { color: #ffff00; }
+
+  /* THE TOUCH CONTROLS — ported verbatim from knight-sim web/index.html
+     (the host page owns its markup, so the sim's page contract is
+     mirrored here; bindTouch in main.js looks these ids up and
+     tolerates their absence, which is why desktop never noticed).
+     The media query shows them only where the pointer is coarse. */
+  #touch { display: none; }
+  @media (pointer: coarse) {
+    #touch {
+      display: block;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+  }
+  #touch .pad, #touch .btn {
+    position: absolute;
+    pointer-events: auto;
+    touch-action: none;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.06);
+    /* a held X was long-press-selecting its own label; the tap-highlight
+       flash goes for the same reason (upstream's phone-reported fix) */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #dpad {
+    left: max(18px, env(safe-area-inset-left));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    width: 148px;
+    height: 148px;
+  }
+  /* The pad's cross, drawn with gradients so there is no asset to load. */
+  #dpad::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.14), rgba(255,255,255,0.14)) 50% 0 / 34% 100% no-repeat,
+      linear-gradient(rgba(255,255,255,0.14), rgba(255,255,255,0.14)) 0 50% / 100% 34% no-repeat;
+    border-radius: inherit;
+  }
+  #touch .btn {
+    width: 64px;
+    height: 64px;
+    color: rgba(255, 255, 255, 0.55);
+    font: bold 20px/60px ui-monospace, Menlo, monospace;
+    text-align: center;
+  }
+  #touch .btn.down { background: rgba(255, 255, 255, 0.22); }
+  #btnZ {
+    right: max(20px, env(safe-area-inset-right));
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 74px);
+  }
+  #btnX {
+    right: calc(max(20px, env(safe-area-inset-right)) + 74px);
+    bottom: max(18px, env(safe-area-inset-bottom));
+  }
+  #touch #btnR {
+    top: max(14px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
+    line-height: 40px;
+  }
+
+  /* SIDEWAYS — ported from knight-sim web/index.html (f30d0f4), minus its
+     #credit rule (the hub page has no credit element). THE TOUCH CSS HERE
+     MUST TRACK UPSTREAM's web/index.html: the vendor script never copies
+     that file, so every touch-layout change upstream needs mirroring — this
+     block lagging a vendor is exactly how landscape shipped missing once. */
+  @media (pointer: coarse) and (orientation: landscape) {
+    #dpad {
+      left: max(12px, env(safe-area-inset-left));
+      bottom: auto;
+      top: 55%;
+      transform: translateY(-50%);
+    }
+    #btnZ {
+      right: max(16px, env(safe-area-inset-right));
+      bottom: auto;
+      top: calc(55% - 58px);
+      transform: translateY(-50%);
+    }
+    #btnX {
+      right: calc(max(16px, env(safe-area-inset-right)) + 40px);
+      bottom: auto;
+      top: calc(55% + 30px);
+      transform: translateY(-50%);
+    }
+  }
+</style>
+</head>
+<body>
+  <canvas id="game" width="640" height="480"></canvas>
+  <div id="hud">loading…</div>
+
+  <div id="touch">
+    <div id="dpad" class="pad"></div>
+    <div id="btnZ" class="btn">Z</div>
+    <div id="btnX" class="btn">X</div>
+    <div id="btnR" class="btn">R</div>
+  </div>
+
+  <!-- The DEVICE_MENU back link and the hub SOUND button are gone by
+       request. The sim's own settings still control volume; removing the
+       hub mute layer also removes its localStorage state, which could
+       leave a visitor silently muted forever with no button to unmute. -->
+
+  <div id="notconnected">
+    <p>* ARE YOU THERE?<br>* . . .<br>* DEVICE_KNIGHT IS NOT CONNECTED.</p>
+  </div>
+
+  <script type="module">
+    // BOOT. The sim's driver is untouched upstream code; this page only
+    // hosts it. A failed import means the vendored build is absent (the
+    // pre-merge state) — show the failure screen instead of a blank canvas.
+    // The hub mute layer is gone with its button: window.__audio stays
+    // enabled and the sim's own settings own the volume. Any stale
+    // thedevice.mute flag from the old button is cleared so nobody stays
+    // silently muted.
+    try { localStorage.removeItem('thedevice.mute'); } catch {}
+    try {
+      await import('./web/main.js');
+    } catch (err) {
+      console.error('sim not connected:', err);
+      document.getElementById('notconnected').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

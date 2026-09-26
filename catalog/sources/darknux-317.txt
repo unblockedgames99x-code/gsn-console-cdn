@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Baldis Basic's in Wonky Physics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #unity-container {
+      position: fixed;
+      inset: 0;
+    }
+
+    #unity-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #unity-loading-bar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: none;
+      z-index: 10;
+      transform: translate(-50%, -50%);
+    }
+
+    #unity-logo {
+      width: 154px;
+      height: 130px;
+      background: url("https://quizizz.com/_media/uploads/25f9521d-3b8f-4071-aaf2-c8cd2922b883-v2") no-repeat center / contain;
+    }
+
+    #unity-progress-bar-empty {
+      position: relative;
+      width: 141px;
+      height: 18px;
+      margin: 10px auto 0;
+      background: url("https://quizizz.com/_media/uploads/4123b1a1-94a3-4936-bb5f-6daba0b82148-v2") no-repeat center / contain;
+      overflow: hidden;
+    }
+
+    #unity-progress-bar-full {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 18px;
+      background: url("https://quizizz.com/_media/uploads/5d64ed27-0a66-4fd0-8f9e-f87a2e28ca6d-v2") no-repeat left center / auto 18px;
+    }
+
+    #unity-warning {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      display: none;
+      z-index: 20;
+      max-width: 90%;
+      padding: 10px;
+      transform: translateX(-50%);
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 4px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+
+    <div id="unity-warning"></div>
+  </div>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingBar = document.querySelector("#unity-loading-bar");
+    const progressBar = document.querySelector("#unity-progress-bar-full");
+    const warningBanner = document.querySelector("#unity-warning");
+
+    function unityShowBanner(message, type) {
+      const div = document.createElement("div");
+      div.innerHTML = message;
+
+      if (type === "error") {
+        div.style.cssText = "background:red;padding:10px;";
+      } else if (type === "warning") {
+        div.style.cssText = "background:yellow;padding:10px;";
+      }
+
+      warningBanner.appendChild(div);
+      warningBanner.style.display = "block";
+
+      if (type !== "error") {
+        setTimeout(() => {
+          div.remove();
+
+          if (!warningBanner.children.length) {
+            warningBanner.style.display = "none";
+          }
+        }, 5000);
+      }
+    }
+
+    const config = {
+      dataUrl:
+        "https://quizizz.com/_media/uploads/51e44301-d464-419b-8db3-2b006d83f658-v2",
+      frameworkUrl:
+        "https://quizizz.com/_media/uploads/ab05cb05-4153-4ec7-ac16-2ca8039b9050-v2",
+      codeUrl:
+        "https://quizizz.com/_media/uploads/ad7c873c-4d08-48df-a41f-f7df509a8525-v2",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "ItzMaxwell",
+      productName: "Baldis Basics In Wonky Physics",
+      productVersion: "eh, who cares about the version -_-",
+      showBanner: unityShowBanner
+    };
+
+    const script = document.createElement("script");
+
+    script.src =
+      "https://quizizz.com/_media/uploads/2bf7f12d-220f-4136-b5e1-ad69ba6392e2-v2";
+
+    loadingBar.style.display = "block";
+
+    script.onload = () => {
+      createUnityInstance(
+        canvas,
+        config,
+        progress => {
+          progressBar.style.width = `${100 * progress}%`;
+        }
+      )
+        .then(() => {
+          loadingBar.style.display = "none";
+        })
+        .catch(message => {
+          unityShowBanner(message, "error");
+        });
+    };
+
+    script.onerror = () => {
+      loadingBar.style.display = "none";
+      unityShowBanner("Failed to load Unity loader script.", "error");
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
