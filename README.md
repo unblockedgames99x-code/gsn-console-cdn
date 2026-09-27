@@ -51,3 +51,6 @@ Release v20260927-7: show Resume Game and Close Game together in the running gam
 
 Release v20260927-8: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-8: replace Movies with the StarStream catalogue and interface; default to CinemaOS, preserve manual source selection and episode IDs, and use native HTTPS CinemaOS embeds. Search/details/default source verified; video playback could not be verified because the provider blocks automated inspection.
+
+Release v20260927-9: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-9: replace genre bars with iconic movie backdrop cards; move episode navigation above the player.
