@@ -12,9 +12,9 @@ export const deadline = (promise, ms, message) => new Promise((resolve, reject) 
   Promise.resolve(promise).then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
 });
 
-export async function createMovieProxy(connection = 0) {
+export async function createMovieProxy(connection = 0, configureTransport) {
   if (!navigator.serviceWorker || location.protocol === 'file:') throw new Error('Open Movies from the GSN launcher. The streaming connection needs a secure web page.');
-  const reg = await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/sw.js', { scope: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/' });
+  const reg = await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/sw.js', { scope: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/' });
   // navigator.serviceWorker.ready can resolve to the parent CDN worker while
   // this more specific registration is still installing.
   const worker = reg.installing || reg.waiting || reg.active;
@@ -33,10 +33,11 @@ export async function createMovieProxy(connection = 0) {
     try { await transport.init(); break; }
     catch (error) { if (!String(error).includes('wasm not loaded') || attempt === 79) throw error; await new Promise(resolve => setTimeout(resolve, 100)); }
   }
+  configureTransport?.(transport);
   const controller = new $jetController.Controller({
     serviceworker: worker, transport,
     jetConfig: { maskedfiles: ['jet.inject.js', 'jet.wasm.js'] },
-    config: { prefix: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/~/', jetPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/vendor/jet/jet.core.js', injectPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/vendor/jet/jet.inject.js', wasmPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-7/apps/movie-proxy/vendor/jet/jet.wasm' },
+    config: { prefix: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/~/', jetPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/vendor/jet/jet.core.js', injectPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/vendor/jet/jet.inject.js', wasmPath: '/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-8/apps/movie-proxy/vendor/jet/jet.wasm' },
   });
   await deadline(controller.wait(), 12000, 'The streaming connection timed out. Try another connection.');
   // A detached frame owns rewriting for catalogue requests without navigating a page.

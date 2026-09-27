@@ -48,3 +48,6 @@ Release v20260927-6: repair double-routed Arcade menu images while retaining pro
 
 Release v20260927-7: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-7: show Resume Game and Close Game together in the running game options; closing unloads the session and restores Play.
+
+Release v20260927-8: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-8: replace Movies with the StarStream catalogue and interface; default to CinemaOS, preserve manual source selection and episode IDs, and use native HTTPS CinemaOS embeds. Search/details/default source verified; video playback could not be verified because the provider blocks automated inspection.

@@ -1,5 +1,6 @@
 import { createMovieProxy, servers } from './engine.js';
 import { createPlaybackHealth } from './playback-health.js';
+import { configureStarStream, STARSTREAM_URL } from './starstream.js';
 
 const params = new URLSearchParams(location.search);
 const allowedOrigin = params.get('consoleOrigin') || location.origin;
@@ -10,14 +11,15 @@ const retry = document.getElementById('retry');
 let controller, frame, transport, loadingTimer;
 const requestedConnection=Number(params.get('connection'));
 const connection=Number.isInteger(requestedConnection)&&requestedConnection>=0?requestedConnection%servers.length:0;
-let target = params.get('url') || 'https://aether.ist/';
+const starstream = location.pathname.endsWith('/starstream.html');
+let target = starstream ? STARSTREAM_URL : params.get('url') || 'https://aether.ist/';
 const send = (type, data = {}) => parent.postMessage({type, attempt: params.get('attempt'), ...data}, allowedOrigin);
 const health = createPlaybackHealth();
 const resumed = new WeakSet();
 let monitorTimer, lastReport = 0;
 async function setup() {
   if (!/^https:\/\//i.test(target)) throw new Error('Choose an HTTPS movie address.');
-  ({ controller, transport } = await createMovieProxy(connection));
+  ({ controller, transport } = await createMovieProxy(connection, starstream ? configureStarStream : undefined));
   frame = controller.createFrame(screen, {plugins:[new $jetUtils.UrlWatcherPlugin(url => send('movie-player-location',{url}))]});
   // Exposed locally for diagnostics; remote pages live inside the rewritten frame.
   window.movieProxy = {controller, frame, transport, server:servers[connection]};
