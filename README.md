@@ -33,3 +33,6 @@ Release v20260927-2: preserve the CDN launcher during Browser startup, retain HT
 
 Release v20260927-2: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Games home now shows large live album artwork, track information, and previous/play-pause/next controls while music is loaded.
+
+Release v20260927-3: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Cloud games use Cherri and recover from explicit unallocated claim rejections with bounded retries. Allocated or interrupted sessions are never automatically replayed.

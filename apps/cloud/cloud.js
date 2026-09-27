@@ -1,5 +1,5 @@
 import { createCloudTransport } from './cloud-transport.js';
-import { CloudError, serverError, displayError, readSession, delay } from './cloud-session.js';
+import { CloudError, serverError, displayError, reserveSession, delay } from './cloud-session.js';
 
 const ROUTES = [{api:'https://cherrion.top/api/cloud'}];
 const video = document.getElementById('cloudVideo');
@@ -76,14 +76,14 @@ async function launch() {
     document.getElementById('name').textContent = game.name;
     document.getElementById('cover').src = game.cover || game.image;
     window.setCloudStep(0, 'Preparing your cloud session…');
-    const response = await request(ctx, '/session', { game_key: game.game_key });
-    const result = await readSession(response, event => {
+    const result = await reserveSession(() => request(ctx, '/session', { game_key: game.game_key }), event => {
       ctx.abort.signal.throwIfAborted();
       if (event.uuid) ctx.uuid = event.uuid;
       if (event.status === 'queue') window.setCloudStep(2, `Waiting for a server · Queue ${event.queue_pos ?? event.position ?? 'pending'}`);
       else if (event.status === 'creating_account' || event.status === 'pool_account') window.setCloudStep(1, 'Preparing your session…');
       else if (event.status === 'requesting_game') window.setCloudStep(2, 'Starting your game…');
-    });
+      else if (event.status === 'retrying_claim') window.setCloudStep(1, `Cloud server busy · Retrying reservation (${event.attempt}/${event.attempts})…`);
+    }, ctx.abort.signal);
     clearTimeout(ctx.startTimer);
     ctx.uuid = result.uuid;
     let queued = result.queued;

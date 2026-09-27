@@ -8,6 +8,8 @@ export class CloudError extends Error {
 
 export function serverError(message) {
   const text = String(message || 'The cloud provider could not start this game.');
+  if (/failed to claim game\.?\s*API Status:\s*201\b/i.test(text)) return new CloudError(
+    'The cloud server could not reserve this game. Please try again shortly.', 'claim-rejected');
   if (/membership|\b4623\b/i.test(text)) return new CloudError(
     'This game requires a membership from the cloud provider. The server account cannot launch it.', 'membership');
   if (/failed to fetch|fetch failed|network|timed?\s*out/i.test(text)) return new CloudError(
@@ -56,6 +58,27 @@ export async function readSession(response, onUpdate) {
   } finally {
     await reader.cancel().catch(() => {});
     reader.releaseLock();
+  }
+}
+
+// Only retry an explicit rejected claim with no allocated session. A lost
+// connection or a response carrying a UUID may already have provisioned a game.
+export async function reserveSession(create, onUpdate, signal, wait = delay) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    signal.throwIfAborted();
+    let allocated = false;
+    try {
+      const response = await create();
+      return await readSession(response, event => {
+        if (event.uuid) allocated = true;
+        onUpdate(event);
+      });
+    } catch (error) {
+      signal.throwIfAborted();
+      if (error.kind !== 'claim-rejected' || allocated || attempt === 2) throw error;
+      onUpdate({ status: 'retrying_claim', attempt: attempt + 2, attempts: 3 });
+      await wait(1500 * (attempt + 1), signal);
+    }
   }
 }
 
