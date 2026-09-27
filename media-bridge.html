@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body,iframe{margin:0;border:0;width:100%;height:100%;background:#080b14;color:white}body{font:16px system-ui}#status{padding:24px}</style></head><body><div id="status">Connecting…</div><script>
+(()=>{'use strict';
+ const params=new URLSearchParams(location.search),root=new URL('./',location.href),parentOrigin=params.get('parentOrigin');
+ if(!parentOrigin||!/^https?:\/\//.test(parentOrigin))return;
+ const app=params.get('app'),allowed=['/apps/browser/index.html','/apps/music/index.html','/apps/movie-proxy/library/index.html','/apps/youtube/index.html','/apps/store/index.html','/apps/store/run.html','/apps/ai/index.html'];
+ let frame,queued=[];
+ const send=data=>parent.postMessage(data,parentOrigin);
+ const outward=new Set(['gsn-open-control','movie-control-center','gsn-ui-sound','gsn-store-install','neo-music-state','neo-music-control-center','neo-music-close']);
+ const inward=new Set(['movie-pause','neo-music-command','neo-music-navigation']);
+ window.addEventListener('message',async event=>{
+   if(frame&&event.source===frame.contentWindow&&event.origin===location.origin){if(outward.has(event.data?.type))send(event.data);return;}
+   if(event.source!==parent||event.origin!==parentOrigin)return;
+   const data=event.data;
+   if(inward.has(data?.type)){if(frame){if(frame.dataset.ready)frame.contentWindow.postMessage(data,location.origin);else queued.push(data);}return;}
+   if(data?.type!=='gsn-service-request'||typeof data.id!=='string')return;
+   try{
+     if(typeof data.path!=='string'||!/^\/api\/(?:console-services|console-cloud|slope|app-store)(?:\/|\?)/.test(data.path)||data.path.includes('..'))throw Error('Unsupported service request.');
+     const url=new URL(root.href+data.path.slice(1));if(url.origin!==root.origin||!url.pathname.startsWith(root.pathname+'api/'))throw Error('Invalid service URL.');
+     const method=data.method||'GET';if(!['GET','POST','PATCH','DELETE'].includes(method)||String(data.body||'').length>4000000)throw Error('Invalid service request.');
+     const response=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:['GET','HEAD'].includes(method)?undefined:data.body,credentials:'omit',signal:AbortSignal.timeout(35000)});
+     send({type:'gsn-service-response',id:data.id,status:response.status,body:await response.text(),contentType:response.headers.get('content-type')||'application/json'});
+   }catch(error){send({type:'gsn-service-response',id:data.id,status:502,body:JSON.stringify({error:error.message}),contentType:'application/json'});}
+ });
+ if(app){const target=new URL(app,'https://gsn.invalid');if(target.origin!=='https://gsn.invalid'||!allowed.includes(target.pathname)){document.getElementById('status').textContent='Unknown app.';return;}
+   const url=new URL(root.href+target.pathname.slice(1));url.search=target.search;url.searchParams.set('consoleOrigin',location.origin);
+   frame=document.createElement('iframe');frame.title='Media app';frame.allow='autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write; microphone; camera; gamepad';frame.allowFullscreen=true;
+   frame.addEventListener('load',()=>{frame.dataset.ready='1';for(const data of queued)frame.contentWindow.postMessage(data,location.origin);queued=[];document.getElementById('status')?.remove();});frame.src=url;document.body.append(frame);
+ }else document.getElementById('status').remove();
+ send({type:'gsn-service-ready'});
+})();
+</script></body></html>
