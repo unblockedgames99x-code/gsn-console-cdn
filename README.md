@@ -39,3 +39,6 @@ Cloud games use Cherri and recover from explicit unallocated claim rejections wi
 
 Release v20260927-4: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Games music player is borderless and transparent, clears the carousel and counter, and includes a seek bar with elapsed and total time.
+
+Release v20260927-5: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-5: keep the current game mounted and suspended across Home and media apps; add Resume Game on Home and a direct game resume card while Music is open.
