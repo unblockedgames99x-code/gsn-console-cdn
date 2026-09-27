@@ -57,3 +57,6 @@ Release v20260927-9: replace genre bars with iconic movie backdrop cards; move e
 
 Release v20260927-10: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-10: credit Movies as By StarStream.
+
+Release v20260927-11: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-11: remove inherited sandbox restrictions from StarStream Movies frames and pass encrypted-media/picture-in-picture permissions.
