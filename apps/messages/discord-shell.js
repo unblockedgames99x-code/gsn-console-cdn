@@ -74,6 +74,7 @@
     }
     function communityMenu(anchor) {
       menu(anchor, [
+        ...(state.servers.find(s=>s.id===state.activeServerId)?.inviteCode ? [['Invite friends', 'invite', ui.inviteServer]] : []),
         ['Find a member', 'invite', () => el.composeButton.click()],
         ['Inbox', 'inbox', inbox],
         ['Notification settings', 'bell', () => settings('notifications')],
@@ -181,8 +182,9 @@
       const id = state.activeChannel?.id;
       if (id && history[historyIndex] !== id && !replaying) { history = history.slice(0, historyIndex + 1); history.push(id); if (history.length > 40) history.shift(); historyIndex = history.length - 1; }
       previous.disabled = historyIndex <= 0; next.disabled = historyIndex >= history.length - 1;
-      title.textContent = ui.space() === 'home' ? 'Direct Messages' : 'GSN Community';
+      title.textContent = ui.space() === 'home' ? 'Direct Messages' : ui.serverTitle();
       serverHeader.dataset.space = ui.space();
+      serverTitle.setAttribute('aria-label',ui.serverTitle()+' menu');serverMenu.setAttribute('aria-label',ui.serverTitle()+' menu');serverMenu.title=ui.serverTitle()+' menu';
     }
     preferences = {...defaults}; apply(); previous.disabled = next.disabled = true;
     window.addEventListener('pagehide', () => { for (const a of audio.values()) { a.pause(); a.removeAttribute('src'); a.load(); } audio.clear(); closePopup(); }, {once: true});

@@ -147,3 +147,17 @@ html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-b
 .dc-emoji-preview{font-size:28px}
 .dc-emoji-footer>span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dc-emoji-footer select{width:100px;min-width:0;padding:5px;border:0;background:#2b2d31;color:#dbdee1;font-size:11px}
+.discord-rail #discordAddServer{color:#23a55a;background:#232428;font-size:32px;font-weight:300;line-height:1;border-radius:50%;margin-top:8px}
+.discord-rail #discordAddServer:hover,.discord-rail #discordAddServer:focus-visible{background:#23a55a;color:white;border-radius:16px}
+.discord-rail .dc-custom-server{background:#313338;color:#dbdee1;font-size:16px;font-weight:700}
+.discord-rail .dc-custom-server[aria-current=true],.discord-rail .dc-custom-server:hover{background:#5865f2;color:white;border-radius:16px}
+.dc-server-dialog{width:440px;max-width:calc(100vw - 24px);border-radius:8px;background:#313338;padding:24px}
+.dc-server-dialog .dc-dialog-heading h2{font-size:24px;font-weight:700}
+.dc-server-description{color:#b5bac1;font-size:14px;line-height:1.5;text-align:center}
+.dc-server-emblem{width:72px;height:72px;display:grid;place-items:center;margin:12px auto;border:2px dashed #80848e;border-radius:50%;font-size:36px;color:#dbdee1}
+.dc-server-label{display:block;color:#b5bac1;font-size:12px;font-weight:700;margin:24px 0 8px}
+.dc-server-label input{display:block;width:100%;margin-top:8px;height:42px;background:#1e1f22;border:0}
+.dc-server-status{color:#f38b91;font-size:13px;min-height:18px}
+.dc-server-dialog .dc-server-submit{display:block;width:100%;background:#5865f2;color:white;border:0;margin:12px 0;min-height:42px;font-weight:600}
+.dc-server-dialog .dc-server-submit:disabled{opacity:.6;cursor:wait}
+.dc-server-dialog>button:last-child{display:block;width:100%;background:#232428;border:0;margin-top:12px;min-height:40px}

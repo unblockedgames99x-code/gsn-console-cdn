@@ -77,10 +77,41 @@
   const nav=button('Open channels','chat',()=>el.app.classList.toggle('dc-nav-open'));nav.classList.add('dc-nav-button');document.querySelector('.chat-header').prepend(nav);
   const navClose=button('Close channels','close',()=>el.app.classList.remove('dc-nav-open'));navClose.classList.add('dc-nav-close');document.querySelector('.sidebar-title-actions').prepend(navClose);
   const social=window.GsnFriends(c,{node,button,profile,saveDraft,navigate:id=>setSpace('home',id==='pending'?'requests':id==='chats'?'chats':'friends',id)});
-  document.getElementById('discordHome').onclick=()=>setSpace('home','friends');document.getElementById('discordCommunity').onclick=()=>setSpace('community');
+  document.getElementById('discordHome').onclick=()=>setSpace('home','friends');document.getElementById('discordCommunity').onclick=()=>selectServer('community');
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{setSpace('home',b.dataset.view);}));
-  function setSpace(value,view='chats',friendTab){if(value==='home'&&view!=='chats')social.show(friendTab|| (view==='requests'?'pending':'all'));else social.hide();space=value;state.activeView=view;el.app.dataset.space=value;document.querySelector('.sidebar-title h1').textContent=value==='home'?'Direct Messages':'GSN Community';document.getElementById('discordHome').setAttribute('aria-current',String(value==='home'));document.getElementById('discordCommunity').setAttribute('aria-current',String(value==='community'));c.renderSidebar();}
-  function sidebar(){shell.sync();social.render();const count=state.channels.filter(x=>x.kind==='server').reduce((n,x)=>n+c.unreadCount(x.id),0);document.getElementById('discordCommunity').classList.toggle('has-unread',!!count);document.querySelectorAll('.conversation-row').forEach(b=>b.setAttribute('aria-current',String(b.classList.contains('active'))));}
+  function setSpace(value,view='chats',friendTab){if(value==='home'&&view!=='chats')social.show(friendTab|| (view==='requests'?'pending':'all'));else social.hide();space=value;state.activeView=view;el.app.dataset.space=value;document.querySelector('.sidebar-title h1').textContent=value==='home'?'Direct Messages':serverTitle();document.getElementById('discordHome').setAttribute('aria-current',String(value==='home'));document.getElementById('discordCommunity').setAttribute('aria-current',String(value==='community'&&state.activeServerId==='community'));c.renderSidebar();}
+  const addServer=button('Add a server',null,()=>serverDialog());addServer.id='discordAddServer';addServer.textContent='+';document.querySelector('.discord-rail').append(addServer);
+  let serverSignature='';
+  function serverTitle(){return state.servers.find(s=>s.id===state.activeServerId)?.name||'GSN Community';}
+  function selectServer(id){el.searchInput.value='';state.activeServerId=id;setSpace('community');const room=state.channels.find(ch=>ch.kind==='server'&&(ch.serverId||'community')===id);if(room)c.openChannel(room.id);}
+  function renderServers(){
+   const signature=JSON.stringify([state.servers,state.activeServerId,space]);if(signature===serverSignature)return;serverSignature=signature;
+   document.querySelectorAll('.dc-custom-server').forEach(b=>b.remove());
+   for(const server of state.servers){const b=button(server.name,null,()=>selectServer(server.id));b.className='dc-custom-server';b.textContent=server.name.split(/\s+/).slice(0,2).map(word=>Array.from(word)[0]).join('').toUpperCase();b.setAttribute('aria-current',String(space==='community'&&server.id===state.activeServerId));addServer.before(b);}
+   document.getElementById('discordCommunity').setAttribute('aria-current',String(space==='community'&&state.activeServerId==='community'));
+   if(space==='community')document.querySelector('.sidebar-title h1').textContent=serverTitle();
+  }
+  function acceptServer(result){
+   state.servers=[...state.servers.filter(s=>s.id!==result.server.id),result.server];
+   state.channels=[...state.channels.filter(ch=>!(result.channels||[]).some(c=>c.id===ch.id)),...(result.channels||[])];
+   state.channelMap=new Map(state.channels.map(ch=>[ch.id,ch]));closeModal();selectServer(result.server.id);
+  }
+  function serverDialog(join=false){
+   const panel=dialog(join?'Join a Server':'Create Your Server','dc-server-dialog');
+   const emblem=node('div','dc-server-emblem',join?'↗':'+');panel.append(emblem,node('p','dc-server-description',join?'Enter an invite code from a server owner.':'Give your friends a place to hang out. Your server starts with a #general channel.'));
+   const form=node('form'),label=node('label','dc-server-label',join?'INVITE CODE':'SERVER NAME'),input=node('input','dc-search-input'),status=node('p','dc-server-status');
+   input.required=true;input.maxLength=join?64:80;input.setAttribute('aria-label',join?'Invite code':'Server name');input.placeholder=join?'Paste an invite code':state.me?.displayName+"’s server";label.append(input);status.setAttribute('role','status');
+   const submit=button(join?'Join Server':'Create',null);submit.type='submit';submit.classList.add('dc-server-submit');form.append(label,status,submit);panel.append(form,button(join?'Create my own server':'Have an invite? Join a Server',null,()=>serverDialog(!join)));
+   form.onsubmit=async event=>{event.preventDefault();const value=input.value.trim();if(!value||submit.disabled)return;const account=state.me?.id;submit.disabled=true;status.textContent=join?'Joining server…':'Creating your server…';
+    try{const result=await c.api(join?'/api/servers/join':'/api/servers',{method:'POST',body:join?{inviteCode:value}:{name:value}});if(state.me?.id!==account)return;if(!result.server?.id)throw Error('The server did not confirm the change.');acceptServer(result);}
+    catch(error){if(panel.isConnected){status.textContent=error.message;submit.disabled=false;}}
+   };queueMicrotask(()=>input.focus());
+  }
+  function inviteServer(){const server=state.servers.find(s=>s.id===state.activeServerId);if(!server?.inviteCode)return;
+   const panel=dialog('Invite friends to '+server.name,'dc-server-dialog');panel.append(node('p','dc-server-description','Friends can use + → Join a Server and enter this code. Anyone with this code can join.'));
+   const field=node('input','dc-search-input');field.readOnly=true;field.value=server.inviteCode;field.setAttribute('aria-label','Server invite code');panel.append(field,button('Copy invite code',null,()=>navigator.clipboard.writeText(server.inviteCode).then(()=>c.toast('Invite code copied')).catch(()=>{field.select();c.toast('Select and copy the invite code.');})));
+  }
+  function sidebar(){renderServers();shell.sync();social.render();const count=state.channels.filter(x=>x.kind==='server'&&!x.serverId).reduce((n,x)=>n+c.unreadCount(x.id),0);document.getElementById('discordCommunity').classList.toggle('has-unread',!!count);document.querySelectorAll('.conversation-row').forEach(b=>b.setAttribute('aria-current',String(b.classList.contains('active'))));}
   function category(label,kind){label.tabIndex=0;label.setAttribute('role','button');label.setAttribute('aria-expanded',String(!collapsedSet.has(kind)));label.textContent=(collapsedSet.has(kind)?'›  ':'⌄  ')+label.textContent;label.onclick=()=>{if(collapsedSet.has(kind))collapsedSet.delete(kind);else collapsedSet.add(kind);c.renderSidebar();};label.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();label.click();}};}
   function saveDraft(){if(!state.me||!state.activeChannel||edit)return;const value={text:el.messageInput.value,reply:state.replyTo?.id||null,attachment:state.attachment};drafts.set(state.activeChannel.id,value);clearTimeout(draftTimer);draftTimer=setTimeout(()=>{const all=storage.get(key(),{});for(const [id,d]of drafts)if(d.text||d.reply||d.attachment)all[id]=d;else delete all[id];if(!storage.set(key(),all))feedback.textContent='Storage is full. Keep this tab open to preserve your draft.';},150);}
   function restoreDraft(id){setSpace(state.activeChannel?.kind==='server'?'community':'home');cancelEdit();const d=drafts.get(id)||storage.get(key(),{})[id]||{};el.messageInput.value=d.text||'';state.replyTo=(state.messages.get(id)||[]).find(m=>m.id===d.reply)||null;state.attachment=d.attachment||null;c.autoSizeComposer();feedback.textContent='';el.app.classList.remove('dc-nav-open');}
@@ -137,8 +168,8 @@
   const memberResize=new ResizeObserver(()=>memberDraw());memberResize.observe(memberScroll);
   function toggleMembers(value){memberOpen=value;memberPanel.hidden=!value;el.app.classList.toggle('dc-members-open',value);memberButton.setAttribute('aria-pressed',String(value));if(value)memberDraw();}
   function refresh(){
-   if(!state.me)return;shell.sync();const scope=state.activeChannel?.kind==='dm'?state.activeChannel.recipientId:'community';
-   if(memberSource!==state.members||memberScope!==scope||state.loadingMembers){memberSource=state.members;memberScope=scope;memberRows=scope==='community'?state.members:state.members.filter(u=>[state.me.id,scope].includes(u.id));memberRows=[...memberRows].sort((a,b)=>c.cleanDisplayName(a).localeCompare(c.cleanDisplayName(b)));memberLabel.textContent=state.loadingMembers?'LOADING MEMBERS…':'MEMBERS — '+memberRows.length;memberDraw();}
+   if(!state.me)return;shell.sync();const scope=state.activeChannel?.kind==='dm'?state.activeChannel.recipientId:(state.activeChannel?.serverId||'community');
+   if(memberSource!==state.members||memberScope!==scope||state.loadingMembers){memberSource=state.members;memberScope=scope;memberRows=scope==='community'?state.members:state.members.filter(u=>state.activeChannel?.kind==='dm'?[state.me.id,scope].includes(u.id):state.servers.find(s=>s.id===scope)?.memberIds.includes(u.id));memberRows=[...memberRows].sort((a,b)=>c.cleanDisplayName(a).localeCompare(c.cleanDisplayName(b)));memberLabel.textContent=state.loadingMembers?'LOADING MEMBERS…':'MEMBERS — '+memberRows.length;memberDraw();}
    const muted=state.mutedChannels.has(state.activeChannel?.id);muteButton.setAttribute('aria-pressed',String(muted));muteButton.title=muted?'Unmute channel notifications':'Mute channel notifications';muteButton.setAttribute('aria-label',muteButton.title);memberButton.setAttribute('aria-pressed',String(memberOpen));
   }
   function markVisibleRead(){const ch=state.activeChannel;if(!ch||social.visible||document.hidden||!c.timeline.bottom||readPending.has(ch.id))return;const latest=(state.messages.get(ch.id)||[]).at(-1)?.createdAt||0;if(latest<=Math.max(state.unreads[ch.id]||0,readTimes.get(ch.id)||0))return;readPending.add(ch.id);void c.api('/api/channels/'+encodeURIComponent(ch.id)+'/read',{method:'POST',body:{}}).then(()=>{state.unreads[ch.id]=latest;readTimes.set(ch.id,latest);c.renderSidebar();}).catch(()=>{}).finally(()=>readPending.delete(ch.id));}
@@ -217,7 +248,7 @@
   window.addEventListener('pagehide',()=>{saveDraft();clearTimeout(draftTimer);const all=storage.get(key(),{});for(const [id,d]of drafts)all[id]=d;if(state.me)storage.set(key(),all);memberResize.disconnect();mediaObserver.disconnect();mediaCleanup.disconnect();animated.clear();cancelAnimationFrame(memberFrame);});
   window.addEventListener('resize',()=>{c.autoSizeComposer();if(modal?.matches('.dc-popout-backdrop,.dc-emoji-backdrop'))closeModal();});
   el.cancelAttachmentButton.addEventListener('click',saveDraft);el.cancelReplyButton.addEventListener('click',saveDraft);
-  const shell=window.GsnDiscordShell(c,{node,button,dialog,closeModal,search,space:()=>space,socialVisible:()=>social.visible});
+  const shell=window.GsnDiscordShell(c,{node,button,dialog,closeModal,search,space:()=>space,serverTitle,inviteServer,socialVisible:()=>social.visible});
   el.app.dataset.space='community';document.getElementById('discordCommunity').setAttribute('aria-current','true');
   return {pendingMessages:id=>state.me?outbox.list(state.me.id,id):[],retryMessage:id=>state.me&&outbox.retry(state.me.id,id),observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
    uploadProgress(loaded,total){feedback.textContent=total?'Reading image · '+Math.round(loaded/total*100)+'%':'';},

@@ -25,6 +25,8 @@
     members: [],
     memberMap: new Map(),
     channels: [],
+    servers: [],
+    activeServerId: "community",
     channelMap: new Map(),
     friends: [],
     unreads: {},
@@ -312,7 +314,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-22/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-23/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -368,7 +370,7 @@
       return available.has(id) && ids.indexOf(id) === index;
     }).slice(0, 9);
     if (!state.pinnedChannelIds.length && !hasSavedPins) {
-      var global = state.channels.find(function (channel) { return channel.kind === "server" && String(channel.name).toLowerCase() === "general"; });
+      var global = state.channels.find(function (channel) { return channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general"; });
       if (global) state.pinnedChannelIds.push(String(global.id));
     }
   }
@@ -529,7 +531,7 @@
 
   function channelTitle(channel) {
     if (!channel) return "Chat";
-    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") return "general";
+    if (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general") return "general";
     if (channel.kind === "dm") {
       var target = channel.recipientId ? userFor(channel.recipientId) : null;
       return target ? cleanDisplayName(target) : String(channel.name || "Direct Message");
@@ -571,7 +573,7 @@
   let sidebarSignature='';
   function renderSidebar() {
     var query = el.searchInput.value.trim().toLowerCase();
-    const signature=JSON.stringify([query,state.activeView,enhanced.space,state.activeChannel?.id,state.pinnedChannelIds,[...state.mutedChannels],state.friends,state.channels.map(ch=>[ch.id,ch.kind,channelTitle(ch),unreadCount(ch.id),latestMessage(ch.id)?.id,latestMessage(ch.id)?.text,channelAvatarUser(ch)]),enhanced.collapsed('server'),enhanced.collapsed('dm')]);
+    const signature=JSON.stringify([query,state.activeView,enhanced.space,state.activeServerId,state.servers,state.activeChannel?.id,state.pinnedChannelIds,[...state.mutedChannels],state.friends,state.channels.map(ch=>[ch.id,ch.kind,channelTitle(ch),unreadCount(ch.id),latestMessage(ch.id)?.id,latestMessage(ch.id)?.text,channelAvatarUser(ch)]),enhanced.collapsed('server'),enhanced.collapsed('dm')]);
     if(sidebarSignature===signature)return;sidebarSignature=signature;
     el.sidebarContent.replaceChildren();
     document.querySelectorAll("[data-view]").forEach(function (button) {
@@ -584,7 +586,7 @@
   }
 
   function renderChats(query) {
-    var channels = state.channels.filter(function (channel) { return channel.kind === (enhanced.space === "home" ? "dm" : "server") && channelTitle(channel).toLowerCase().includes(query); });
+    var channels = state.channels.filter(function (channel) { return channel.kind === (enhanced.space === "home" ? "dm" : "server") && (channel.kind==='dm'||(channel.serverId||'community')===state.activeServerId) && channelTitle(channel).toLowerCase().includes(query); });
     for (var kind of ['server','dm']) {
       var group=channels.filter(function(channel){return channel.kind===kind;});
       if(!group.length)continue;
@@ -661,7 +663,7 @@
     var avatar = document.createElement("span");
     avatar.className = "avatar";
     var person = channelAvatarUser(channel);
-    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") paintGlobalAvatar(avatar);
+    if (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general") paintGlobalAvatar(avatar);
     else paintAvatar(avatar, person || { username: channel.name, displayName: channel.name }, { large: true });
     artwork.appendChild(avatar);
     var unread = unreadCount(channel.id);
@@ -701,13 +703,13 @@
   function channelRow(channel) {
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "conversation-row" + (channel.kind === "server" && String(channel.name).toLowerCase() === "general" ? " global-row" : "") + (state.activeChannel && state.activeChannel.id === channel.id ? " active" : "");
+    button.className = "conversation-row" + (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general" ? " global-row" : "") + (state.activeChannel && state.activeChannel.id === channel.id ? " active" : "");
     button.dataset.channel = channel.id;
     button.dataset.kind = channel.kind;
     button.draggable = true;
     var person = channelAvatarUser(channel);
     var avatar;
-    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") {
+    if (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general") {
       avatar = document.createElement("span");
       avatar.className = "avatar";
       paintGlobalAvatar(avatar);
@@ -716,7 +718,7 @@
     var title = document.createElement("span"); title.textContent = channelTitle(channel);
     var preview = document.createElement("small");
     var latest = latestMessage(channel.id);
-    preview.textContent = latest ? (latest.authorId === (state.me && state.me.id) ? "You: " : "") + (latest.text ? displayMessageText(latest.text) : (latest.attachments ? "Attachment" : "Message")) : (channel.kind === "server" && String(channel.name).toLowerCase() === "general" ? "Everyone in the community" : channel.kind === "server" ? "Public room" : "Start a conversation");
+    preview.textContent = latest ? (latest.authorId === (state.me && state.me.id) ? "You: " : "") + (latest.text ? displayMessageText(latest.text) : (latest.attachments ? "Attachment" : "Message")) : (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general" ? "Everyone in the community" : channel.kind === "server" ? "Public room" : "Start a conversation");
     copy.append(title, preview);
     var meta = document.createElement("span"); meta.className = "row-meta";
     var time = document.createElement("time"); time.textContent = latest ? formatTime(latest.createdAt) : ""; meta.appendChild(time);
@@ -784,13 +786,14 @@
   function saveWarmChat() {
     if (!state.me || !state.channels.length) return;
     const histories = [...state.messages].slice(-4).map(([id, rows]) => [id, rows.slice(-80)]);
-    const value = JSON.stringify({at: Date.now(), channels: state.channels, members: state.members, histories});
+    const value = JSON.stringify({at: Date.now(), channels: state.channels, servers: state.servers, members: state.members, histories});
     try { if (value.length < 500000) sessionStorage.setItem('gsn-chat-warm:' + state.me.id, value); } catch {}
   }
   function restoreWarmChat() {
     try {
       const data = JSON.parse(sessionStorage.getItem('gsn-chat-warm:' + state.me.id) || 'null');
       if (!data || Date.now() - data.at > 1800000 || !Array.isArray(data.channels) || !data.channels.length) return false;
+      state.servers = data.servers || [];
       state.channels = data.channels.filter(channel => !isHiddenPublicRoom(channel));
       state.members = data.members || [];
       state.memberMap = new Map(state.members.map(member => [member.id, member]));
@@ -809,6 +812,7 @@
     if (!warm) {
       const result = await api("/api/dm", {priority: 'foreground'});
       if (!current()) return;
+      state.servers = result.servers || [];
       state.channels = (result.channels || []).filter(channel => !isHiddenPublicRoom(channel));
     }
     state.channelMap = new Map(state.channels.map(channel => [channel.id, channel]));
@@ -817,13 +821,14 @@
     connectSocket(); setConnection("Live", true);
     state.loading = false;
     el.app.setAttribute("aria-busy", "false");
-    const general = state.channels.find(channel => channel.kind === "server" && String(channel.name).toLowerCase() === "general");
+    const general = state.channels.find(channel => channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general");
     const opening = general && window.innerWidth > 560 ? openChannel(general.id) : Promise.resolve();
     const background = (path, apply) => api(path).then(data => {
       if (!current()) return;
       apply(data); saveWarmChat(); renderSidebar(); enhanced.refresh();
     }).catch(error => { if (current()) toast(error.message); });
     if (warm) void background("/api/dm", data => {
+      state.servers = data.servers || [];
       state.channels = (data.channels || []).filter(channel => !isHiddenPublicRoom(channel));
       state.channelMap = new Map(state.channels.map(channel => [channel.id, channel]));
     });
@@ -913,6 +918,7 @@
     if (state.subscribedChannel && state.socket && state.socket.readyState === WebSocket.OPEN) state.socket.send(JSON.stringify({ t: "unsub", channel: state.subscribedChannel }));
     enhanced.saveDraft();
     state.activeChannel = channel;
+    if(channel.kind==='server')state.activeServerId=channel.serverId||'community';
     enhanced.restoreDraft(id);
     syncComposeExtras();
     el.emptyState.hidden = true;
@@ -947,8 +953,8 @@
     el.chatView.dataset.channelKind = channel.kind;
     enhanced.refresh();
     el.messageInput.placeholder = channel.kind === 'server' ? 'Message #'+channel.name : 'Message @'+channelTitle(channel);
-    el.chatSubtitle.textContent = channel.kind === "server" ? (String(channel.name).toLowerCase() === "general" ? "Global room · everyone in the community" : "Public room") : (person && state.online.has(person.id) ? "Online" : "Direct message");
-    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") {
+    el.chatSubtitle.textContent = channel.kind === "server" ? (!channel.serverId && String(channel.name).toLowerCase() === "general" ? "Global room · everyone in the community" : (channel.serverId ? "Server channel" : "Public room")) : (person && state.online.has(person.id) ? "Online" : "Direct message");
+    if (channel.kind === "server" && !channel.serverId && String(channel.name).toLowerCase() === "general") {
       paintGlobalAvatar(el.chatAvatar);
     } else paintAvatar(el.chatAvatar, person || { username: channel.name, displayName: channel.name });
   }
@@ -1139,7 +1145,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-22/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-23/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1411,7 +1417,7 @@
       }
       if(Date.now()-metadataAt>60000){
         const [dm,members,friends,unreads]=await Promise.all([api('/api/dm'),api('/api/members'),api('/api/friends'),api('/api/unread')]);
-        state.channels=dm.channels||[];state.channelMap=new Map(state.channels.map(c=>[c.id,c]));state.members=members.members||[];state.memberMap=new Map(state.members.map(u=>[u.id,u]));state.friends=friends.friends||[];state.unreads=Object.assign(state.unreads,unreads.unread||{});metadataAt=Date.now();updateRequestBadge();enhanced.refresh();
+        state.servers=dm.servers||[];state.channels=dm.channels||[];state.channelMap=new Map(state.channels.map(c=>[c.id,c]));state.members=members.members||[];state.memberMap=new Map(state.members.map(u=>[u.id,u]));state.friends=friends.friends||[];state.unreads=Object.assign(state.unreads,unreads.unread||{});metadataAt=Date.now();updateRequestBadge();enhanced.refresh();
       }
       if(Date.now()-previewsAt>30000){await loadPreviews();previewsAt=Date.now();}renderSidebar();pollFailures=0;setConnection('Connected · updates every '+((window.GSN_CHAT?.pollInterval||10000)/1000)+' seconds',true);
     }catch(error){pollFailures++;setConnection(navigator.onLine?'Reconnecting · '+error.message:'Offline · drafts saved',false);}
@@ -1477,7 +1483,7 @@
   function openDetails() {
     if (!state.activeChannel) return;
     var person = channelAvatarUser(state.activeChannel);
-    var isGlobal = state.activeChannel.kind === "server" && String(state.activeChannel.name).toLowerCase() === "general";
+    var isGlobal = state.activeChannel.kind === "server" && !state.activeChannel.serverId && String(state.activeChannel.name).toLowerCase() === "general";
     el.detailsName.textContent = channelTitle(state.activeChannel);
     el.detailsStatus.textContent = state.activeChannel.kind === "server" ? "Public community room" : (person && state.online.has(person.id) ? "Online" : "Direct message");
     if (isGlobal) paintGlobalAvatar(el.detailsAvatar);

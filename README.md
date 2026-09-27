@@ -87,3 +87,5 @@ Release v20260927-20: remove the blue chat badge from the empty conversation scr
 Release v20260927-21: prioritize message sends over background reads, reduce preview traffic, and show unconfirmed messages immediately while preserving drafts on failure. Includes removal of the blue empty-chat badge.
 
 Release v20260927-22: immediate durable message composing, faster conversation-first startup and tab-local cache, anchored emoji picker with categories/search/skin tones.
+
+Release v20260927-23: create and join private GSN servers from the new plus button; persistent server rail, default general channel, owner invite codes and backend membership checks.
