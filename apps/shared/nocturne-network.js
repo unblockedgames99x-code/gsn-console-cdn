@@ -1,12 +1,12 @@
 (() => {
   const originalFetch=window.fetch.bind(window), OriginalEventSource=window.EventSource;
   const route=value=>{
-    try {const url=new URL(value,location.href);if(['d27jvgogyihpmk.cloudfront.net','nocturne.lol'].includes(url.hostname))return location.origin+'/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-12/apps/nocturne-relay/'+encodeURIComponent(url.origin+url.pathname)+url.search;}catch{}
+    try {const url=new URL(value,location.href);if(['d27jvgogyihpmk.cloudfront.net','nocturne.lol'].includes(url.hostname))return location.origin+'/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/apps/nocturne-relay/'+encodeURIComponent(url.origin+url.pathname)+url.search;}catch{}
     return value;
   };
   const ready=(async()=>{
     if(!navigator.serviceWorker)throw new Error('Open this app from the console web preview.');
-    const reg=await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-12/apps/nocturne-sw.js',{scope:'/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-12/apps/',type:'module'});
+    const reg=await navigator.serviceWorker.register('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/apps/nocturne-sw.js',{scope:'/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/apps/',type:'module'});
     if(!reg.active)await new Promise(resolve=>{const worker=reg.installing||reg.waiting;worker?.addEventListener('statechange',()=>{if(worker.state==='activated')resolve();});});
     if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));
   })();

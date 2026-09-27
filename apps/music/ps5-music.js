@@ -56,6 +56,7 @@
   }
   const modal=document.createElement('dialog');modal.className='music-dialog';document.body.append(modal);
   function showModal(title, build) {
+    modal.className='music-dialog';modal.removeAttribute('style');modal.removeAttribute('aria-labelledby');
     modal.replaceChildren();const h=document.createElement('h2');h.textContent=title;modal.append(h);build(modal);
     modal.append(button('Cancel',null,()=>modal.close(),'dialog-cancel'));modal.showModal();lucide.createIcons();
   }
@@ -73,20 +74,60 @@
       box.append(button('Create new playlist',null,()=>{modal.close();createPlaylist(track);}));
     });
   }
-  function trackMenu(track) {
-    showModal(track.title,box=>{
-      box.append(button('Play next',null,()=>{P.add(track,true);modal.close();}),button('Add to queue',null,()=>{P.add(track,false);modal.close();}),button('Add to playlist',null,()=>{modal.close();addToPlaylist(track);}),button('View artist',null,()=>{modal.close();collection(track.artist,libraryTracks().filter(t=>t.artist===track.artist),'Artist');}));
-      if(track.album)box.append(button('View album',null,()=>{modal.close();collection(track.album,libraryTracks().filter(t=>t.album===track.album),'Album');}));
-      if(selectedPlaylist)box.append(button('Remove from playlist',null,()=>{selectedPlaylist.tracks=selectedPlaylist.tracks.filter(t=>t.id!==track.id);save('neo-ps5-playlists',playlists);modal.close();openPlaylist(selectedPlaylist);}));
-    });
+  function trackMenu(track, trigger) {
+    modal.replaceChildren();modal.className='music-dialog song-actions';
+    modal.setAttribute('aria-labelledby','song-actions-title');
+    trigger.setAttribute('aria-expanded','true');
+    const header=document.createElement('header');header.className='song-actions-header';
+    header.innerHTML=`<img class="song-actions-cover" alt=""/><div class="song-actions-meta"><span class="song-actions-eyebrow">SONG OPTIONS</span><h2 id="song-actions-title">${esc(track.title)}</h2><p>${esc(track.artist || 'Unknown artist')}</p></div>`;
+    applyCoverFallback(header.querySelector('img'),track.thumb);
+    header.append(button('Close song options','x',()=>modal.close(),'song-actions-close'));
+    modal.append(header);
+    const group=()=>{const g=document.createElement('div');g.className='song-actions-group';modal.append(g);return g;};
+    const action=(holder,label,icon,run,extra='')=>{
+      const b=button(label,icon,run,'song-action '+extra);
+      const text=document.createElement('span');text.textContent=label;b.append(text);holder.append(b);return b;
+    };
+    const queue=group();
+    action(queue,'Play next','skip-forward',()=>{P.add(track,true);modal.close();},'song-action-primary');
+    action(queue,'Add to queue','list-music',()=>{P.add(track,false);modal.close();});
+    const library=group();
+    action(library,'Add to playlist','plus',()=>{modal.close();addToPlaylist(track);},'song-action-forward');
+    const browse=group();
+    action(browse,'View artist','users',()=>{modal.close();collection(track.artist,libraryTracks().filter(t=>t.artist===track.artist),'Artist');});
+    if(track.album)action(browse,'View album','disc',()=>{modal.close();collection(track.album,libraryTracks().filter(t=>t.album===track.album),'Album');});
+    if(selectedPlaylist)action(group(),'Remove from playlist','x',()=>{selectedPlaylist.tracks=selectedPlaylist.tracks.filter(t=>t.id!==track.id);save('neo-ps5-playlists',playlists);modal.close();openPlaylist(selectedPlaylist);},'song-action-danger');
+    modal.showModal();lucide.createIcons();
+    const position=()=>{
+      if(innerWidth<=600){modal.style.removeProperty('left');modal.style.removeProperty('top');return;}
+      const anchor=trigger.getBoundingClientRect(),rect=modal.getBoundingClientRect(),gap=12;
+      const left=Math.min(innerWidth-rect.width-gap,Math.max(gap,anchor.right-rect.width));
+      const below=anchor.bottom+8;
+      const top=below+rect.height<=innerHeight-gap?below:Math.max(gap,anchor.top-rect.height-8);
+      modal.style.left=left+'px';modal.style.top=top+'px';
+    };
+    position();window.addEventListener('resize',position);
+    modal.addEventListener('close',()=>{trigger.setAttribute('aria-expanded','false');window.removeEventListener('resize',position);},{once:true});
+    queue.querySelector('button').focus({preventScroll:true});
   }
+  modal.addEventListener('click',event=>{
+    if(!modal.classList.contains('song-actions')||event.target!==modal)return;
+    const r=modal.getBoundingClientRect();
+    if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)modal.close();
+  });
+  modal.addEventListener('keydown',event=>{
+    if(!modal.classList.contains('song-actions')||!['ArrowDown','ArrowUp','Home','End'].includes(event.key))return;
+    event.preventDefault();const options=[...modal.querySelectorAll('.song-action')],i=options.indexOf(document.activeElement);
+    options[event.key==='Home'?0:event.key==='End'?options.length-1:(i+(event.key==='ArrowDown'?1:-1)+options.length)%options.length]?.focus();
+  });
   renderCard=function(track) {
     tracks.set(String(track.id),track);
     const card=originalCard(track);card.tabIndex=0;card.setAttribute('role','group');card.setAttribute('aria-label',`${track.title} by ${track.artist}`);
     card.addEventListener('keydown',event=>{if(event.target!==card)return;if(['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();playTrack(track);}});
     const like=card.querySelector('.card-fav-btn');like.title='Like song';like.setAttribute('aria-label',`Like ${track.title}`);like.setAttribute('aria-pressed',isFavourite(track.id));
     like.addEventListener('click',event=>{event.stopPropagation();toggleFavourite(track);});
-    card.append(button(`Options for ${track.title}`,'more-horizontal',event=>{event.stopPropagation();trackMenu(track);},'track-menu'));
+    const options=button(`Options for ${track.title}`,'more-horizontal',event=>{event.stopPropagation();trackMenu(track,event.currentTarget);},'track-menu');
+    options.setAttribute('aria-haspopup','dialog');options.setAttribute('aria-expanded','false');card.append(options);
     const play=card.querySelector('.card-play');play.setAttribute('aria-hidden','true');
     return card;
   };

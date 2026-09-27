@@ -22,3 +22,5 @@ Release v20260926-11 hides app scrollbars while preserving wheel, touch and keyb
 
 
 Release v20260926-12 repairs cloud-game launch routing for the entire cloud catalog.
+
+Release v20260926-13 adds a responsive song-actions menu with artwork, grouped icon actions and keyboard navigation.

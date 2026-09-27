@@ -11,3 +11,30 @@ html[data-neo-app="music"][data-neo-theme] .main-panel{background:radial-gradien
 @media(max-width:650px){.main-panel{grid-area:1 / 2 / 2 / 3!important}.spotify-player{grid-area:2 / 1 / 3 / 3!important}.spotify-buttons>:not(#npPlayBtn):not(#spotifyNextBtn){display:grid!important}.spotify-player .np-progress{display:flex!important}.top-bar{display:flex!important;flex-wrap:nowrap!important}.spotify-track{grid-template-columns:40px minmax(0,1fr)!important}.spotify-transport{justify-self:stretch!important}.music-console{flex-shrink:0}.music-welcome p{font-size:9px}}
 html[data-neo-app="music"]{--spotify-green:#1ed760;--spotify-green-pressed:#38e879;--meting-accent:#1ed760!important;--meting-accent-text:#05140a!important}.spotify-buttons .np-play-btn,.collection-actions .collection-play{background:#1ed760!important;color:#05140a!important}.spotify-buttons .active,.player-like.active,.card-fav-btn[aria-pressed=true]{color:#1ed760!important}#musicSeek{accent-color:#1ed760}.music-output{display:block;font-size:10px;white-space:nowrap;color:#8fa191}.playlist-link{gap:12px}.playlist-link span{overflow:hidden;text-overflow:ellipsis}.np-view:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#09120ce8,#0d1318ed),var(--track-cover);background-size:cover;background-position:center;filter:blur(40px);pointer-events:none}.np-left,.np-right{position:relative}.music-card:focus-within .card-play{opacity:1;transform:translateY(0)}.queue-panel.visible{animation:queue-enter .18s ease-out}@keyframes queue-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(max-width:1250px){.music-output{display:none}}@media(min-width:2000px){.spotify-player{height:112px!important}.np-icon{width:70px!important;height:70px!important}}.catalog-status{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center}.catalog-status:has(button){animation:none}@media(prefers-reduced-motion:reduce){.queue-panel.visible{animation:none!important}}
 #musicFullSeek{flex:1;min-width:0;accent-color:#1ed760}.card-fav-btn.faved{color:#1ed760!important}.card-fav-btn.faved svg{fill:#1ed760!important;stroke:#1ed760!important}.console-music-card{cursor:default}
+
+/* Song actions stay beside the selected track; phones use a bottom sheet. */
+.track-menu{width:32px;height:32px;transition:background .15s,color .15s}
+.track-menu:hover,.track-menu[aria-expanded=true]{background:#344358;color:#fff}
+.track-menu:focus-visible{outline:2px solid #b4d7ff;outline-offset:3px}
+.music-dialog.song-actions{position:fixed;inset:auto;margin:0;width:332px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);box-sizing:border-box;padding:8px;overflow:auto;border:1px solid #ffffff1c;border-radius:18px;background:linear-gradient(145deg,#222d3d,#151d2a 75%);box-shadow:0 24px 70px #0009,0 3px 12px #0005,inset 0 1px #ffffff08;color:#f2f5fa;animation:song-actions-in .15s ease-out}
+.music-dialog.song-actions::backdrop{background:#05091138;backdrop-filter:none}
+.song-actions-header{display:flex;align-items:center;gap:12px;padding:12px 8px 18px;position:relative}
+.song-actions-cover{width:56px;height:56px;flex:0 0 56px;object-fit:cover;border-radius:9px;background:#303c4d;box-shadow:0 4px 12px #0005}
+.song-actions-meta{min-width:0;flex:1;padding-right:24px}
+.song-actions-eyebrow{display:block;color:#91a3bb;font-size:9px;line-height:1.4;font-weight:700;letter-spacing:.14em;margin-bottom:4px}
+.song-actions .song-actions-header h2{font-size:15px;line-height:1.35;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+.song-actions-meta p{font-size:12px;line-height:1.5;margin:3px 0 0;color:#aebacd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-actions button.song-actions-close{position:absolute;top:8px;right:4px;width:28px;height:28px;margin:0;padding:6px;border-radius:50%;display:grid;place-items:center;background:transparent;color:#96a6bc}
+.song-actions-close svg{width:16px;height:16px}
+.song-actions-group{padding:5px 0;border-top:1px solid #ffffff0c}
+.song-actions-group:last-child{padding-bottom:0}
+.song-actions button.song-action{display:flex;align-items:center;gap:13px;width:100%;min-height:44px;margin:0;padding:10px 13px;border:0;border-radius:9px;background:transparent;color:#e2e8f2;text-align:left;font:500 13px/1.4 "Segoe UI",sans-serif;cursor:pointer;transition:background .12s,color .12s}
+.song-action svg{width:18px;height:18px;flex:0 0 18px;stroke-width:1.7;color:#9baec7}
+.song-actions button.song-action:hover,.song-actions button.song-action:focus-visible{background:#ffffff0c;color:#fff}
+.song-actions button:focus-visible{outline:2px solid #a7ccff;outline-offset:-2px}
+.song-actions .song-action-primary svg{color:#c0dcff}
+.song-action-forward::after{content:"";width:6px;height:6px;border-top:1.5px solid #8d9fb7;border-right:1.5px solid #8d9fb7;transform:rotate(45deg);margin-left:auto}
+.song-actions button.song-action-danger,.song-action-danger svg{color:#f1a5ac}
+@keyframes song-actions-in{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
+@media(max-width:600px){.music-dialog.song-actions{left:10px!important;right:10px;top:auto!important;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-width:none;border-radius:22px;padding:10px}.song-actions-header{padding:15px 10px 20px}.song-actions-cover{width:62px;height:62px;flex-basis:62px}.song-actions button.song-action{min-height:49px;font-size:14px}.music-dialog.song-actions::backdrop{background:#03060b99;backdrop-filter:blur(3px)}}
+@media(prefers-reduced-motion:reduce){.music-dialog.song-actions{animation:none}.song-actions button.song-action,.track-menu{transition:none}}
