@@ -20,6 +20,11 @@
  function timeline(root,hooks){
   let id=null,list=[],entries=[],offsets=[0],nodes=new Map(),sizes=new Map(),positions=new Map(),frame=0,atBottom=true,known=new Set(),unseen=0,rendering=false;
   let suspended=false,resumePosition=null;
+  const acknowledged=new Map();
+  function acknowledge(channel,local,message){
+   acknowledged.set(channel+':'+message.id,{id:local.id,createdAt:local.createdAt});
+   if(acknowledged.size>4000)acknowledged.delete(acknowledged.keys().next().value);
+  }
   const top=node('div','dc-spacer'),bottom=node('div','dc-spacer'),jump=document.getElementById('newMessagesButton');
   root.setAttribute('aria-live','off');root.tabIndex=0;
   const announce=node('div','sr-only');announce.setAttribute('role','status');root.after(announce);
@@ -40,10 +45,14 @@
   }
   function reset(next){if(id)positions.set(id,{top:root.scrollTop,bottom:atBottom});id=next;atBottom=positions.get(next)?.bottom??true;nodes.clear();ro.disconnect();entries=[];known.clear();unseen=0;jump.hidden=true;announce.textContent="";root.replaceChildren();}
   function update(next,data){
+   // Keep the optimistic row's identity, measured height and position after
+   // confirmation, including subsequent polling responses from the server.
+   const identity=m=>acknowledged.get(next+':'+m.id)?.id||m.id;
+   data=data.map(m=>{const sent=acknowledged.get(next+':'+m.id);return sent?{...m,createdAt:sent.createdAt}:m;}).sort((a,b)=>Number(a.createdAt)-Number(b.createdAt));
    const changed=id!==next;if(changed){reset(next);window.ChatReactions?.close();}
-   const added=data.filter(m=>!known.has(m.id));if(!changed&&added.length){announce.textContent=added.length+' new message'+(added.length===1?'':'s');if(!atBottom){unseen+=added.length;jump.hidden=false;jump.textContent='↓ '+unseen+' new messages';}}
-   known=new Set(data.map(m=>m.id));list=data;const byId=new Map(data.map(m=>[m.id,m]));entries=[];
-   data.forEach((m,i)=>{const prev=data[i-1],next=data[i+1],day=!prev||new Date(prev.createdAt).toDateString()!==new Date(m.createdAt).toDateString();if(day)entries.push({key:id+':day:'+m.id,day:true,message:m,signature:String(m.createdAt)});const start=day||!!m.replyTo||prev.authorId!==m.authorId||m.createdAt-prev.createdAt>300000,end=!next||next.authorId!==m.authorId||next.createdAt-m.createdAt>300000||!!next.replyTo;entries.push({key:id+':'+m.id,message:m,start,end,signature:JSON.stringify([m,start,end,hooks.user(m.authorId),byId.get(m.replyTo)])});});
+   const added=data.filter(m=>!known.has(identity(m)));if(!changed&&added.length){announce.textContent=added.length+' new message'+(added.length===1?'':'s');if(!atBottom){unseen+=added.length;jump.hidden=false;jump.textContent='↓ '+unseen+' new messages';}}
+   known=new Set(data.map(identity));list=data;const byId=new Map(data.map(m=>[m.id,m]));entries=[];
+   data.forEach((m,i)=>{const prev=data[i-1],next=data[i+1],day=!prev||new Date(prev.createdAt).toDateString()!==new Date(m.createdAt).toDateString();if(day)entries.push({key:id+':day:'+identity(m),day:true,message:m,signature:String(m.createdAt)});const start=day||!!m.replyTo||prev.authorId!==m.authorId||m.createdAt-prev.createdAt>300000,end=!next||next.authorId!==m.authorId||next.createdAt-m.createdAt>300000||!!next.replyTo;entries.push({key:id+':'+identity(m),message:m,start,end,signature:JSON.stringify([m,start,end,hooks.user(m.authorId),byId.get(m.replyTo)])});});
    calc();if(!entries.length){ro.disconnect();nodes.clear();root.replaceChildren(node('div','thread-empty','No messages yet. Say hello.'));return;}
    if(changed){const saved=positions.get(id);atBottom=saved?.bottom??true;root.replaceChildren(top,bottom);top.style.height=offsets.at(-1)+'px';root.scrollTop=atBottom?offsets.at(-1):saved.top;}
    else if(atBottom){top.style.height=offsets.at(-1)+'px';root.scrollTop=offsets.at(-1);}
@@ -57,7 +66,7 @@
   jump.onclick=()=>{atBottom=true;root.scrollTop=root.scrollHeight;unseen=0;jump.hidden=true;draw();hooks.read();};
   const containerObserver=new ResizeObserver(()=>{if(suspended||!root.clientHeight)return;sizes.clear();calc();schedule();});containerObserver.observe(root);
   window.addEventListener('pagehide',()=>{ro.disconnect();containerObserver.disconnect();cancelAnimationFrame(frame);},{once:true});
-  return {pause(){if(!suspended)resumePosition={top:root.scrollTop,bottom:atBottom};suspended=true;},resume(){if(!suspended)return;suspended=false;atBottom=resumePosition?.bottom??true;root.scrollTop=atBottom?root.scrollHeight:(resumePosition?.top||0);draw();schedule();},update,reset,jump:jumpTo,get bottom(){return atBottom},get count(){return nodes.size}};
+  return {acknowledge,pause(){if(!suspended)resumePosition={top:root.scrollTop,bottom:atBottom};suspended=true;},resume(){if(!suspended)return;suspended=false;atBottom=resumePosition?.bottom??true;root.scrollTop=atBottom?root.scrollHeight:(resumePosition?.top||0);draw();schedule();},update,reset,jump:jumpTo,get bottom(){return atBottom},get count(){return nodes.size}};
  }
  function install(c){
   const {state,el}=c;let space='community',edit=null,sending=false,memberOpen=true,memberRows=[],memberFrame=0,readPending=new Set(),readTimes=new Map(),memberSource=null,memberScope='',draftTimer=0,searchSerial=0,searchTimer=0,modal=null,menu=null,returnFocus=null,editDraft=null;
@@ -131,7 +140,7 @@
   const outbox=window.GsnOutbox({storage:localStorage,
    send:record=>{if(state.me?.id!==record.authorId)throw Error('Account changed. Sign back in to retry.');return c.api('/api/channels/'+encodeURIComponent(record.channelId)+'/messages',{method:'POST',body:{text:record.text,replyTo:record.replyTo||null,attachments:record.attachments}});},
    changed:account=>{if(state.me?.id===account)c.renderMessages();},warning:c.toast,
-   delivered:(account,channelId,message)=>{if(state.me?.id!==account)return;state.mutationVersions.set(channelId,(state.mutationVersions.get(channelId)||0)+1);const list=state.messages.get(channelId)||[];c.cacheMessages(channelId,c.normalizeMessages([...list.filter(m=>m.id!==message.id),message]));shell.sound('sent');c.renderSidebar();}
+   delivered:(account,channelId,message,local)=>{if(state.me?.id!==account)return;c.timeline.acknowledge(channelId,local,message);state.mutationVersions.set(channelId,(state.mutationVersions.get(channelId)||0)+1);const list=state.messages.get(channelId)||[];c.cacheMessages(channelId,c.normalizeMessages([...list.filter(m=>m.id!==message.id),message]));shell.sound('sent');c.renderSidebar();}
   });
   async function send(){
    if(sending||!state.activeChannel||!state.me)return;const channel=state.activeChannel,account=state.me.id,raw=el.messageInput.value,text=raw.trim(),attachment=state.attachment,reply=state.replyTo,editing=edit;

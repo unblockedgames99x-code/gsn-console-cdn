@@ -314,7 +314,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-29/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-30/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -997,12 +997,14 @@
     renderAttachments(bubble, message.attachments);
     if(message.pending){
       row.classList.add('dc-message-pending');
-      const status=document.createElement('small');status.className='dc-send-status';
+      stack.appendChild(bubble);
       if(message.delivery==='failed'){
+        const status=document.createElement('small');status.className='dc-send-status';
         row.classList.add('dc-message-failed');status.setAttribute('role','status');status.textContent=message.error+' ';
         const retry=document.createElement('button');retry.type='button';retry.textContent='Retry';retry.onclick=()=>enhanced.retryMessage(message.id);status.appendChild(retry);
-      }else{status.classList.add('dc-confirmation-pending');status.title='Waiting for server confirmation';status.setAttribute('aria-label','Waiting for server confirmation');status.textContent='◷';}
-      stack.append(bubble,status);row.appendChild(stack);return row;
+        stack.appendChild(status);
+      }
+      row.appendChild(stack);return row;
     }
     var tools = document.createElement("span"); tools.className = "message-tools";
     var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.innerHTML = '<svg aria-hidden="true"><use href="#i-reply"></use></svg>'; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
@@ -1145,7 +1147,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-29/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-30/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");

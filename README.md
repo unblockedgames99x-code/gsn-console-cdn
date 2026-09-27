@@ -102,3 +102,5 @@ Release v20260927-27: Sign out clears the local session immediately, revokes the
 Release v20260927-28: Sign out clears the local session immediately, revokes the session in the background, and opens sign-in without waiting for Google.
 
 Release v20260927-29: Music uses the provider API directly on the CDN instead of depending on the WebSocket relay. Local previews retain their server proxy.
+
+Release v20260927-30: Messages appear immediately without a pending clock; server acknowledgement retains the displayed message identity, timestamp and measured row height to avoid scroll jumps. Failed sends retain Retry.

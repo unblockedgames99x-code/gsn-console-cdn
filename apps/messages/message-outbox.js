@@ -20,7 +20,7 @@
           if (!result?.message?.id) throw Error('No server confirmation. Check the conversation before retrying.');
           records(account).delete(record.id);
           try { persist(account); } catch { warning('Message delivered, but local recovery storage could not be updated.'); }
-          delivered(account, record.channelId, result.message);
+          delivered(account, record.channelId, result.message, record);
         } catch (error) {
           record.delivery = 'failed';
           record.error = (error.message || 'Message was not confirmed.') + ' Check the conversation before retrying.';
