@@ -5,3 +5,6 @@ self.addEventListener('activate', event => event.waitUntil(self.clients.claim())
 self.addEventListener('fetch', event => {
   if ($jetController.shouldRoute(event)) event.respondWith($jetController.route(event));
 });
+
+self.GSN_CDN_SKIP=event=>$jetController.shouldRoute(event);
+importScripts('../../launcher-sw.js');

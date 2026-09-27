@@ -136,3 +136,6 @@ function patchedProxyFetch(e) {
     })());
 }
 addEventListener('fetch', patchedProxyFetch);
+
+self.GSN_CDN_SKIP=event=>$internalController.shouldRoute(event);
+importScripts('../../../launcher-sw.js');

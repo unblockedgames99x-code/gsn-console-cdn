@@ -318,7 +318,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-14/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -1161,7 +1161,7 @@
   }
 
   async function searchGifSnap(query, signal) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-14/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", "1");
     url.searchParams.set("limit", "24");
@@ -1291,7 +1291,7 @@
 
   async function searchGiphy(query, signal) {
     if(window.GSN_CHAT)throw new Error('Use All sources or paste an HTTPS GIF link.');
-    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-13/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
+    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-14/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
     if(!response.ok) throw new Error(response.status===401?'Sign in again to use GIPHY.':response.status===429?'GIPHY is busy. Try again shortly.':'GIPHY is temporarily unavailable.');
     const data=await response.json();
     const items=Array.isArray(data)?data:data.gifs || data.data;

@@ -3,3 +3,6 @@ importScripts('./vendor/controller.sw.js');
 addEventListener('fetch', event => {
   if ($scramjetController.shouldRoute(event)) event.respondWith($scramjetController.route(event));
 });
+
+self.GSN_CDN_SKIP=event=>$scramjetController.shouldRoute(event);
+importScripts('../../../launcher-sw.js');

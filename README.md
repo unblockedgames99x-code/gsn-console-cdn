@@ -24,3 +24,5 @@ Release v20260926-11 hides app scrollbars while preserving wheel, touch and keyb
 Release v20260926-12 repairs cloud-game launch routing for the entire cloud catalog.
 
 Release v20260926-13 adds a responsive song-actions menu with artwork, grouped icon actions and keyboard navigation.
+
+Release v20260926-14: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
