@@ -66,3 +66,6 @@ Release v20260927-12: remove Browser title/logo/clock header and align connectio
 
 Release v20260927-13: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-13: remove the extra start-page action buttons, settings gear/menu, and clock widget.
+
+Release v20260927-14: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-14: allow bare domains in bookmarks, normalize them to HTTPS, and reject non-web addresses without using search fallback.

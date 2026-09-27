@@ -36,7 +36,7 @@
     dialog.innerHTML = '<form class="neo-bookmark-card" id="neoBookmarkForm">' +
       '<h2 id="neoBookmarkTitle">Add bookmark</h2>' +
       '<p>Save a page to your Browser home screen.</p>' +
-      '<label class="neo-bookmark-field">Website URL<input id="neoBookmarkUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" required></label>' +
+      '<label class="neo-bookmark-field">Website URL<input id="neoBookmarkUrl" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="example.com or https://example.com" required></label>' +
       '<label class="neo-bookmark-field">Name<input id="neoBookmarkName" type="text" autocomplete="off" maxlength="48" placeholder="Example" required></label>' +
       '<p class="neo-bookmark-error" id="neoBookmarkError" role="alert"></p>' +
       '<div class="neo-bookmark-actions"><button type="button" data-bookmark-cancel>Cancel</button><button type="submit" data-bookmark-save>Save bookmark</button></div>' +
@@ -85,7 +85,18 @@
   function saveBookmark(event) {
     event.preventDefault();
     var normalized = "";
-    try { normalized = normalizeInput(urlInput.value); }
+    // Bookmark addresses must not use the address bar's search fallback.
+    // Normalize before validation so a bare domain is a valid bookmark.
+    try {
+      var value = urlInput.value.trim();
+      if (!value || /\s/.test(value)) throw new Error('Invalid address');
+      var explicitScheme = /^[a-z][a-z\d+.-]*:/i.test(value);
+      var hostWithPort = /^[^/?#]+:\d+(?:[/?#]|$)/.test(value);
+      if (explicitScheme && !/^https?:\/\//i.test(value) && !hostWithPort) throw new Error('Unsupported address');
+      var address = new URL(/^https?:\/\//i.test(value) ? value : value.startsWith('//') ? 'https:' + value : 'https://' + value);
+      if (address.username || address.password || !(address.hostname.includes('.') || address.hostname === 'localhost' || address.hostname.startsWith('['))) throw new Error('Invalid website');
+      normalized = address.href;
+    }
     catch (error) {}
     if (!normalized || !/^https?:\/\//i.test(normalized)) {
       errorText.textContent = "Enter a valid website address.";
