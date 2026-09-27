@@ -71,7 +71,7 @@
  function attach(context){
   const {message,channelId,userId,tools,stack}=context;
   const locked=pending.has(channelId+':'+message.id);
-  const add=document.createElement('button');add.type='button';add.className='reaction-add';add.title='Add reaction';add.setAttribute('aria-label','Add reaction');add.setAttribute('aria-haspopup','dialog');add.setAttribute('aria-expanded','false');add.textContent='☺';add.disabled=locked;add.onclick=()=>open(context,add);tools.prepend(add);
+  const add=document.createElement('button');add.type='button';add.className='reaction-add';add.title='Add reaction';add.setAttribute('aria-label','Add reaction');add.setAttribute('aria-haspopup','dialog');add.setAttribute('aria-expanded','false');add.innerHTML='<svg aria-hidden="true"><use href="#i-smile"></use></svg>';add.disabled=locked;add.onclick=()=>open(context,add);tools.prepend(add);
   const bar=document.createElement('div');bar.className='message-reactions';bar.setAttribute('aria-label','Reactions');
   for(const item of message.reactions||[]){
    if(typeof item.emoji!=='string'||!Array.isArray(item.userIds)||!item.userIds.length)continue;

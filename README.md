@@ -75,3 +75,5 @@ Release v20260927-14: allow bare domains in bookmarks, normalize them to HTTPS, 
 Release v20260927-15: Discord-style GSN Chat with virtualized timelines and members, saved drafts, profiles, search, reliable send reconciliation, and the existing private GSN backend.
 
 Release v20260927-16: open YouTube video links in the official embedded player without running watch pages through the Browser rewriter; preserve tabs, history, timestamps, and explicit playback errors.
+
+Release v20260927-17: add Discord-style Friends, Pending and Add Friend screens backed by the existing GSN account server; preserve chat drafts and scroll position, simplify the DM sidebar, and refine message icons and context menus.

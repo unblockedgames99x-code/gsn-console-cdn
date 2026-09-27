@@ -312,7 +312,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-16/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-17/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -577,11 +577,9 @@
     document.querySelectorAll("[data-view]").forEach(function (button) {
       button.classList.toggle("active", button.dataset.view === state.activeView);
     });
-    el.searchInput.placeholder = state.activeView === "chats" ? "Search conversations" : state.activeView === "friends" ? "Search friends" : "Search requests";
+    el.searchInput.placeholder = "Search conversations";
 
-    if (state.activeView === "chats") renderChats(query);
-    else if (state.activeView === "friends") renderFriends(query);
-    else renderRequests(query);
+    renderChats(query);
     enhanced.sidebar();
   }
 
@@ -944,21 +942,21 @@
       }
       var preview = document.createElement("span"); preview.className = "reply-preview-text"; preview.textContent = target ? displayMessageText(target.text || "Attachment").replace(/\s+/g, " ").trim() : "Original message unavailable"; reply.appendChild(preview);
       reply.title = "Reply to " + (target ? sender.textContent + ": " : "") + preview.textContent;
-      reply.setAttribute("aria-label", reply.title); if(target){reply.tabIndex=0;reply.setAttribute("role","button");reply.onclick=()=>timeline.jump(target.id);reply.onkeydown=e=>{if(e.key==="Enter")timeline.jump(target.id);};} stack.appendChild(reply);
+      reply.setAttribute("aria-label", reply.title); if(target){reply.tabIndex=0;reply.setAttribute("role","button");reply.onclick=()=>timeline.jump(target.id);reply.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();timeline.jump(target.id);}};} stack.appendChild(reply);
     }
     if (groupStart && state.activeChannel) {
       var name = document.createElement("span"); name.className = "message-author"; name.textContent = cleanDisplayName(author);
       enhanced.profileTrigger(name,author);
-      var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=formatTime(message.createdAt);name.appendChild(timestamp);stack.appendChild(name);
+      var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=new Date(message.createdAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});timestamp.title=new Date(message.createdAt).toLocaleString();const heading=document.createElement('div');heading.className='dc-message-heading';heading.append(name,timestamp);stack.appendChild(heading);
     }
     var bubble = document.createElement("div"); bubble.className = "message-bubble";
     if (message.text) appendMessageText(bubble, message.text);
     if(message.editedAt){const edited=document.createElement("small");edited.className="edited-marker";edited.textContent=" (edited)";edited.title=new Date(message.editedAt).toLocaleString();bubble.append(edited);}
     renderAttachments(bubble, message.attachments);
     var tools = document.createElement("span"); tools.className = "message-tools";
-    var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.textContent = "↩"; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
+    var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.innerHTML = '<svg aria-hidden="true"><use href="#i-reply"></use></svg>'; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
     {
-      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Message actions"; moreButton.setAttribute("aria-label", "Message actions"); moreButton.textContent = "•••"; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
+      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Message actions"; moreButton.setAttribute("aria-label", "Message actions"); moreButton.innerHTML = '<svg aria-hidden="true"><use href="#i-more"></use></svg>'; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
     }
     bubble.appendChild(tools); stack.appendChild(bubble);
     if (window.GSN_CHAT || window.CHERRI_CHAT) window.ChatReactions.attach({
@@ -975,7 +973,7 @@
     if (groupEnd) {
       var meta = document.createElement("time"); meta.className = "message-meta"; meta.dateTime = new Date(Number(message.createdAt || Date.now())).toISOString(); meta.textContent = (mine ? "Delivered · " : "") + formatTime(message.createdAt) + (message.editedAt ? " · Edited" : ""); stack.appendChild(meta);
     }
-    row.appendChild(stack);  return row;
+    row.appendChild(stack); row.addEventListener("contextmenu",event=>{if(event.target.closest("a")||getSelection().toString())return;event.preventDefault();enhanced.messageMenu(moreButton,message);}); return row;
   }
 
   function renderAttachments(bubble, raw) {
@@ -1096,7 +1094,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-16/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-17/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1390,6 +1388,8 @@
   }
 
   async function startDm(user) {
+    const existing = state.channels.find(channel => channel.kind === "dm" && channel.recipientId === user.id);
+    if (existing) { hideOverlay(el.newChatOverlay); return openChannel(existing.id); }
     try {
       if (window.NEO_CHAT_BRIDGE && window.NEO_CHAT_BRIDGE.mode === "neo") {
         var payload = await api("/api/dm", { method: "POST", body: { username: user.username, userId: user.id } });
@@ -1765,6 +1765,6 @@
     }
   });
   window.addEventListener('nocturne-search', event => { state.members = event.detail; state.members.forEach(member => state.memberMap.set(member.id, member)); renderPeople(el.peopleSearch.value); });
-    const enhanced=window.GsnChatUI.install({state,el,api,renderSidebar,renderMessages,openChannel,startDm,sendFriendRequest,cleanDisplayName,userFor,createAvatar,channelTitle,unreadCount,cacheMessages,normalizeMessages,loadChannelMessages,autoSizeComposer,syncComposeExtras,syncSendButton,fileToAttachment,openGifPicker,toast,timeline,deleteMessage,toggleChannelMuted,showProfileSetup,closeDetails});
+    const enhanced=window.GsnChatUI.install({state,el,api,renderSidebar,renderMessages,openChannel,startDm,sendFriendRequest,refreshFriends,cleanDisplayName,userFor,createAvatar,channelTitle,unreadCount,cacheMessages,normalizeMessages,loadChannelMessages,autoSizeComposer,syncComposeExtras,syncSendButton,fileToAttachment,openGifPicker,toast,timeline,deleteMessage,toggleChannelMuted,showProfileSetup,closeDetails});
   boot();
 })();
