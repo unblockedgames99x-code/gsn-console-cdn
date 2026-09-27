@@ -98,3 +98,5 @@ Release v20260927-25: updated console and app assets.
 Release v20260927-26: private DM voice/video calling, incoming answer/decline, mute/camera controls, call timer, minimize and hang-up. Google backend version 13. STUN configured; TURN configuration supported for restrictive networks.
 
 Release v20260927-27: Sign out clears the local session immediately, revokes the session in the background, and opens sign-in without waiting for Google.
+
+Release v20260927-28: Sign out clears the local session immediately, revokes the session in the background, and opens sign-in without waiting for Google.
