@@ -45,3 +45,6 @@ Release v20260927-5: keep the current game mounted and suspended across Home and
 
 Release v20260927-6: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-6: repair double-routed Arcade menu images while retaining proxy session boundaries; verified platform logos load before and after menu scrolling.
+
+Release v20260927-7: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-7: show Resume Game and Close Game together in the running game options; closing unloads the session and restores Play.
