@@ -60,3 +60,6 @@ Release v20260927-10: credit Movies as By StarStream.
 
 Release v20260927-11: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-11: remove inherited sandbox restrictions from StarStream Movies frames and pass encrypted-media/picture-in-picture permissions.
+
+Release v20260927-12: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-12: remove Browser title/logo/clock header and align connection settings to the remaining toolbar.

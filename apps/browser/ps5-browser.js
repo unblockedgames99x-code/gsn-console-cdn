@@ -2,10 +2,6 @@
   "use strict";
   const $ = id => document.getElementById(id);
   document.documentElement.style.colorScheme = "dark";
-  const header = document.createElement("header");
-  header.className = "gsn-heading";
-  header.innerHTML = '<button class="gsn-console" aria-label="Open Control Center" title="Control Center"><img src="../../assets/playstation.svg" alt=""></button><strong>Browser <small>by &lt;GSN&gt;</small></strong><time aria-label="Current time"></time>';
-  document.querySelector(".app").prepend(header);
   document.querySelector(".nt-logo").innerHTML = 'Browser<small>by &lt;GSN&gt;</small>';
   document.querySelector(".nt-section-title").textContent = "Your favorites";
   $("add-shortcut").textContent = "+ Add favorite";
@@ -39,17 +35,6 @@
     const target = soundTarget(event);
     if (target && !target.disabled && !target.closest('.gsn-console')) sound(target.matches('[role="tab"]') ? 'panel' : 'select');
   }, true);
-  header.querySelector("button").addEventListener("click", controlCenter);
-  if (parent === window) header.querySelector("button").hidden = true;
-  const clock = header.querySelector("time");
-  function tick() {
-    const date = new Date();
-    clock.dateTime = date.toISOString();
-    clock.textContent = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
-  }
-  tick();
-  const timer = setInterval(tick, 1000);
-  window.addEventListener("pagehide", () => clearInterval(timer));
   function accessibleItems() {
     for (const tab of $("tabbar").querySelectorAll(".tab")) {
       tab.setAttribute("role", "tab");

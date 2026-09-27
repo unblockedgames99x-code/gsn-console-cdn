@@ -8,12 +8,6 @@
 html, body, button, input, select { font-family: "Segoe UI", Arial, sans-serif; }
 html, body { color: var(--text); font-size: 14px; }
 .app { padding: 0; background: var(--bg); height: 100dvh; }
-.gsn-heading { display: flex; align-items: center; gap: 18px; height: 76px; flex-shrink: 0; padding: 0 32px; background: #0b111b; }
-.gsn-console { display: grid; place-items: center; width: 48px; height: 44px; border-radius: 8px; }
-.gsn-console img { width: 34px; height: 30px; filter: invert(1); }
-.gsn-heading strong { font-weight: 400; font-size: 21px; letter-spacing: -.4px; }
-.gsn-heading strong small { display: block; color: #a7b4c7; font-size: 14px; margin: 0; }
-.gsn-heading time { margin-left: auto; font-size: 21px; font-weight: 300; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .chrome { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; grid-template-rows: 43px 48px; gap: 8px 16px; height: 115px; padding: 0 32px 16px; background: #0b111b; border-bottom: 1px solid #ffffff15; }
 .tabbar { grid-column: 1/-1; grid-row: 1; width: 100%; height: 43px; gap: 8px; padding: 2px; background: transparent; align-items: center; }
 .tab { height: 36px; width: 218px; max-width: 218px; min-width: 100px; border: 1px solid transparent; border-radius: 8px; background: #ffffff05; color: #9faec1; padding: 0 12px; gap: 10px; }
@@ -27,7 +21,7 @@ html, body { color: var(--text); font-size: 14px; }
 #b-fwd { order: 0; } #b-reload { order: 0; }
 .cbtn { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #d4deeb; }
 .cbtn i { font-size: 21px; line-height: 1; }
-.cbtn:hover, .gsn-console:hover { background: #ffffff14; }
+.cbtn:hover { background: #ffffff14; }
 .cbtn:disabled { opacity: .3; }
 .url-wrap, .url-wrap:focus-within { grid-row: 2; width: 100%; min-width: 0; height: 42px; border-radius: 24px; padding: 0 20px; background: #1b2534; color: white; border: 1px solid #ffffff12; }
 .url-wrap:focus-within { border-color: #e0efff; box-shadow: 0 0 0 3px #b8dfff16; }
@@ -74,7 +68,7 @@ html, body { color: var(--text); font-size: 14px; }
 .engine-menu button:hover, .engine-menu button:focus-visible { background: #ffffff16; }
 .engine-menu .selected-check { color: #b3e2ff; }
 .start-settings { top: 65px; right: 28px; }
-.wisp-panel { top: 182px; right: 28px; padding: 22px; }
+.wisp-panel { top: 106px; right: 28px; padding: 22px; }
 .wisp-panel select, .wisp-panel input { color: #f2f6fc; background: #0e1624; border-color: #ffffff22; }
 .wisp-apply { background: #edf5ff; color: #121a27; border-radius: 22px; font-weight: 500; }
 .clock-widget { background: #ffffff08; border-radius: 18px; margin: 0 0 24px; }
@@ -83,20 +77,16 @@ button:focus-visible, [tabindex]:focus-visible, .cbtn:focus-visible { outline: 2
 .neo-bookmark-card { background: #172132 !important; border-radius: 20px !important; }
 .neo-bookmark-field input { background: #0d1625 !important; }
 @media (max-width: 760px) {
-  .gsn-heading { padding: 0 16px; height: 62px; gap: 10px; }
-  .gsn-heading strong { font-size: 18px; } .gsn-heading time { font-size: 16px; }
   .chrome { padding: 0 12px 12px; gap: 6px; height: 108px; }
   .nav-btns { gap: 0; } .cbtn { width: 32px; height: 36px; }
   .url-wrap { padding: 0 12px; } .url-wrap input { font-size: 13px; }
   .new-tab { padding: 42px 22px 85px; }
   .nt-logo { font-size: 38px; } .nt-brand-mark { width: 76px; height: 76px; }
   .nt-search { height: 54px; padding: 0 14px; } .nt-search input { font-size: 14px; }
-  .wisp-panel { top: 164px; right: 12px; }
+  .wisp-panel { top: 102px; right: 12px; }
   .start-settings-button { right: 10px; top: 8px; }
 }
 @media (max-width: 440px) {
-  .gsn-heading strong small { display: block; margin: 0; font-size: 11px; }
-  .gsn-console { width: 34px; } .gsn-console img { width: 29px; }
   #b-fwd { display: none; } .nt-brand { gap: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
