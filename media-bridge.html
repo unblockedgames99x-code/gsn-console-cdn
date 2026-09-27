@@ -11,6 +11,11 @@
    if(frame&&event.source===frame.contentWindow&&event.origin===location.origin){if(outward.has(event.data?.type))send(event.data);return;}
    if(event.source!==parent||event.origin!==parentOrigin)return;
    const data=event.data;
+   if(data?.type==='gsn-service-reset'&&typeof data.id==='string'){
+     try { const host=new URL(parentOrigin).hostname;if(parentOrigin!==location.origin&&!host.endsWith('-script.googleusercontent.com')&&!['localhost','127.0.0.1'].includes(host))throw Error('Unsupported console origin.'); const {clearConsoleData}=await import('./apps/shared/site-data.js'); await clearConsoleData(); send({type:'gsn-service-response',id:data.id,status:200,body:'{}',contentType:'application/json'}); }
+     catch(error){send({type:'gsn-service-response',id:data.id,status:500,body:JSON.stringify({error:error.message}),contentType:'application/json'});}
+     return;
+   }
    if(inward.has(data?.type)){if(frame){if(frame.dataset.ready)frame.contentWindow.postMessage(data,location.origin);else queued.push(data);}return;}
    if(data?.type!=='gsn-service-request'||typeof data.id!=='string')return;
    try{

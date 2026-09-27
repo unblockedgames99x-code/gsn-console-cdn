@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><title>GSN data reset</title></head><body><script type="module">
+import {clearConsoleData} from './site-data.js';
+const origin = new URLSearchParams(location.search).get('parentOrigin');
+// This endpoint is only needed for the isolated localhost media origin.
+const caller = origin && new URL(origin);
+if (caller && ['localhost','127.0.0.1'].includes(caller.hostname) && caller.port === location.port) {
+  addEventListener('message', async event => {
+    if (event.source !== parent || event.origin !== origin || event.data?.type !== 'gsn-clear-data') return;
+    try { await clearConsoleData(); parent.postMessage({type:'gsn-data-cleared', id:event.data.id}, origin); }
+    catch (error) { parent.postMessage({type:'gsn-data-cleared', id:event.data.id, error:error.message}, origin); }
+  });
+  parent.postMessage({type:'gsn-reset-ready'}, origin);
+}
+</script></body></html>

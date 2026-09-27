@@ -15,3 +15,5 @@ Release v20260926-7 adds Arcade by Greg to Media, with the supplied GAM.ONL libr
 Release v20260926-8 replaces the Arcade tile and loading-screen icon with the Apple Arcade joystick logo.
 
 Release v20260926-9 keeps the media loading screen within the viewport to remove the outer scrollbar.
+
+Release v20260926-10 implements restart, rest mode, and scoped browser data reset on power off.
