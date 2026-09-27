@@ -42,3 +42,6 @@ Games music player is borderless and transparent, clears the carousel and counte
 
 Release v20260927-5: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-5: keep the current game mounted and suspended across Home and media apps; add Resume Game on Home and a direct game resume card while Music is open.
+
+Release v20260927-6: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-6: repair double-routed Arcade menu images while retaining proxy session boundaries; verified platform logos load before and after menu scrolling.
