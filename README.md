@@ -9,3 +9,5 @@ The service worker serves the application's HTML and routes supported chat/media
 Release v20260926-5 connects GSN Chat to its own Google Apps Script backend and private spreadsheet. Chat accounts and history are separate from the former shared chat service.
 
 Release v20260926-6 provides an isolated media/API bridge for the native Google Apps Script console. GSN console and Chat code are stored in Apps Script; external game/media assets remain here.
+
+Release v20260926-7 adds Arcade by Greg to Media, with the supplied GAM.ONL library and an existing arcade-cabinet icon by Upnow Graphic / Flaticon.

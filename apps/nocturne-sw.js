@@ -1,6 +1,6 @@
 import CurlTransport from './movie-proxy/vendor/curl/index.mjs';
 // Only the explicit relay prefix is handled. Browser/movie proxy workers retain their own scopes.
-const PREFIX = '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-6/apps/nocturne-relay/';
+const PREFIX = '/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-7/apps/nocturne-relay/';
 let ready;
 async function transport() {
   if (!ready) ready = (async () => {
@@ -20,7 +20,7 @@ self.addEventListener('fetch',event=>{
       if(!['d27jvgogyihpmk.cloudfront.net','nocturne.lol'].includes(remote.hostname)||remote.protocol!=='https:')return new Response('Unknown service',{status:400});
       // Nocturne's thumbnail endpoint currently returns 502 for valid YouTube
       // artwork. Fetch those same image URLs over its Wisp transport instead.
-      if(remote.pathname==='/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-6/api/youtube/thumb') {
+      if(remote.pathname==='/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-7/api/youtube/thumb') {
         const encoded=remote.searchParams.get('url')||'';
         const image=new URL(atob(encoded.replace(/-/g,'+').replace(/_/g,'/')));
         if(image.protocol!=='https:'||!/(^|\.)(ytimg\.com|ggpht\.com|googleusercontent\.com)$/.test(image.hostname))return new Response('Unknown thumbnail host',{status:400});

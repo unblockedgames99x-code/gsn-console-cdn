@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade</title></head>
+<body style="margin:0;background:#0e1020;color:white;font:16px system-ui">
+<p>Opening Arcade…</p>
+<script>
+// Launch the supplied GAM.ONL library through the existing isolated app connection.
+const target = new URL('../movie-proxy/arcade.html', location.href);
+target.search = location.search;
+target.searchParams.set('url', 'https://gam.onl/');
+location.replace(target.href);
+</script>
+</body></html>
