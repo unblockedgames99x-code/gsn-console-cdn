@@ -33,6 +33,7 @@
     pinnedChannelIds: [],
     draggedChannelId: "",
     messages: new Map(),
+    mutationVersions: new Map(),
     activeChannel: null,
     activeView: "chats",
     online: new Set(),
@@ -180,7 +181,9 @@
       var raw = await blinkRequest("dms/" + channel.blinkPair + "/messages");
       return normalizeBlinkMessages(raw, channel);
     }
+    const version=state.mutationVersions.get(channel.id)||0;
     var payload = await api("/api/channels/" + encodeURIComponent(channel.id) + "/messages");
+    if(version!==(state.mutationVersions.get(channel.id)||0))return state.messages.get(channel.id)||[];
     return normalizeMessages(payload.messages);
   }
 
@@ -266,26 +269,17 @@
   }
 
   function appendMessageText(container, value) {
-    var text = displayMessageText(value);
-    var pattern = mentionPattern();
-    var cursor = 0;
-    var match;
-    while ((match = pattern.exec(text))) {
-      var mentionStart = match.index + match[1].length;
-      if (mentionStart > cursor) container.appendChild(document.createTextNode(text.slice(cursor, mentionStart)));
-      var mention = document.createElement("strong");
-      mention.className = "message-mention";
-      mention.textContent = "@" + match[2];
-      container.appendChild(mention);
-      cursor = pattern.lastIndex;
-    }
-    if (cursor < text.length) container.appendChild(document.createTextNode(text.slice(cursor)));
+    window.GsnChatUI.format(container, displayMessageText(value), {
+      user: username => state.members.find(u => u.username.toLowerCase() === username.toLowerCase()),
+      profile: user => enhanced.profile(user),
+      channel: name => {const channel=state.channels.find(c=>c.name===name);if(channel)openChannel(channel.id);}
+    });
   }
 
   function isHiddenPublicRoom(channel) {
     if (!channel || channel.kind !== "server") return false;
     var name = String(channel.name || "").trim().toLowerCase().replace(/[-_]+/g, " ");
-    return name === "games" || name === "off topic";
+    return false; // Channel visibility belongs to the server.
   }
 
   function notificationStorageKey() {
@@ -318,7 +312,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-14/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-15/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -516,6 +510,7 @@
 
   function setConnection(label, online) {
     el.connectionLabel.textContent = label;
+    el.connectionLabel.title = label; el.connectionLabel.setAttribute("aria-label", label); el.connectionLabel.classList.toggle("connected", Boolean(online));
     el.myPresence.classList.toggle("online", Boolean(online));
   }
 
@@ -573,8 +568,11 @@
     return node;
   }
 
+  let sidebarSignature='';
   function renderSidebar() {
     var query = el.searchInput.value.trim().toLowerCase();
+    const signature=JSON.stringify([query,state.activeView,enhanced.space,state.activeChannel?.id,state.pinnedChannelIds,[...state.mutedChannels],state.friends,state.channels.map(ch=>[ch.id,ch.kind,channelTitle(ch),unreadCount(ch.id),latestMessage(ch.id)?.id,latestMessage(ch.id)?.text,channelAvatarUser(ch)]),enhanced.collapsed('server'),enhanced.collapsed('dm')]);
+    if(sidebarSignature===signature)return;sidebarSignature=signature;
     el.sidebarContent.replaceChildren();
     document.querySelectorAll("[data-view]").forEach(function (button) {
       button.classList.toggle("active", button.dataset.view === state.activeView);
@@ -584,14 +582,16 @@
     if (state.activeView === "chats") renderChats(query);
     else if (state.activeView === "friends") renderFriends(query);
     else renderRequests(query);
+    enhanced.sidebar();
   }
 
   function renderChats(query) {
-    var channels = state.channels.filter(function (channel) { return !isHiddenPublicRoom(channel) && channelTitle(channel).toLowerCase().includes(query); });
+    var channels = state.channels.filter(function (channel) { return channel.kind === (enhanced.space === "home" ? "dm" : "server") && channelTitle(channel).toLowerCase().includes(query); });
     for (var kind of ['server','dm']) {
       var group=channels.filter(function(channel){return channel.kind===kind;});
       if(!group.length)continue;
-      el.sidebarContent.appendChild(sectionLabel(kind==='server'?'TEXT CHANNELS':'DIRECT MESSAGES'));
+      const heading=sectionLabel(kind==='server'?'TEXT CHANNELS':'DIRECT MESSAGES');
+      enhanced.category(heading,kind);el.sidebarContent.appendChild(heading);if(enhanced.collapsed(kind)&&!query)continue;
       group.sort(function(a,b){return state.pinnedChannelIds.includes(b.id)-state.pinnedChannelIds.includes(a.id);});
       group.forEach(function(channel){el.sidebarContent.appendChild(channelRow(channel));});
     }
@@ -741,7 +741,7 @@
     var entries = state.friends.filter(function (friend) { return friend.state === "friends" && friend.user && displayName(friend.user).toLowerCase().includes(query); });
     el.sidebarContent.appendChild(sectionLabel("Friends · " + entries.length));
     entries.forEach(function (friend) {
-      var row = personRow(friend.user, state.online.has(friend.user.id) ? "Online" : "Offline");
+      var row = personRow(friend.user, "Community member");
       var action = document.createElement("button"); action.type = "button"; action.className = "mini-button primary"; action.textContent = "Message";
       action.addEventListener("click", function (event) { event.stopPropagation(); startDm(friend.user); });
       row.appendChild(action);
@@ -751,9 +751,9 @@
   }
 
   function renderRequests(query) {
-    var entries = state.friends.filter(function (friend) { return /^pending_/.test(friend.state) && friend.user && displayName(friend.user).toLowerCase().includes(query); });
-    var incoming = entries.filter(function (friend) { return friend.state === "pending_in"; });
-    var outgoing = entries.filter(function (friend) { return friend.state === "pending_out"; });
+    var entries = state.friends.filter(function (friend) { return /^(incoming|outgoing)$/.test(friend.state) && friend.user && displayName(friend.user).toLowerCase().includes(query); });
+    var incoming = entries.filter(function (friend) { return friend.state === "incoming"; });
+    var outgoing = entries.filter(function (friend) { return friend.state === "outgoing"; });
     if (incoming.length) {
       el.sidebarContent.appendChild(sectionLabel("Incoming"));
       incoming.forEach(function (friend) {
@@ -801,7 +801,8 @@
     updateMe();
     updateRequestBadge();
     renderSidebar();
-    void loadPreviews({ initial: true }).then(renderSidebar);
+    void loadPreviews({ initial: true }).then(renderSidebar).catch(()=>{});
+    enhanced.refresh();
     connectSocket();
     setConnection("Live", true);
     state.loading = false;
@@ -812,9 +813,11 @@
     startPolling();
   }
 
+  var previewCursor=0;
   async function loadPreviews(options) {
     options = options || {};
-    var channels = state.channels.slice(0, 24);
+    var all=state.channels.filter(c=>c.id!==state.activeChannel?.id);
+    var channels=Array.from({length:Math.min(3,all.length)},()=>all[previewCursor++ % all.length]);
     let cursor=0;
     await Promise.all(Array.from({length:4},async()=>{
       while(cursor<channels.length){const channel=channels[cursor++];
@@ -828,7 +831,7 @@
 
   function normalizeMessages(messages) {
     var list = Array.isArray(messages) ? messages : Object.values(messages || {});
-    return list.filter(Boolean).sort(function (a, b) { return Number(a.createdAt || 0) - Number(b.createdAt || 0); });
+    return [...new Map(list.filter(m=>m&&m.id).map(m=>[m.id,m])).values()].sort(function(a,b){return Number(a.createdAt||0)-Number(b.createdAt||0)||String(a.id).localeCompare(String(b.id));});
   }
 
   function loadProfile() {
@@ -853,7 +856,7 @@
   }
 
   function updateRequestBadge() {
-    var count = state.friends.filter(function (friend) { return friend.state === "pending_in"; }).length;
+    var count = state.friends.filter(function (friend) { return friend.state === "incoming"; }).length;
     el.requestBadge.hidden = !count;
     el.requestBadge.textContent = String(count);
   }
@@ -874,32 +877,29 @@
     var channel = state.channelMap.get(id);
     if (!channel) return;
     if (state.subscribedChannel && state.socket && state.socket.readyState === WebSocket.OPEN) state.socket.send(JSON.stringify({ t: "unsub", channel: state.subscribedChannel }));
+    enhanced.saveDraft();
     state.activeChannel = channel;
-    state.replyTo = null;
-    state.attachment = null;
+    enhanced.restoreDraft(id);
     syncComposeExtras();
     el.emptyState.hidden = true;
     el.chatView.hidden = false;
     el.app.classList.add("conversation-open");
     updateHeader();
     renderSidebar();
-    el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';
+    if(state.messages.has(id))renderMessages();else{el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';}
     try {
-      cacheMessages(id, await loadChannelMessages(channel));
+      const loaded=await loadChannelMessages(channel);
       if(navigation!==channelNavigation)return;
+      cacheMessages(id,loaded);
       renderMessages();
-      if (channel.backend === "blink") rememberBlinkRead(id, Date.now());
-      else {
-        await api("/api/channels/" + encodeURIComponent(id) + "/read", { method: "POST", body: {} }).catch(function () {});
-        state.unreads[id] = Date.now();
-      }
+      enhanced.markVisibleRead();
       if(navigation!==channelNavigation)return;
       renderSidebar();
       subscribe(id);
       if (options.focus !== false) el.messageInput.focus();
     } catch (error) {
       if(navigation!==channelNavigation)return;
-      el.messageScroll.innerHTML = '<div class="thread-empty">This conversation could not be loaded.</div>';
+      if(!state.messages.has(id))enhanced.loadError(()=>openChannel(id));
       toast(error.message);
     }
   }
@@ -911,6 +911,7 @@
     var person = channelAvatarUser(channel);
     el.chatTitle.textContent = channelTitle(channel);
     el.chatView.dataset.channelKind = channel.kind;
+    enhanced.refresh();
     el.messageInput.placeholder = channel.kind === 'server' ? 'Message #'+channel.name : 'Message @'+channelTitle(channel);
     el.chatSubtitle.textContent = channel.kind === "server" ? (String(channel.name).toLowerCase() === "general" ? "Global room · everyone in the community" : "Public room") : (person && state.online.has(person.id) ? "Online" : "Direct message");
     if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") {
@@ -918,61 +919,12 @@
     } else paintAvatar(el.chatAvatar, person || { username: channel.name, displayName: channel.name });
   }
 
-  const messageVisibility=window.IntersectionObserver ? new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>target.classList.toggle('render-offscreen',!isIntersecting)),{root:el.messageScroll,rootMargin:'400px'}) : null;
-  let messageNodes = new Map();
-  var renderedChannel = null, renderedIds = new Set(), unseenIds = new Set();
-  const jumpButton=document.getElementById('newMessagesButton');
-  function updateJump() {
-    jumpButton.hidden=!unseenIds.size;
-    jumpButton.textContent='↓  '+unseenIds.size+' new message'+(unseenIds.size===1?'':'s');
-  }
-  jumpButton.addEventListener('click',()=>{el.messageScroll.scrollTo({top:el.messageScroll.scrollHeight,behavior:'smooth'});unseenIds.clear();updateJump();});
-  el.messageScroll.addEventListener('scroll',()=>{if(el.messageScroll.scrollHeight-el.messageScroll.scrollTop-el.messageScroll.clientHeight<70){unseenIds.clear();updateJump();}},{passive:true});
-  function renderMessages() {
-    var channel = state.activeChannel;
-    if (!channel) return;
-    var list = state.messages.get(channel.id) || [];
-    const changed=renderedChannel!==channel.id;
-    if (changed) window.ChatReactions?.close();
-    const oldTop=el.messageScroll.scrollTop;
-    const pinned=changed || el.messageScroll.scrollHeight-oldTop-el.messageScroll.clientHeight<80;
-    const added=list.filter(m=>!renderedIds.has(m.id));
-    const ownNew=added.some(m=>m.authorId===state.me?.id);
-    if(changed||pinned||ownNew) unseenIds.clear();
-    else added.forEach(m=>unseenIds.add(m.id));
-    renderedChannel=channel.id;renderedIds=new Set(list.map(m=>m.id));updateJump();
-    if(changed) { messageVisibility?.disconnect(); messageNodes.clear(); el.messageScroll.replaceChildren(); }
-    const nextNodes = new Map(), ordered = [];
-    if (!list.length) {
-      el.messageScroll.replaceChildren(); messageNodes.clear();
-      var empty = document.createElement("div"); empty.className = "thread-empty"; empty.textContent = "No messages yet. Say hello."; el.messageScroll.appendChild(empty); return;
-    }
-    var previous = null;
-    list.forEach(function (message, index) {
-      var date = new Date(Number(message.createdAt || Date.now()));
-      if (!previous || new Date(Number(previous.createdAt || 0)).toDateString() !== date.toDateString()) {
-        const key='day:'+message.id;
-        const entry=messageNodes.get(key)||{node:document.createElement('div')};
-        entry.node.className='day-divider';entry.node.textContent=formatDay(message.createdAt);
-        nextNodes.set(key,entry);ordered.push(entry.node);
-      }
-      var next = list[index + 1];
-      var start = !previous || !!message.replyTo || previous.authorId !== message.authorId || Number(message.createdAt) - Number(previous.createdAt) > 300000;
-      var end = !next || !!next.replyTo || next.authorId !== message.authorId || Number(next.createdAt) - Number(message.createdAt) > 300000;
-      const target=message.replyTo && list.find(item=>item.id===message.replyTo);
-      const signature=JSON.stringify([message,start,end,userFor(message.authorId),target,target&&userFor(target.authorId)]);
-      let entry=messageNodes.get(message.id);
-      if(!entry||entry.signature!==signature)entry={signature,node:messageNode(message,start,end)};
-      nextNodes.set(message.id,entry);ordered.push(entry.node);
-      previous = message;
-    });
-    // Reuse untouched rows: typing/polls/reactions do not restart every GIF or steal focus.
-    const keep=new Set(ordered);
-    for(const child of [...el.messageScroll.children])if(!keep.has(child)){messageVisibility?.unobserve(child);child.remove();}
-    let cursor=el.messageScroll.firstChild;
-    for(const node of ordered){if(node===cursor)cursor=cursor.nextSibling;else el.messageScroll.insertBefore(node,cursor);}
-    messageNodes=nextNodes;
-    requestAnimationFrame(function () { el.messageScroll.scrollTop = pinned || ownNew ? el.messageScroll.scrollHeight : oldTop; });
+  const timeline=window.GsnChatUI.timeline(el.messageScroll, {
+    row: messageNode, user: userFor, day: formatDay, me:()=>state.me,
+    read:()=>enhanced.markVisibleRead()
+  });
+  function renderMessages(){
+    if(state.activeChannel)timeline.update(state.activeChannel.id,state.messages.get(state.activeChannel.id)||[]);
   }
 
   function messageNode(message, groupStart, groupEnd) {
@@ -981,7 +933,7 @@
     var row = document.createElement("article");
     row.className = "message-group" + (mine ? " mine" : "") + (messageMentionsMe(message) ? " is-mentioned" : "") + (groupStart ? " group-start" : "") + (groupEnd ? " group-end" : "");
     row.dataset.message = message.id;
-    row.appendChild(createAvatar(author, "message-avatar"));
+    const avatar=createAvatar(author, "message-avatar");enhanced.profileTrigger(avatar,author);row.appendChild(avatar);
     var stack = document.createElement("div"); stack.className = "message-stack";
     if (message.replyTo) {
       var target = (state.messages.get(state.activeChannel.id) || []).find(function (item) { return item.id === message.replyTo; });
@@ -992,19 +944,21 @@
       }
       var preview = document.createElement("span"); preview.className = "reply-preview-text"; preview.textContent = target ? displayMessageText(target.text || "Attachment").replace(/\s+/g, " ").trim() : "Original message unavailable"; reply.appendChild(preview);
       reply.title = "Reply to " + (target ? sender.textContent + ": " : "") + preview.textContent;
-      reply.setAttribute("aria-label", reply.title); stack.appendChild(reply);
+      reply.setAttribute("aria-label", reply.title); if(target){reply.tabIndex=0;reply.setAttribute("role","button");reply.onclick=()=>timeline.jump(target.id);reply.onkeydown=e=>{if(e.key==="Enter")timeline.jump(target.id);};} stack.appendChild(reply);
     }
     if (groupStart && state.activeChannel) {
       var name = document.createElement("span"); name.className = "message-author"; name.textContent = cleanDisplayName(author);
+      enhanced.profileTrigger(name,author);
       var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=formatTime(message.createdAt);name.appendChild(timestamp);stack.appendChild(name);
     }
     var bubble = document.createElement("div"); bubble.className = "message-bubble";
     if (message.text) appendMessageText(bubble, message.text);
+    if(message.editedAt){const edited=document.createElement("small");edited.className="edited-marker";edited.textContent=" (edited)";edited.title=new Date(message.editedAt).toLocaleString();bubble.append(edited);}
     renderAttachments(bubble, message.attachments);
     var tools = document.createElement("span"); tools.className = "message-tools";
     var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.textContent = "↩"; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
-    if (mine) {
-      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Edit or delete"; moreButton.setAttribute("aria-label", "Edit or delete"); moreButton.textContent = "•••"; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
+    {
+      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Message actions"; moreButton.setAttribute("aria-label", "Message actions"); moreButton.textContent = "•••"; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
     }
     bubble.appendChild(tools); stack.appendChild(bubble);
     if (window.GSN_CHAT || window.CHERRI_CHAT) window.ChatReactions.attach({
@@ -1013,7 +967,7 @@
       update: (channelId,id,reactions)=>{
         const list=state.messages.get(channelId)||[];
         const target=list.find(item=>item.id===id);
-        if(target)target.reactions=reactions;
+        if(target)target.reactions=reactions;state.mutationVersions.set(channelId,(state.mutationVersions.get(channelId)||0)+1);
         if(state.activeChannel?.id===channelId)renderMessages();
       },
       onError:toast
@@ -1021,7 +975,7 @@
     if (groupEnd) {
       var meta = document.createElement("time"); meta.className = "message-meta"; meta.dateTime = new Date(Number(message.createdAt || Date.now())).toISOString(); meta.textContent = (mine ? "Delivered · " : "") + formatTime(message.createdAt) + (message.editedAt ? " · Edited" : ""); stack.appendChild(meta);
     }
-    row.appendChild(stack); messageVisibility?.observe(row); return row;
+    row.appendChild(stack);  return row;
   }
 
   function renderAttachments(bubble, raw) {
@@ -1032,40 +986,17 @@
       var preview = attachment.data || attachment.previewUrl || data;
       if (String(attachment.type || "").startsWith("image/") && data) {
         var link = document.createElement("a"); link.className = "message-attachment"; link.href = data; link.target = "_blank"; link.rel = "noopener";
-        var image = document.createElement("img"); image.loading="lazy";image.decoding="async"; image.src = preview; image.alt = attachment.name || "Image attachment"; link.appendChild(image); bubble.appendChild(link);
+        var image = document.createElement("img"); image.loading="lazy";image.decoding="async"; image.src = preview; image.alt = attachment.name || "Image attachment"; link.appendChild(image); bubble.appendChild(link); enhanced.attachmentImage(image,attachment);
       } else if (data) {
         var file = document.createElement("a"); file.className = "message-attachment file-attachment"; file.href = data; file.download = attachment.name || "attachment"; file.textContent = "📎 " + (attachment.name || "Attachment"); bubble.appendChild(file);
       }
     });
   }
 
-  async function sendMessage(event) {
-    event.preventDefault();
-    if (!state.activeChannel || !state.me) return;
-    var text = el.messageInput.value.trim();
-    if (!text && !state.attachment) return;
-    el.sendButton.disabled = true;
-    var body = { text: text };
-    if (state.replyTo) body.replyTo = state.replyTo.id;
-    if (state.attachment) body.attachments = [state.attachment];
-    try {
-      var payload;
-      if (state.activeChannel.backend === "blink") {
-        var blinkBody = { name: state.me.username, text: text, ts: Date.now() };
-        if (body.replyTo) blinkBody.replyTo = body.replyTo;
-        if (body.attachments) blinkBody.attachments = body.attachments;
-        var created = await blinkRequest("dms/" + state.activeChannel.blinkPair + "/messages", { method: "POST", body: blinkBody });
-        payload = { message: { id: created.name, authorId: state.me.id, text: text, createdAt: blinkBody.ts, replyTo: blinkBody.replyTo || null, attachments: blinkBody.attachments || [] } };
-      } else payload = await api("/api/channels/" + encodeURIComponent(state.activeChannel.id) + "/messages", { method: "POST", body: body });
-      var list = state.messages.get(state.activeChannel.id) || [];
-      if (payload.message && !list.some(function (item) { return item.id === payload.message.id; })) list.push(payload.message);
-      state.messages.set(state.activeChannel.id, normalizeMessages(list));
-      el.messageInput.value = ""; autoSizeComposer(); state.replyTo = null; state.attachment = null; syncComposeExtras(); renderMessages(); renderSidebar();
-    } catch (error) { toast(error.message); }
-    syncSendButton();
+  async function sendMessage(event){
+    event.preventDefault(); await enhanced.send();
   }
-
-  function syncSendButton() { el.sendButton.disabled = !state.activeChannel || (!el.messageInput.value.trim() && !state.attachment); }
+  function syncSendButton(){el.sendButton.disabled=enhanced.sending || !state.activeChannel || (!el.messageInput.value.trim()&&!state.attachment);}
 
   function autoSizeComposer() {
     el.messageInput.style.height = "auto";
@@ -1080,21 +1011,25 @@
       el.attachmentName.textContent = state.attachment.name;
       el.attachmentSize.textContent = formatBytes(state.attachment.size);
       el.attachmentPreview.replaceChildren();
-      if (String(state.attachment.type).startsWith("image/")) { var image = document.createElement("img"); image.src = state.attachment.data; image.alt = ""; el.attachmentPreview.appendChild(image); }
+      if (String(state.attachment.type).startsWith("image/")) { var image = document.createElement("img"); image.src = state.attachment.data || state.attachment.url; image.alt = ""; el.attachmentPreview.appendChild(image); }
       else el.attachmentPreview.textContent = "📎";
     }
     syncSendButton();
   }
 
   async function fileToAttachment(file) {
-    if (file.type !== "image/gif" && file.size > 2.2 * 1024 * 1024) throw new Error("Keep non-GIF attachments under 2 MB");
+    if(!file)return null;
+    if(!/^image\/(png|jpeg|webp|gif)$/.test(file.type))throw new Error("This server accepts PNG, JPEG, WebP and GIF images only.");
+    if(file.size>8*1024*1024)throw new Error("Choose an image under 8 MB before resizing.");
+    if(file.type==="image/gif"&&file.size>500000)throw new Error("GIF uploads must be under 500 KB. You can share an HTTPS GIF link instead.");
     var data = await readFileData(file);
     if (file.type.startsWith("image/") && file.type !== "image/gif") data = await resizeImage(data, 1280, .82);
-    return { name: file.name.slice(0, 100), type: file.type || "application/octet-stream", size: file.size, data: data };
+    if(data.length>=660000)throw new Error("The image is still too large. Choose a smaller image (500 KB after resizing).");
+    return { name: file.name.slice(0, 100), type: file.type === "image/gif" ? file.type : "image/webp", size: Math.round(data.length*0.75), data: data };
   }
 
   function readFileData(file) {
-    return new Promise(function (resolve, reject) { var reader = new FileReader(); reader.onload = function () { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(file); });
+    return new Promise(function (resolve, reject) { var reader = new FileReader(); reader.onprogress = function(e){enhanced.uploadProgress(e.loaded,e.total);}; reader.onload = function () { enhanced.uploadProgress(0,0); resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(file); });
   }
 
   function resizeImage(source, max, quality) {
@@ -1133,7 +1068,7 @@
   function closeGifPicker() {
     gifObserver?.disconnect();
     el.gifResults.querySelectorAll("img[data-still]").forEach(img=>img.src=img.dataset.still);
-    el.gifPicker.hidden = true;
+    el.gifPicker.hidden = true;gifBusy=false;
     window.clearTimeout(state.gifSearchTimer);
     state.gifRequestSerial++;
     if (state.gifAbortController) state.gifAbortController.abort();
@@ -1160,10 +1095,10 @@
     };
   }
 
-  async function searchGifSnap(query, signal) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-14/api/console-services/gifs/search", location.origin);
+  async function searchGifSnap(query, signal, page = 1) {
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-15/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
-    url.searchParams.set("page", "1");
+    url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
     var response = await fetch(url, { signal: AbortSignal.any([signal,AbortSignal.timeout(8000)]), cache: "no-store" });
     if (!response.ok) throw new Error("GIF search is unavailable");
@@ -1176,13 +1111,14 @@
     }).filter(function (item) { return /^https:\/\//i.test(item.url); });
   }
 
-  async function searchCommonsGifs(query, signal) {
+  async function searchCommonsGifs(query, signal, page = 1) {
     var url = new URL("https://commons.wikimedia.org/w/api.php");
     url.searchParams.set("action", "query");
     url.searchParams.set("generator", "search");
     url.searchParams.set("gsrsearch", query + " filemime:image/gif");
     url.searchParams.set("gsrnamespace", "6");
     url.searchParams.set("gsrlimit", "18");
+    url.searchParams.set("gsroffset", String((page-1)*18));
     url.searchParams.set("prop", "imageinfo");
     url.searchParams.set("iiprop", "url|mime|size");
     url.searchParams.set("iiurlwidth", "360");
@@ -1204,6 +1140,7 @@
     if (busy) status.appendChild(document.createElement("i"));
     var copy = document.createElement("span"); copy.textContent = message; status.appendChild(copy);
     el.gifResults.appendChild(status);
+    if(!busy&&/unavailable|try again/i.test(message)){const retry=document.createElement('button');retry.type='button';retry.textContent='Retry GIF search';retry.onclick=()=>searchGifs(el.gifSearchInput.value);el.gifResults.append(retry);}
   }
 
   function gifRelayUrl(value) {
@@ -1241,7 +1178,7 @@
       state.attachment = await remoteGifAttachment(result);
       syncComposeExtras();
       closeGifPicker();
-      el.messageInput.focus();
+      enhanced.saveDraft();el.messageInput.focus();
     } catch (error) {
       toast(error.message && error.message !== "Failed to fetch" ? error.message : "That GIF could not be downloaded. Try another result.");
     } finally {
@@ -1253,7 +1190,7 @@
     gifObserver?.disconnect();
     if(!window.IntersectionObserver)return;
     gifObserver=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{
-      target.src=isIntersecting&&!document.hidden&&!el.gifPicker.hidden?target.dataset.animated:target.dataset.still;
+      target.src=isIntersecting&&!document.hidden&&!el.gifPicker.hidden&&!matchMedia('(prefers-reduced-motion: reduce)').matches?target.dataset.animated:target.dataset.still;
     }),{root:el.gifResults,rootMargin:'80px'});
     el.gifResults.querySelectorAll('img[data-still]').forEach(image=>gifObserver.observe(image));
   }
@@ -1266,7 +1203,7 @@
       var key = String(item.url || "").replace(/[?#].*$/, "");
       if (!key || seen.has(key)) return false;
       seen.add(key); return true;
-    }).slice(0, 36).forEach(function (item) {
+    }).slice(0, 180).forEach(function (item) {
       var button = document.createElement("button");
       button.type = "button";
       button.className = "gif-result";
@@ -1291,7 +1228,7 @@
 
   async function searchGiphy(query, signal) {
     if(window.GSN_CHAT)throw new Error('Use All sources or paste an HTTPS GIF link.');
-    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-14/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
+    const response=await fetch('/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
     if(!response.ok) throw new Error(response.status===401?'Sign in again to use GIPHY.':response.status===429?'GIPHY is busy. Try again shortly.':'GIPHY is temporarily unavailable.');
     const data=await response.json();
     const items=Array.isArray(data)?data:data.gifs || data.data;
@@ -1299,18 +1236,20 @@
     return items.map(g=>{const url=g.images?.original?.url||g.url;return {id:g.id,url,previewUrl:g.preview||g.images?.fixed_width?.url||url,stillUrl:g.images?.fixed_width_still?.url||g.images?.original_still?.url,title:g.title||'GIF',provider:'GIPHY'}}).filter(g=>g.id&&/^https:\/\//i.test(g.url||'')&&/^https:\/\//i.test(g.previewUrl||''));
   }
 
-  async function searchGifs(value) {
+  let gifPage=1,gifItems=[],gifMore=false,gifBusy=false;
+  async function searchGifs(value, append=false) {
+    if(append&&gifBusy)return;gifBusy=true;if(!append){gifPage=1;gifItems=[];gifMore=false;}else gifPage++;
     var query = String(value || "").trim().slice(0, 80) || "reaction";
     var serial = ++state.gifRequestSerial;
     if (state.gifAbortController) state.gifAbortController.abort();
     state.gifAbortController = new AbortController();
     const signal=state.gifAbortController.signal;
-    gifStatus("Searching GIFs…", true);
+    if(!append)gifStatus("Searching GIFs…", true);
     try {
       var searches = [];
       if (state.gifProvider === "all" || state.gifProvider === "giphy") searches.push(searchGiphy(query, state.gifAbortController.signal));
-      if (state.gifProvider === "all" || state.gifProvider === "gifsnap") searches.push(searchGifSnap(query, state.gifAbortController.signal));
-      if (state.gifProvider === "all" || state.gifProvider === "commons") searches.push(searchCommonsGifs(query, state.gifAbortController.signal));
+      if (state.gifProvider === "all" || state.gifProvider === "gifsnap") searches.push(searchGifSnap(query, state.gifAbortController.signal,gifPage));
+      if (state.gifProvider === "all" || state.gifProvider === "commons") searches.push(searchCommonsGifs(query, state.gifAbortController.signal,gifPage));
       var settled = await Promise.allSettled(searches);
       if (serial !== state.gifRequestSerial) return;
       var results = settled.reduce(function (all, entry) { return entry.status === "fulfilled" ? all.concat(entry.value) : all; }, []);
@@ -1324,13 +1263,17 @@
       }
       if(serial!==state.gifRequestSerial||signal.aborted)return;
       if(!results.length&&settled.every(entry=>entry.status==='rejected')){gifStatus('GIF search is temporarily unavailable. Please try again or paste a GIF link.',false);return}
-      renderGifResults(results, query);
+      const oldCount=gifItems.length;gifItems=[...new Map([...gifItems,...results].map(item=>[item.url,item])).values()].slice(0,180);gifMore=gifItems.length>oldCount&&gifItems.length<180;
+      const scrollTop=el.gifResults.scrollTop;renderGifResults(gifItems, query);if(append)el.gifResults.scrollTop=scrollTop;
+      if(gifMore){const more=document.createElement('button');more.className='gif-load-more';more.textContent='Load more GIFs';more.onclick=()=>searchGifs(query,true);el.gifResults.append(more);}
       if(results.length&&fallbackNote){const note=document.createElement('p');note.className='gif-fallback-note';note.textContent=fallbackNote;el.gifResults.prepend(note)}
     } catch (error) {
       if (error.name !== "AbortError" && serial === state.gifRequestSerial) gifStatus("GIF search is temporarily unavailable. You can still paste a direct link.", false);
-    }
+    } finally {if(serial===state.gifRequestSerial)gifBusy=false;}
+
   }
 
+  el.gifResults.addEventListener('scroll',()=>{if(gifMore&&!gifBusy&&el.gifResults.scrollHeight-el.gifResults.scrollTop-el.gifResults.clientHeight<120)searchGifs(el.gifSearchInput.value,true);},{passive:true});
   function queueGifSearch() {
     window.clearTimeout(state.gifSearchTimer);
     state.gifSearchTimer = window.setTimeout(function () { searchGifs(el.gifSearchInput.value); }, 280);
@@ -1407,23 +1350,33 @@
     state.socket.send(JSON.stringify({ t: "typing", channel: state.activeChannel.id }));
   }
 
-  let polling = false;
-  function startPolling() {
-    window.clearInterval(state.pollTimer);
-    state.pollTimer = window.setInterval(async function () {
-      if (document.hidden || polling || !state.me) return;
-      polling=true;
-      try {
-        var unreadPayload = await api("/api/unread").catch(function () { return { unread: state.unreads }; });
-        state.unreads = Object.assign({}, state.unreads, unreadPayload.unread || {});
-        await loadBlinkChannels();
-        state.channelMap = new Map(state.channels.map(function (channel) { return [channel.id, channel]; }));
-        await loadPreviews();
-        if (state.activeChannel) renderMessages();
-        renderSidebar();
-      } catch (error) {} finally { polling=false; }
-    }, POLL_MS);
+  let polling=false,pollFailures=0,metadataAt=0,previewsAt=0;
+  async function pollChat(){
+    clearTimeout(state.pollTimer);
+    if(polling||!state.me)return;
+    if(document.hidden){state.pollTimer=setTimeout(pollChat,15000);return;}
+    polling=true;
+    try{
+      if(!navigator.onLine)throw new Error('Offline');
+      const channel=state.activeChannel;
+      if(channel){
+        const known=new Set((state.messages.get(channel.id)||[]).map(message=>message.id));
+        const messages=await loadChannelMessages(channel);
+        cacheMessages(channel.id,messages);
+        scanMentionNotifications(channel,messages.filter(message=>!known.has(message.id)),false);
+        if(state.activeChannel?.id===channel.id){renderMessages();enhanced.markVisibleRead();}
+      }
+      if(Date.now()-metadataAt>60000){
+        const [dm,members,friends,unreads]=await Promise.all([api('/api/dm'),api('/api/members'),api('/api/friends'),api('/api/unread')]);
+        state.channels=dm.channels||[];state.channelMap=new Map(state.channels.map(c=>[c.id,c]));state.members=members.members||[];state.memberMap=new Map(state.members.map(u=>[u.id,u]));state.friends=friends.friends||[];state.unreads=Object.assign(state.unreads,unreads.unread||{});metadataAt=Date.now();updateRequestBadge();enhanced.refresh();
+      }
+      if(Date.now()-previewsAt>30000){await loadPreviews();previewsAt=Date.now();}renderSidebar();pollFailures=0;setConnection('Connected · updates every '+((window.GSN_CHAT?.pollInterval||10000)/1000)+' seconds',true);
+    }catch(error){pollFailures++;setConnection(navigator.onLine?'Reconnecting · '+error.message:'Offline · drafts saved',false);}
+    finally{polling=false;state.pollTimer=setTimeout(pollChat,Math.min(60000,(window.GSN_CHAT?.pollInterval||10000)*2**Math.min(pollFailures,3)));}
   }
+  function startPolling(){clearTimeout(state.pollTimer);metadataAt=Date.now();state.pollTimer=setTimeout(pollChat,window.GSN_CHAT?.pollInterval||10000);}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void pollChat();});
+  window.addEventListener('online',()=>void pollChat());
 
   function renderPeople(query) {
     query = String(query || "").trim().toLowerCase();
@@ -1506,7 +1459,7 @@
     });
     el.detailsActions.appendChild(mute);
     el.detailsPanel.hidden = false;
-    el.app.style.gridTemplateColumns = window.innerWidth > 780 ? "370px minmax(0,1fr) 260px" : "";
+    enhanced.detailsOpened();
   }
 
   function closeDetails() { el.detailsPanel.hidden = true; el.app.style.gridTemplateColumns = ""; }
@@ -1565,7 +1518,7 @@
     try {
       var updated = await api("/api/users/me", { method: "PATCH", body: { displayName: serverName } });
       state.profile = { kind: state.profileChoice.kind, value: state.profileChoice.value, displayName: name };
-      await api("/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } }).catch(function () {});
+      await api("/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } });
       state.me = updated.user || Object.assign({}, state.me, { displayName: serverName });
       var key = "gsn-chat-profile:" + state.me.id;
       try { localStorage.setItem(key, JSON.stringify(state.profile)); } catch (error) {}
@@ -1580,6 +1533,7 @@
     try {
       var data = await readFileData(file);
       data = file.type === "image/gif" ? data : await resizeImage(data, 320, .82);
+      if(data.length>=660000)throw new Error("Choose a profile picture under 500 KB.");
       state.profileChoice = { kind: "photo", value: data };
       renderNeojis(); el.profileFeedback.textContent = "Custom picture selected";
     } catch (error) { el.profileFeedback.textContent = "That picture could not be opened."; }
@@ -1604,7 +1558,7 @@
     try { await api("/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
     if (state.socket) state.socket.close();
     window.clearInterval(state.pollTimer);
-    location.reload();
+    enhanced.saveDraft();location.reload();
   }
 
   function setAuthMode(mode) {
@@ -1630,9 +1584,7 @@
     }
   }
 
-  function renderEmojiPicker() {
-    EMOJIS.forEach(function (emoji) { var button = document.createElement("button"); button.type = "button"; button.textContent = emoji; button.addEventListener("click", function () { insertEmoji(emoji); }); el.emojiPopover.appendChild(button); });
-  }
+  function renderEmojiPicker(){enhanced.emojiInit();}
 
   function insertEmoji(emoji) {
     var input = el.messageInput; var start = input.selectionStart; var end = input.selectionEnd;
@@ -1660,8 +1612,8 @@
     el.profileForm.addEventListener("submit", saveProfile); el.profileFile.addEventListener("change", function () { chooseProfilePhoto(el.profileFile.files[0]); });
     el.authForm.addEventListener("submit", authenticate);
     el.composer.addEventListener("submit", sendMessage);
-    el.messageInput.addEventListener("input", function () { autoSizeComposer(); syncSendButton(); sendTyping(); });
-    el.messageInput.addEventListener("keydown", function (event) { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); if (!el.sendButton.disabled) el.composer.requestSubmit(); } });
+    el.messageInput.addEventListener("input", function () { autoSizeComposer(); syncSendButton(); sendTyping(); enhanced.saveDraft(); });
+    el.messageInput.addEventListener("keydown", function (event) { if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); if (!el.sendButton.disabled) el.composer.requestSubmit(); } });
     el.attachButton.addEventListener("pointerenter", showAttachmentMenu);
     el.attachButton.addEventListener("pointerleave", scheduleAttachmentMenuClose);
     el.attachButton.addEventListener("click", showAttachmentMenu);
@@ -1682,10 +1634,10 @@
       if (!url) return;
       chooseGif(gifResult(url, "Shared GIF", url, url, "Direct link", url));
     });
-    el.fileInput.addEventListener("change", async function () { try { state.attachment = await fileToAttachment(el.fileInput.files[0]); syncComposeExtras(); } catch (error) { toast(error.message); } el.fileInput.value = ""; });
+    el.fileInput.addEventListener("change", function () { enhanced.upload(el.fileInput.files[0]); el.fileInput.value = ""; });
     el.cancelAttachmentButton.addEventListener("click", function () { state.attachment = null; syncComposeExtras(); });
     el.cancelReplyButton.addEventListener("click", function () { state.replyTo = null; syncComposeExtras(); });
-    el.emojiButton.addEventListener("click", function () { el.emojiPopover.hidden = !el.emojiPopover.hidden; });
+    el.emojiButton.addEventListener("click", function () { el.emojiPopover.hidden = true; });
     document.addEventListener("pointerdown", function (event) { if (!el.emojiPopover.hidden && !event.target.closest("#emojiPopover, #emojiButton")) el.emojiPopover.hidden = true; });
     document.addEventListener("pointerdown", function (event) {
       if (!el.attachmentMenu.hidden && !event.target.closest("#attachmentMenu, #attachButton")) closeAttachmentMenu();
@@ -1694,6 +1646,7 @@
     document.addEventListener("pointerdown", function (event) { if (state.actionMenu && !event.target.closest(".message-action-menu, [data-action=more]")) closeMessageActionMenu(); });
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Escape") return;
+      enhanced.cancelEdit();state.replyTo=null;syncComposeExtras();enhanced.saveDraft();
       closeMessageActionMenu();
       closeAttachmentMenu();
       closeGifPicker();
@@ -1703,7 +1656,7 @@
       }
     });
     el.messageScroll.addEventListener("click", handleMessageAction);
-    window.addEventListener("online", function () { setConnection("Live", true); connectSocket(); });
+    window.addEventListener("online", function () { setConnection("Reconnecting", false); });
     window.addEventListener("offline", function () { setConnection("Offline", false); });
   }
 
@@ -1784,57 +1737,23 @@
     state.actionMenu = null;
   }
 
-  function openMessageActionMenu(anchor, message) {
-    closeMessageActionMenu();
-    var menu = document.createElement("div");
-    menu.className = "message-action-menu";
-    menu.setAttribute("role", "menu");
-    var edit = document.createElement("button"); edit.type = "button"; edit.textContent = "Edit"; edit.setAttribute("role", "menuitem");
-    var remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Delete"; remove.className = "danger"; remove.setAttribute("role", "menuitem");
-    edit.addEventListener("click", function () { closeMessageActionMenu(); editMessage(message); });
-    remove.addEventListener("click", function () { closeMessageActionMenu(); deleteMessage(message); });
-    menu.append(edit, remove); document.body.appendChild(menu); state.actionMenu = menu;
-    var rect = anchor.getBoundingClientRect();
-    var left = Math.min(window.innerWidth - menu.offsetWidth - 10, Math.max(10, rect.right - menu.offsetWidth));
-    var top = rect.bottom + 7;
-    if (top + menu.offsetHeight > window.innerHeight - 10) top = rect.top - menu.offsetHeight - 7;
-    menu.style.left = left + "px"; menu.style.top = Math.max(10, top) + "px";
-    requestAnimationFrame(function () { menu.classList.add("visible"); edit.focus(); });
-  }
+  function openMessageActionMenu(anchor,message){enhanced.messageMenu(anchor,message);}
 
   async function deleteMessage(message) {
-    if (!window.confirm("Delete this message?")) return;
+
     var channel = state.activeChannel; if (!channel) return;
     try {
       if (channel.backend === "blink") await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "DELETE" });
       else await api("/api/messages/" + encodeURIComponent(message.id), { method: "DELETE" });
+      state.mutationVersions.set(channel.id,(state.mutationVersions.get(channel.id)||0)+1);
       var list = state.messages.get(channel.id) || [];
       state.messages.set(channel.id, list.filter(function (item) { return item.id !== message.id; }));
       renderMessages(); renderSidebar(); toast("Message deleted");
     } catch (error) { toast(error.message); }
   }
 
-  async function editMessage(message) {
-    var text = window.prompt("Edit message", message.text || ""); if (text == null || !text.trim()) return;
-    var channel = state.activeChannel; if (!channel) return;
-    try {
-      if (channel.backend === "blink") {
-        var editedAt = Date.now();
-        await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "PATCH", body: { text: text.trim(), editedAt: editedAt } });
-        receiveMessage(channel.id, Object.assign({}, message, { text: text.trim(), editedAt: editedAt }));
-      } else {
-        var payload = await api("/api/messages/" + encodeURIComponent(message.id), { method: "PATCH", body: { text: text.trim() } });
-        receiveMessage(channel.id, payload.message);
-      }
-      toast("Message edited");
-    } catch (error) { toast(error.message); }
-  }
-
-window.addEventListener('nocturne-update', async () => {
-    if (!state.me || !state.activeChannel) return;
-    const id = state.activeChannel.id;
-    try { const messages = await loadChannelMessages(state.activeChannel); cacheMessages(id, messages); if (state.activeChannel?.id === id) renderMessages(); renderSidebar(); } catch {}
-  });
+  function editMessage(message){enhanced.edit(message);}
+  window.addEventListener('nocturne-update',()=>void pollChat());
   window.addEventListener('nocturne-profile', event => {
     if (!event.detail?.id) return;
     const user = event.detail, previous = state.memberMap.get(user.id);
@@ -1846,5 +1765,6 @@ window.addEventListener('nocturne-update', async () => {
     }
   });
   window.addEventListener('nocturne-search', event => { state.members = event.detail; state.members.forEach(member => state.memberMap.set(member.id, member)); renderPeople(el.peopleSearch.value); });
-    boot();
+    const enhanced=window.GsnChatUI.install({state,el,api,renderSidebar,renderMessages,openChannel,startDm,sendFriendRequest,cleanDisplayName,userFor,createAvatar,channelTitle,unreadCount,cacheMessages,normalizeMessages,loadChannelMessages,autoSizeComposer,syncComposeExtras,syncSendButton,fileToAttachment,openGifPicker,toast,timeline,deleteMessage,toggleChannelMuted,showProfileSetup,closeDetails});
+  boot();
 })();

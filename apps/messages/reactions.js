@@ -40,6 +40,7 @@
   finally{pending.delete(key);row()?.querySelectorAll('.reaction-add,.reaction-chip').forEach(b=>b.disabled=false)}
  }
  function open(context,anchor){
+  if(window.GsnChatUI?.chooseEmoji){window.GsnChatUI.chooseEmoji(anchor,emoji=>toggle(context,emoji));return;}
   if(current?.message.id===context.message.id){close(true);return}close();current=context;
   anchor.setAttribute('aria-expanded','true');
   picker=document.createElement('section');picker.className='reaction-picker';picker.setAttribute('role','dialog');picker.setAttribute('aria-label','Add a reaction');

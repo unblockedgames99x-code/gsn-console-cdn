@@ -69,3 +69,7 @@ Release v20260927-13: remove the extra start-page action buttons, settings gear/
 
 Release v20260927-14: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-14: allow bare domains in bookmarks, normalize them to HTTPS, and reject non-web addresses without using search fallback.
+
+
+
+Release v20260927-15: Discord-style GSN Chat with virtualized timelines and members, saved drafts, profiles, search, reliable send reconciliation, and the existing private GSN backend.
