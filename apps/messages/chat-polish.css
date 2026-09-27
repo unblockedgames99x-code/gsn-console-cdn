@@ -68,3 +68,5 @@ html[data-neo-app="chat"] .message-tools button { min-width: 30px; min-height: 3
   html[data-neo-app="chat"] .message-tools { top: -30px; right: 0; left: auto; z-index: 4; }
   html[data-neo-app="chat"] .message-group:not(.mine) .message-tools { left: 0; right: auto; }
 }
+
+.message-group.render-offscreen { content-visibility: auto; contain-intrinsic-size: auto 90px; }

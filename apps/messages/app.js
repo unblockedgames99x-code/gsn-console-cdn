@@ -41,7 +41,7 @@
     typingTimer: 0,
     typingClearTimer: 0,
     pollTimer: 0,
-    gifProvider: "giphy",
+    gifProvider: "all",
     gifSearchTimer: 0,
     gifRequestSerial: 0,
     gifAbortController: null,
@@ -80,6 +80,7 @@
     if (window.NEO_CHAT_BRIDGE && window.NEO_CHAT_BRIDGE.mode === "neo") {
       return window.NEO_CHAT_BRIDGE.api(path, options);
     }
+    throw new Error("The GSN Chat connection did not load. Reload to try again.");
     options = options || {};
     var request = {
       method: options.method || "GET",
@@ -179,7 +180,7 @@
       var raw = await blinkRequest("dms/" + channel.blinkPair + "/messages");
       return normalizeBlinkMessages(raw, channel);
     }
-    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/channels/" + encodeURIComponent(channel.id) + "/messages");
+    var payload = await api("/api/channels/" + encodeURIComponent(channel.id) + "/messages");
     return normalizeMessages(payload.messages);
   }
 
@@ -317,7 +318,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-5/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -355,7 +356,7 @@
     var values = Array.from(state.mutedChannels);
     state.settings.neoChatMutedChannels = values;
     try { localStorage.setItem(notificationStorageKey(), JSON.stringify(values)); } catch (error) {}
-    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/me/settings", { method: "PATCH", body: { neoChatMutedChannels: values } }).catch(function () {});
+    await api("/api/me/settings", { method: "PATCH", body: { neoChatMutedChannels: values } }).catch(function () {});
   }
 
   function loadPinnedChannels() {
@@ -382,7 +383,7 @@
     var values = state.pinnedChannelIds.slice(0, 9);
     state.settings.neoChatPinnedChannels = values;
     try { localStorage.setItem(pinnedStorageKey(), JSON.stringify(values)); } catch (error) {}
-    await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/me/settings", { method: "PATCH", body: { neoChatPinnedChannels: values } }).catch(function () {});
+    await api("/api/me/settings", { method: "PATCH", body: { neoChatPinnedChannels: values } }).catch(function () {});
   }
 
   function pinChannel(channelId, beforeId) {
@@ -478,7 +479,7 @@
       image.decoding = 'async';
       image.referrerPolicy = 'no-referrer';
       image.addEventListener('error', function () {
-        failedAvatarUrls.add(imageUrl);
+        if(failedAvatarUrls.size>=256)failedAvatarUrls.delete(failedAvatarUrls.values().next().value);failedAvatarUrls.add(imageUrl);
         if (!node.contains(image)) return;
         node.textContent = (cleanDisplayName(user)[0] || '?').toUpperCase();
       }, { once: true });
@@ -533,11 +534,12 @@
 
   function channelTitle(channel) {
     if (!channel) return "Chat";
-    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") return "Global Chat";
+    if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") return "general";
     if (channel.kind === "dm") {
       var target = channel.recipientId ? userFor(channel.recipientId) : null;
       return target ? cleanDisplayName(target) : String(channel.name || "Direct Message");
     }
+    if(channel.kind === "server") return String(channel.name || "channel");
     return String(channel.name || "Conversation").replace(/(^|[-_])\w/g, function (value) { return value.replace(/[-_]/, " ").toUpperCase(); });
   }
 
@@ -586,23 +588,14 @@
 
   function renderChats(query) {
     var channels = state.channels.filter(function (channel) { return !isHiddenPublicRoom(channel) && channelTitle(channel).toLowerCase().includes(query); });
-    var pinnedSet = new Set(state.pinnedChannelIds);
-    var pinned = state.pinnedChannelIds.map(function (id) { return state.channelMap.get(id); }).filter(function (channel) {
-      return channel && !isHiddenPublicRoom(channel) && channelTitle(channel).toLowerCase().includes(query);
-    });
-    if (!query || pinned.length) {
-      el.sidebarContent.appendChild(sectionLabel("Pinned · " + state.pinnedChannelIds.length + "/9"));
-      el.sidebarContent.appendChild(pinnedConversationShelf(pinned, query));
+    for (var kind of ['server','dm']) {
+      var group=channels.filter(function(channel){return channel.kind===kind;});
+      if(!group.length)continue;
+      el.sidebarContent.appendChild(sectionLabel(kind==='server'?'TEXT CHANNELS':'DIRECT MESSAGES'));
+      group.sort(function(a,b){return state.pinnedChannelIds.includes(b.id)-state.pinnedChannelIds.includes(a.id);});
+      group.forEach(function(channel){el.sidebarContent.appendChild(channelRow(channel));});
     }
-    var rest = channels.filter(function (channel) { return !pinnedSet.has(String(channel.id)); });
-    if (rest.length) {
-      el.sidebarContent.appendChild(sectionLabel("Conversations"));
-      rest.sort(function (a, b) {
-        var am = latestMessage(a.id), bm = latestMessage(b.id);
-        return Number(bm && bm.createdAt || b.createdAt || 0) - Number(am && am.createdAt || a.createdAt || 0);
-      }).forEach(function (channel) { el.sidebarContent.appendChild(channelRow(channel)); });
-    }
-    if (!pinned.length && !rest.length) el.sidebarContent.appendChild(emptySidebar("#i-chat", query ? "No conversations match your search." : "No conversations yet."));
+    if(!channels.length)el.sidebarContent.appendChild(emptySidebar('#i-chat','No conversations match your search.'));
   }
 
   function beginChannelDrag(event, channelId) {
@@ -662,6 +655,7 @@
     button.type = "button";
     button.className = "pinned-conversation" + (state.activeChannel && state.activeChannel.id === channel.id ? " active" : "");
     button.dataset.channel = channel.id;
+    button.dataset.kind = channel.kind;
     button.draggable = true;
     button.setAttribute("aria-label", "Open " + channelTitle(channel));
     var artwork = document.createElement("span");
@@ -711,6 +705,7 @@
     button.type = "button";
     button.className = "conversation-row" + (channel.kind === "server" && String(channel.name).toLowerCase() === "general" ? " global-row" : "") + (state.activeChannel && state.activeChannel.id === channel.id ? " active" : "");
     button.dataset.channel = channel.id;
+    button.dataset.kind = channel.kind;
     button.draggable = true;
     var person = channelAvatarUser(channel);
     var avatar;
@@ -789,7 +784,7 @@
   async function loadEverything() {
     setConnection("Connecting", false);
     var results = await Promise.all([
-      api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/members"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/dm"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/friends"), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/me/settings").catch(function () { return { settings: {} }; }), api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/unread").catch(function () { return { unread: {} }; })
+      api("/api/members"), api("/api/dm"), api("/api/friends"), api("/api/me/settings").catch(function () { return { settings: {} }; }), api("/api/unread").catch(function () { return { unread: {} }; })
     ]);
     state.members = results[0].members || [];
     state.memberMap = new Map(state.members.map(function (member) { return [member.id, member]; }));
@@ -806,8 +801,7 @@
     updateMe();
     updateRequestBadge();
     renderSidebar();
-    await loadPreviews({ initial: true });
-    renderSidebar();
+    void loadPreviews({ initial: true }).then(renderSidebar);
     connectSocket();
     setConnection("Live", true);
     state.loading = false;
@@ -821,10 +815,11 @@
   async function loadPreviews(options) {
     options = options || {};
     var channels = state.channels.slice(0, 24);
-    await Promise.all(channels.map(async function (channel) {
-      try {
-        state.messages.set(channel.id, await loadChannelMessages(channel));
-      } catch (error) {}
+    let cursor=0;
+    await Promise.all(Array.from({length:4},async()=>{
+      while(cursor<channels.length){const channel=channels[cursor++];
+        try{cacheMessages(channel.id,await loadChannelMessages(channel));}catch{}
+      }
     }));
     channels.forEach(function (channel) {
       scanMentionNotifications(channel, state.messages.get(channel.id) || [], Boolean(options.initial));
@@ -837,7 +832,7 @@
   }
 
   function loadProfile() {
-    var key = state.me ? "cherri-chat-profile:" + state.me.id : "";
+    var key = state.me ? "gsn-chat-profile:" + state.me.id : "";
     var local = null;
     try { local = JSON.parse(localStorage.getItem(key) || "null"); } catch (error) {}
     state.profile = (state.settings && state.settings.neoChatProfile) || local || null;
@@ -863,7 +858,18 @@
     el.requestBadge.textContent = String(count);
   }
 
+  const historyOrder=new Map();
+  function cacheMessages(id,messages){
+    state.messages.set(id,messages);historyOrder.delete(id);historyOrder.set(id,true);
+    while(historyOrder.size>32){const oldest=historyOrder.keys().next().value;historyOrder.delete(oldest);
+      if(oldest===state.activeChannel?.id){historyOrder.set(oldest,true);continue;}
+      // Keep the sidebar preview; the complete history remains on its existing server.
+      state.messages.set(oldest,(state.messages.get(oldest)||[]).slice(-1));
+    }
+  }
+  let channelNavigation=0;
   async function openChannel(id, options) {
+    const navigation=++channelNavigation;
     options = options || {};
     var channel = state.channelMap.get(id);
     if (!channel) return;
@@ -879,17 +885,20 @@
     renderSidebar();
     el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';
     try {
-      state.messages.set(id, await loadChannelMessages(channel));
+      cacheMessages(id, await loadChannelMessages(channel));
+      if(navigation!==channelNavigation)return;
       renderMessages();
       if (channel.backend === "blink") rememberBlinkRead(id, Date.now());
       else {
-        await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/channels/" + encodeURIComponent(id) + "/read", { method: "POST", body: {} }).catch(function () {});
+        await api("/api/channels/" + encodeURIComponent(id) + "/read", { method: "POST", body: {} }).catch(function () {});
         state.unreads[id] = Date.now();
       }
+      if(navigation!==channelNavigation)return;
       renderSidebar();
       subscribe(id);
       if (options.focus !== false) el.messageInput.focus();
     } catch (error) {
+      if(navigation!==channelNavigation)return;
       el.messageScroll.innerHTML = '<div class="thread-empty">This conversation could not be loaded.</div>';
       toast(error.message);
     }
@@ -901,12 +910,16 @@
     if (!channel) return;
     var person = channelAvatarUser(channel);
     el.chatTitle.textContent = channelTitle(channel);
+    el.chatView.dataset.channelKind = channel.kind;
+    el.messageInput.placeholder = channel.kind === 'server' ? 'Message #'+channel.name : 'Message @'+channelTitle(channel);
     el.chatSubtitle.textContent = channel.kind === "server" ? (String(channel.name).toLowerCase() === "general" ? "Global room · everyone in the community" : "Public room") : (person && state.online.has(person.id) ? "Online" : "Direct message");
     if (channel.kind === "server" && String(channel.name).toLowerCase() === "general") {
       paintGlobalAvatar(el.chatAvatar);
     } else paintAvatar(el.chatAvatar, person || { username: channel.name, displayName: channel.name });
   }
 
+  const messageVisibility=window.IntersectionObserver ? new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>target.classList.toggle('render-offscreen',!isIntersecting)),{root:el.messageScroll,rootMargin:'400px'}) : null;
+  let messageNodes = new Map();
   var renderedChannel = null, renderedIds = new Set(), unseenIds = new Set();
   const jumpButton=document.getElementById('newMessagesButton');
   function updateJump() {
@@ -928,22 +941,37 @@
     if(changed||pinned||ownNew) unseenIds.clear();
     else added.forEach(m=>unseenIds.add(m.id));
     renderedChannel=channel.id;renderedIds=new Set(list.map(m=>m.id));updateJump();
-    el.messageScroll.replaceChildren();
+    if(changed) { messageVisibility?.disconnect(); messageNodes.clear(); el.messageScroll.replaceChildren(); }
+    const nextNodes = new Map(), ordered = [];
     if (!list.length) {
+      el.messageScroll.replaceChildren(); messageNodes.clear();
       var empty = document.createElement("div"); empty.className = "thread-empty"; empty.textContent = "No messages yet. Say hello."; el.messageScroll.appendChild(empty); return;
     }
     var previous = null;
     list.forEach(function (message, index) {
       var date = new Date(Number(message.createdAt || Date.now()));
       if (!previous || new Date(Number(previous.createdAt || 0)).toDateString() !== date.toDateString()) {
-        var divider = document.createElement("div"); divider.className = "day-divider"; divider.textContent = formatDay(message.createdAt) + " " + formatTime(message.createdAt); el.messageScroll.appendChild(divider);
+        const key='day:'+message.id;
+        const entry=messageNodes.get(key)||{node:document.createElement('div')};
+        entry.node.className='day-divider';entry.node.textContent=formatDay(message.createdAt);
+        nextNodes.set(key,entry);ordered.push(entry.node);
       }
       var next = list[index + 1];
       var start = !previous || !!message.replyTo || previous.authorId !== message.authorId || Number(message.createdAt) - Number(previous.createdAt) > 300000;
       var end = !next || !!next.replyTo || next.authorId !== message.authorId || Number(next.createdAt) - Number(message.createdAt) > 300000;
-      el.messageScroll.appendChild(messageNode(message, start, end));
+      const target=message.replyTo && list.find(item=>item.id===message.replyTo);
+      const signature=JSON.stringify([message,start,end,userFor(message.authorId),target,target&&userFor(target.authorId)]);
+      let entry=messageNodes.get(message.id);
+      if(!entry||entry.signature!==signature)entry={signature,node:messageNode(message,start,end)};
+      nextNodes.set(message.id,entry);ordered.push(entry.node);
       previous = message;
     });
+    // Reuse untouched rows: typing/polls/reactions do not restart every GIF or steal focus.
+    const keep=new Set(ordered);
+    for(const child of [...el.messageScroll.children])if(!keep.has(child)){messageVisibility?.unobserve(child);child.remove();}
+    let cursor=el.messageScroll.firstChild;
+    for(const node of ordered){if(node===cursor)cursor=cursor.nextSibling;else el.messageScroll.insertBefore(node,cursor);}
+    messageNodes=nextNodes;
     requestAnimationFrame(function () { el.messageScroll.scrollTop = pinned || ownNew ? el.messageScroll.scrollHeight : oldTop; });
   }
 
@@ -967,20 +995,21 @@
       reply.setAttribute("aria-label", reply.title); stack.appendChild(reply);
     }
     if (groupStart && state.activeChannel) {
-      var name = document.createElement("span"); name.className = "message-author"; name.textContent = cleanDisplayName(author); stack.appendChild(name);
+      var name = document.createElement("span"); name.className = "message-author"; name.textContent = cleanDisplayName(author);
+      var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=formatTime(message.createdAt);name.appendChild(timestamp);stack.appendChild(name);
     }
     var bubble = document.createElement("div"); bubble.className = "message-bubble";
     if (message.text) appendMessageText(bubble, message.text);
     renderAttachments(bubble, message.attachments);
     var tools = document.createElement("span"); tools.className = "message-tools";
-    var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.textContent = "↩"; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
+    var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.textContent = "↩"; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
     if (mine) {
-      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Edit or delete"; moreButton.textContent = "•••"; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
+      var moreButton = document.createElement("button"); moreButton.type = "button"; moreButton.title = "Edit or delete"; moreButton.setAttribute("aria-label", "Edit or delete"); moreButton.textContent = "•••"; moreButton.dataset.action = "more"; tools.appendChild(moreButton);
     }
     bubble.appendChild(tools); stack.appendChild(bubble);
-    if (window.CHERRI_CHAT) window.ChatReactions.attach({
+    if (window.GSN_CHAT || window.CHERRI_CHAT) window.ChatReactions.attach({
       message, channelId:state.activeChannel.id, userId:state.me.id, tools, stack,
-      send: (id,emoji)=>api('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/messages/'+encodeURIComponent(id)+'/react',{method:'POST',body:{emoji}}),
+      send: (id,emoji)=>api('/api/messages/'+encodeURIComponent(id)+'/react',{method:'POST',body:{emoji}}),
       update: (channelId,id,reactions)=>{
         const list=state.messages.get(channelId)||[];
         const target=list.find(item=>item.id===id);
@@ -992,7 +1021,7 @@
     if (groupEnd) {
       var meta = document.createElement("time"); meta.className = "message-meta"; meta.dateTime = new Date(Number(message.createdAt || Date.now())).toISOString(); meta.textContent = (mine ? "Delivered · " : "") + formatTime(message.createdAt) + (message.editedAt ? " · Edited" : ""); stack.appendChild(meta);
     }
-    row.appendChild(stack); return row;
+    row.appendChild(stack); messageVisibility?.observe(row); return row;
   }
 
   function renderAttachments(bubble, raw) {
@@ -1003,7 +1032,7 @@
       var preview = attachment.data || attachment.previewUrl || data;
       if (String(attachment.type || "").startsWith("image/") && data) {
         var link = document.createElement("a"); link.className = "message-attachment"; link.href = data; link.target = "_blank"; link.rel = "noopener";
-        var image = document.createElement("img"); image.src = preview; image.alt = attachment.name || "Image attachment"; link.appendChild(image); bubble.appendChild(link);
+        var image = document.createElement("img"); image.loading="lazy";image.decoding="async"; image.src = preview; image.alt = attachment.name || "Image attachment"; link.appendChild(image); bubble.appendChild(link);
       } else if (data) {
         var file = document.createElement("a"); file.className = "message-attachment file-attachment"; file.href = data; file.download = attachment.name || "attachment"; file.textContent = "📎 " + (attachment.name || "Attachment"); bubble.appendChild(file);
       }
@@ -1027,7 +1056,7 @@
         if (body.attachments) blinkBody.attachments = body.attachments;
         var created = await blinkRequest("dms/" + state.activeChannel.blinkPair + "/messages", { method: "POST", body: blinkBody });
         payload = { message: { id: created.name, authorId: state.me.id, text: text, createdAt: blinkBody.ts, replyTo: blinkBody.replyTo || null, attachments: blinkBody.attachments || [] } };
-      } else payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/channels/" + encodeURIComponent(state.activeChannel.id) + "/messages", { method: "POST", body: body });
+      } else payload = await api("/api/channels/" + encodeURIComponent(state.activeChannel.id) + "/messages", { method: "POST", body: body });
       var list = state.messages.get(state.activeChannel.id) || [];
       if (payload.message && !list.some(function (item) { return item.id === payload.message.id; })) list.push(payload.message);
       state.messages.set(state.activeChannel.id, normalizeMessages(list));
@@ -1100,7 +1129,10 @@
     }, 180);
   }
 
+  let gifObserver;
   function closeGifPicker() {
+    gifObserver?.disconnect();
+    el.gifResults.querySelectorAll("img[data-still]").forEach(img=>img.src=img.dataset.still);
     el.gifPicker.hidden = true;
     window.clearTimeout(state.gifSearchTimer);
     state.gifRequestSerial++;
@@ -1113,6 +1145,7 @@
     el.emojiPopover.hidden = true;
     el.gifPicker.hidden = false;
     window.setTimeout(function () { el.gifSearchInput.focus(); }, 0);
+    watchGifPreviews();
     if (!el.gifResults.children.length || el.gifResults.querySelector('.gif-results-status')) searchGifs(el.gifSearchInput.value || "reaction");
   }
 
@@ -1128,7 +1161,7 @@
   }
 
   async function searchGifSnap(query, signal) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-5/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", "1");
     url.searchParams.set("limit", "24");
@@ -1216,7 +1249,17 @@
     }
   }
 
+  function watchGifPreviews(){
+    gifObserver?.disconnect();
+    if(!window.IntersectionObserver)return;
+    gifObserver=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{
+      target.src=isIntersecting&&!document.hidden&&!el.gifPicker.hidden?target.dataset.animated:target.dataset.still;
+    }),{root:el.gifResults,rootMargin:'80px'});
+    el.gifResults.querySelectorAll('img[data-still]').forEach(image=>gifObserver.observe(image));
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)el.gifResults.querySelectorAll('img[data-still]').forEach(img=>img.src=img.dataset.still);else if(!el.gifPicker.hidden)watchGifPreviews();});
   function renderGifResults(results, query) {
+    gifObserver?.disconnect();
     el.gifResults.replaceChildren();
     var seen = new Set();
     results.filter(function (item) {
@@ -1230,7 +1273,9 @@
       button.title = item.title + " · " + item.provider;
       button.setAttribute("aria-label", "Add " + item.title + " from " + item.provider);
       var image = document.createElement("img");
-      image.src = item.previewUrl;
+      image.src = item.stillUrl || item.previewUrl;
+      image.decoding="async";
+      if(item.stillUrl){image.dataset.still=item.stillUrl;image.dataset.animated=item.previewUrl;}
       image.alt = item.title;
       image.loading = "lazy";
       image.referrerPolicy = "no-referrer";
@@ -1240,16 +1285,18 @@
       button.addEventListener("click", function () { chooseGif(item, button); });
       el.gifResults.appendChild(button);
     });
+    watchGifPreviews();
     if (!el.gifResults.children.length) gifStatus("No GIFs found for “" + query + "”. Try another search or paste a link.", false);
   }
 
   async function searchGiphy(query, signal) {
-    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
+    if(window.GSN_CHAT)throw new Error('Use All sources or paste an HTTPS GIF link.');
+    const response=await fetch('/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-5/api/console-cherri/giphy?q='+encodeURIComponent(query),{signal:AbortSignal.any([signal,AbortSignal.timeout(8000)]),headers:localStorage.getItem('cherri-session')?{Authorization:'Bearer '+localStorage.getItem('cherri-session')}: {}});
     if(!response.ok) throw new Error(response.status===401?'Sign in again to use GIPHY.':response.status===429?'GIPHY is busy. Try again shortly.':'GIPHY is temporarily unavailable.');
     const data=await response.json();
     const items=Array.isArray(data)?data:data.gifs || data.data;
     if(!Array.isArray(items))throw new Error('GIPHY returned an invalid response.');
-    return items.map(g=>{const url=g.images?.original?.url||g.url;return {id:g.id,url,previewUrl:g.preview||g.images?.fixed_width?.url||url,title:g.title||'GIF',provider:'GIPHY'}}).filter(g=>g.id&&/^https:\/\//i.test(g.url||'')&&/^https:\/\//i.test(g.previewUrl||''));
+    return items.map(g=>{const url=g.images?.original?.url||g.url;return {id:g.id,url,previewUrl:g.preview||g.images?.fixed_width?.url||url,stillUrl:g.images?.fixed_width_still?.url||g.images?.original_still?.url,title:g.title||'GIF',provider:'GIPHY'}}).filter(g=>g.id&&/^https:\/\//i.test(g.url||'')&&/^https:\/\//i.test(g.previewUrl||''));
   }
 
   async function searchGifs(value) {
@@ -1309,7 +1356,7 @@
 
   function connectSocket() {
     if (window.NEO_CHAT_BRIDGE && window.NEO_CHAT_BRIDGE.mode === "neo") {
-      state.online = new Set(window.CHERRI_CHAT ? [state.me.id] : state.members.map(function (member) { return member.id; }));
+      state.online = new Set((window.GSN_CHAT || window.CHERRI_CHAT) ? [state.me.id] : state.members.map(function (member) { return member.id; }));
       setConnection("Connected", true);
       return;
     }
@@ -1345,7 +1392,7 @@
       if (state.activeChannel.backend === "blink") rememberBlinkRead(channelId, Date.now());
       else {
         state.unreads[channelId] = Date.now();
-        api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/channels/" + encodeURIComponent(channelId) + "/read", { method: "POST", body: {} }).catch(function () {});
+        api("/api/channels/" + encodeURIComponent(channelId) + "/read", { method: "POST", body: {} }).catch(function () {});
       }
       renderMessages();
     }
@@ -1360,19 +1407,21 @@
     state.socket.send(JSON.stringify({ t: "typing", channel: state.activeChannel.id }));
   }
 
+  let polling = false;
   function startPolling() {
     window.clearInterval(state.pollTimer);
     state.pollTimer = window.setInterval(async function () {
-      if (document.hidden) return;
+      if (document.hidden || polling || !state.me) return;
+      polling=true;
       try {
-        var unreadPayload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/unread").catch(function () { return { unread: state.unreads }; });
+        var unreadPayload = await api("/api/unread").catch(function () { return { unread: state.unreads }; });
         state.unreads = Object.assign({}, state.unreads, unreadPayload.unread || {});
         await loadBlinkChannels();
         state.channelMap = new Map(state.channels.map(function (channel) { return [channel.id, channel]; }));
         await loadPreviews();
         if (state.activeChannel) renderMessages();
         renderSidebar();
-      } catch (error) {}
+      } catch (error) {} finally { polling=false; }
     }, POLL_MS);
   }
 
@@ -1390,7 +1439,7 @@
   async function startDm(user) {
     try {
       if (window.NEO_CHAT_BRIDGE && window.NEO_CHAT_BRIDGE.mode === "neo") {
-        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/dm", { method: "POST", body: { username: user.username, userId: user.id } });
+        var payload = await api("/api/dm", { method: "POST", body: { username: user.username, userId: user.id } });
         var neoChannel = payload.channel;
         if (!neoChannel || !neoChannel.id) throw new Error("Conversation unavailable");
         state.channelMap.set(neoChannel.id, neoChannel);
@@ -1414,16 +1463,16 @@
   }
 
   async function answerFriend(id, action) {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/friends/requests/" + encodeURIComponent(id) + "/" + action, { method: "POST", body: {} }); await refreshFriends(); toast(action === "accept" ? "Friend added" : "Request declined"); }
+    try { await api("/api/friends/requests/" + encodeURIComponent(id) + "/" + action, { method: "POST", body: {} }); await refreshFriends(); toast(action === "accept" ? "Friend added" : "Request declined"); }
     catch (error) { toast(error.message); }
   }
 
   async function refreshFriends() {
-    var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/friends"); state.friends = payload.friends || []; updateRequestBadge(); renderSidebar();
+    var payload = await api("/api/friends"); state.friends = payload.friends || []; updateRequestBadge(); renderSidebar();
   }
 
   async function sendFriendRequest(user) {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/friends/requests", { method: "POST", body: { username: user.username } }); await refreshFriends(); toast("Friend request sent to @" + user.username); }
+    try { await api("/api/friends/requests", { method: "POST", body: { username: user.username } }); await refreshFriends(); toast("Friend request sent to @" + user.username); }
     catch (error) { toast(error.message); }
   }
 
@@ -1514,11 +1563,11 @@
       ? "[tapback:" + state.profileChoice.value + "] " + name
       : name;
     try {
-      var updated = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/users/me", { method: "PATCH", body: { displayName: serverName } });
+      var updated = await api("/api/users/me", { method: "PATCH", body: { displayName: serverName } });
       state.profile = { kind: state.profileChoice.kind, value: state.profileChoice.value, displayName: name };
-      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } }).catch(function () {});
+      await api("/api/me/settings", { method: "PATCH", body: { neoChatProfile: state.profile } }).catch(function () {});
       state.me = updated.user || Object.assign({}, state.me, { displayName: serverName });
-      var key = "cherri-chat-profile:" + state.me.id;
+      var key = "gsn-chat-profile:" + state.me.id;
       try { localStorage.setItem(key, JSON.stringify(state.profile)); } catch (error) {}
       updateMe(); renderSidebar(); updateHeader(); hideOverlay(el.profileOverlay); el.profileFeedback.textContent = ""; toast("Profile updated");
     } catch (error) { el.profileFeedback.textContent = error.message; }
@@ -1540,7 +1589,7 @@
     event.preventDefault();
     el.authSubmit.disabled = true; el.authFeedback.textContent = state.authMode === "login" ? "Signing in…" : "Creating account…";
     try {
-      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/auth/" + state.authMode, { method: "POST", body: { username: el.authUsername.value.trim(), password: el.authPassword.value } });
+      var payload = await api("/api/auth/" + state.authMode, { method: "POST", body: { username: el.authUsername.value.trim(), password: el.authPassword.value } });
       state.me = payload.user; hideOverlay(el.authOverlay); el.authFeedback.textContent = ""; await loadEverything();
     } catch (error) {
       el.authFeedback.textContent = error instanceof TypeError
@@ -1552,7 +1601,7 @@
   }
 
   async function logout() {
-    try { await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
+    try { await api("/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
     if (state.socket) state.socket.close();
     window.clearInterval(state.pollTimer);
     location.reload();
@@ -1561,8 +1610,8 @@
   function setAuthMode(mode) {
     state.authMode = mode;
     document.querySelectorAll("[data-auth-mode]").forEach(function (button) { button.classList.toggle("active", button.dataset.authMode === mode); });
-    el.authTitle.textContent = mode === "login" ? "Sign in" : "Create account";
-    el.authSubmit.textContent = mode === "login" ? "Continue" : "Create account";
+    el.authTitle.textContent = mode === "login" ? "Welcome back!" : "Create an account";
+    el.authSubmit.textContent = mode === "login" ? "Log In" : "Create account";
     el.authPassword.autocomplete = mode === "login" ? "current-password" : "new-password";
     el.authFeedback.textContent = "";
   }
@@ -1571,7 +1620,7 @@
     renderEmojiPicker();
     wireEvents();
     try {
-      var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/auth/me");
+      var payload = await api("/api/auth/me");
       state.me = payload.user;
       hideOverlay(el.authOverlay);
       await loadEverything();
@@ -1664,7 +1713,7 @@
     if (channel.backend === "blink") rememberBlinkRead(channel.id, stamp);
     else {
       state.unreads[channel.id] = stamp;
-      await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/channels/" + encodeURIComponent(channel.id) + "/read", { method: "POST", body: {} }).catch(function () {});
+      await api("/api/channels/" + encodeURIComponent(channel.id) + "/read", { method: "POST", body: {} }).catch(function () {});
     }
     renderSidebar();
     toast("Conversation marked as read.");
@@ -1758,7 +1807,7 @@
     var channel = state.activeChannel; if (!channel) return;
     try {
       if (channel.backend === "blink") await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "DELETE" });
-      else await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/messages/" + encodeURIComponent(message.id), { method: "DELETE" });
+      else await api("/api/messages/" + encodeURIComponent(message.id), { method: "DELETE" });
       var list = state.messages.get(channel.id) || [];
       state.messages.set(channel.id, list.filter(function (item) { return item.id !== message.id; }));
       renderMessages(); renderSidebar(); toast("Message deleted");
@@ -1774,7 +1823,7 @@
         await blinkRequest("dms/" + channel.blinkPair + "/messages/" + message.id, { method: "PATCH", body: { text: text.trim(), editedAt: editedAt } });
         receiveMessage(channel.id, Object.assign({}, message, { text: text.trim(), editedAt: editedAt }));
       } else {
-        var payload = await api("/gh/unblockedgames99x-code/gsn-console-cdn@v20260926-4/api/messages/" + encodeURIComponent(message.id), { method: "PATCH", body: { text: text.trim() } });
+        var payload = await api("/api/messages/" + encodeURIComponent(message.id), { method: "PATCH", body: { text: text.trim() } });
         receiveMessage(channel.id, payload.message);
       }
       toast("Message edited");
@@ -1784,7 +1833,7 @@
 window.addEventListener('nocturne-update', async () => {
     if (!state.me || !state.activeChannel) return;
     const id = state.activeChannel.id;
-    try { const messages = await loadChannelMessages(state.activeChannel); state.messages.set(id, messages); if (state.activeChannel?.id === id) renderMessages(); renderSidebar(); } catch {}
+    try { const messages = await loadChannelMessages(state.activeChannel); cacheMessages(id, messages); if (state.activeChannel?.id === id) renderMessages(); renderSidebar(); } catch {}
   });
   window.addEventListener('nocturne-profile', event => {
     if (!event.detail?.id) return;

@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const quick=['👍','❤️','😂','🔥','🎉','👀','😭','🙏'];
  const common='😀.😂.🥹.😊.😍.😎.🤔.😴.😭.😤.😡.🥳.🤯.😳.🙄.😬.👍.👎.👌.🙏.👀.💪.🔥.✨.💀.❤️.💔.💯.🎉.🚀.⭐.⚡.😺.🍒.🍕.☕.🎮.🎵.💬.✅'.split('.');
- const custom=[['hi','hello wave hey'],['love','heart adore cute'],['cry','sad sob tears'],['angry','mad rage'],['glare','annoyed suspicious'],['confused','what question lost'],['nervous','sweat worried'],['sleepy','tired sleep'],['shush','quiet secret'],['point','this look'],['no','nope stop'],['ban','hammer mod'],['gun','pistol']].map(([name,keywords])=>({emoji:':d_'+name+':',name:'Cat '+name,keywords:['cat',...keywords.split(' ')],url:'https://cherrion.top/elements/emoji/dominum/'+name+'.png'}));
+ const custom=[];
  let catalog=[],catalogRequest,picker=null,current=null;
  const pending=new Set();
  function loadCatalog(){return catalogRequest||=fetch('reaction-emoji.json').then(r=>{if(!r.ok)throw Error();return r.json()}).then(data=>{catalog=data}).catch(()=>{catalogRequest=null})}
