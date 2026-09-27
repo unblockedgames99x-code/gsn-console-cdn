@@ -54,3 +54,6 @@ Release v20260927-8: replace Movies with the StarStream catalogue and interface;
 
 Release v20260927-9: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-9: replace genre bars with iconic movie backdrop cards; move episode navigation above the player.
+
+Release v20260927-10: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-10: credit Movies as By StarStream.
