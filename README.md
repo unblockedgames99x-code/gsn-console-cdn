@@ -92,3 +92,5 @@ Release v20260927-23: create and join private GSN servers from the new plus butt
 
 Release v20260927-24: updated console and app assets.
 Release v20260927-24: working server icon picker with square previews and persistent icons; matched white circled-plus Add Server button. Google Chat backend version 12.
+
+Release v20260927-25: updated console and app assets.
