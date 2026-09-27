@@ -103,8 +103,20 @@ function repairMalformedProxyRequestUrl(rawUrl) {
 }
 
 function patchedProxyFetch(e) {
-    if (!$internalController.shouldRoute(e)) return;
+    // Registrations survive an idle worker, but its controller ports do not.
+    // The Browser host is outside this worker's scope, so include it when
+    // asking pages to reconnect before attempting the navigation.
+    if (!proxyRouteParts(new URL(e.request.url))) return;
     e.respondWith((async function() {
+        if (!$internalController.shouldRoute(e)) {
+            const hosts = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+            for (const host of hosts) host.postMessage({ $controller$swrevive: {} });
+            const deadline = Date.now() + 5000;
+            while (!$internalController.shouldRoute(e) && Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, 25));
+            }
+            if (!$internalController.shouldRoute(e)) return new Response('The browser connection expired. Reload Browser to reconnect.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+        }
         var routedEvent = e;
         var repairedUrl = repairMalformedProxyRequestUrl(e.request.url)
             || repairSameOriginProxyRequestUrl(e.request.url, e.request.referrer);
@@ -137,5 +149,5 @@ function patchedProxyFetch(e) {
 }
 addEventListener('fetch', patchedProxyFetch);
 
-self.GSN_CDN_SKIP=event=>$internalController.shouldRoute(event);
+self.GSN_CDN_SKIP=event=>new URL(event.request.url).pathname.includes('/study/uv/');
 importScripts('../../../launcher-sw.js');

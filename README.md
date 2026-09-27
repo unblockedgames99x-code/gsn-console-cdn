@@ -26,3 +26,5 @@ Release v20260926-12 repairs cloud-game launch routing for the entire cloud cata
 Release v20260926-13 adds a responsive song-actions menu with artwork, grouped icon actions and keyboard navigation.
 
 Release v20260926-14: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+
+Release v20260927-1: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
