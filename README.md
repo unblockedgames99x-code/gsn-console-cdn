@@ -81,3 +81,5 @@ Release v20260927-17: add Discord-style Friends, Pending and Add Friend screens 
 Release v20260927-18: reference-measured GSN Chat shell, local licensed icons/fonts/sounds, conversation history, inbox, account settings, resizable sidebar, compact profile editor, and mobile navigation fixes. Existing GSN accounts and messages remain connected. Asset sources and licenses are in apps/messages/assets/SOURCES.json.
 
 Release v20260927-19: correct inherited colors on outlined navigation icons and search; includes the complete reference-driven Chat update from v18.
+
+Release v20260927-20: remove the blue chat badge from the empty conversation screen.
