@@ -36,3 +36,6 @@ Games home now shows large live album artwork, track information, and previous/p
 
 Release v20260927-3: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Cloud games use Cherri and recover from explicit unallocated claim rejections with bounded retries. Allocated or interrupted sessions are never automatically replayed.
+
+Release v20260927-4: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Games music player is borderless and transparent, clears the carousel and counter, and includes a seek bar with elapsed and total time.
