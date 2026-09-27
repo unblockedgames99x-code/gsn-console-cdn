@@ -20,3 +20,5 @@ Release v20260926-10 implements restart, rest mode, and scoped browser data rese
 
 Release v20260926-11 hides app scrollbars while preserving wheel, touch and keyboard scrolling.
 
+
+Release v20260926-12 repairs cloud-game launch routing for the entire cloud catalog.
