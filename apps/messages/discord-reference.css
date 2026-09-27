@@ -119,4 +119,31 @@ html[data-neo-app=chat][data-chat-layout=discord] .profile-card{width:480px;padd
 @media(max-width:700px){.dc-titlebar .dc-mobile-drawer{display:flex;position:absolute;left:6px}.dc-window-heading{left:42px}.dc-titlebar .dc-history{display:none}}
 html[data-neo-app=chat][data-chat-layout=discord] .conversation{transform:none!important}
 html[data-neo-app=chat][data-chat-layout=discord] .search-box svg{fill:currentColor;stroke:none;color:#94959c}
-html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-bubble{opacity:.6}.dc-send-status{display:block;font-size:11px;line-height:18px;color:var(--dc-muted)}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-bubble{opacity:1}
+.dc-send-status{font-size:11px;line-height:18px;color:var(--dc-muted)}
+.dc-confirmation-pending{display:inline-block;font-size:12px;opacity:.55;line-height:12px}
+.dc-message-failed .dc-send-status{display:block;color:#f38b91}
+.dc-send-status button{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer}
+.dc-emoji-backdrop{background:transparent;display:block}
+.dc-dialog.dc-emoji-picker{position:fixed;width:440px;max-width:calc(100vw - 16px);height:500px;padding:0;display:flex;flex-direction:column;overflow:hidden;background:#2b2d31;border:1px solid #1e1f22;border-radius:8px;box-shadow:0 8px 32px #0008}
+.dc-emoji-picker .dc-dialog-heading{height:52px;min-height:52px;margin:0;padding:0 12px 0 16px;box-shadow:0 1px 0 #1e1f22}
+.dc-picker-tabs{display:flex;align-items:center;gap:8px;font-size:14px}
+.dc-picker-tabs button,.dc-picker-tabs strong{padding:7px 12px;border:0;border-radius:4px;font-weight:600}
+.dc-picker-tabs button{background:none;color:#b5bac1;cursor:pointer}
+.dc-picker-tabs strong{background:#404249;color:#f2f3f5}
+.dc-picker-body{display:flex;flex:1;min-height:0}
+.dc-emoji-categories{width:48px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:center;padding:8px 4px;background:#232428;overflow-y:auto}
+.dc-emoji-categories .dc-button{width:36px;height:36px;min-height:36px;padding:0;font-size:23px;background:transparent;border:0;color:#b5bac1;filter:grayscale(1);border-radius:4px}
+.dc-emoji-categories .dc-button:hover,.dc-emoji-categories .dc-button[aria-pressed=true]{background:#404249;color:white;filter:none}
+.dc-emoji-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:12px 12px 0}
+.dc-emoji-picker .dc-search-input{flex:none;width:100%;height:34px;padding:8px;border:0;border-radius:4px;background:#1e1f22;font-size:13px}
+.dc-emoji-picker .dc-emoji-grid{flex:1;min-height:0;max-height:none;align-content:start;grid-template-columns:repeat(8,minmax(0,1fr));gap:0;margin-top:8px;overscroll-behavior:contain;scrollbar-width:thin}
+.dc-emoji-picker .dc-emoji-grid .dc-button{height:38px;min-height:38px;padding:3px;font-size:27px;line-height:30px;background:transparent;border:0;border-radius:4px}
+.dc-emoji-picker .dc-emoji-grid .dc-button:hover{background:#404249}
+.dc-emoji-picker .dc-emoji-grid .dc-button.dc-emoji-more{grid-column:1/-1;font-size:13px}
+.dc-emoji-picker h3.dc-emoji-section{grid-column:1/-1;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:#b5bac1;margin:10px 0 8px;font-weight:700}
+.dc-emoji-empty{grid-column:1/-1;color:#b5bac1;font-size:13px}
+.dc-emoji-footer{height:52px;min-height:52px;display:flex;align-items:center;gap:10px;padding:8px 12px;background:#232428;font-size:12px}
+.dc-emoji-preview{font-size:28px}
+.dc-emoji-footer>span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dc-emoji-footer select{width:100px;min-width:0;padding:5px;border:0;background:#2b2d31;color:#dbdee1;font-size:11px}

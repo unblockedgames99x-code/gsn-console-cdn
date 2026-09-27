@@ -86,16 +86,29 @@
   function restoreDraft(id){setSpace(state.activeChannel?.kind==='server'?'community':'home');cancelEdit();const d=drafts.get(id)||storage.get(key(),{})[id]||{};el.messageInput.value=d.text||'';state.replyTo=(state.messages.get(id)||[]).find(m=>m.id===d.reply)||null;state.attachment=d.attachment||null;c.autoSizeComposer();feedback.textContent='';el.app.classList.remove('dc-nav-open');}
   function cancelEdit(){if(!edit)return;edit=null;editor.hidden=true;if(editDraft){el.messageInput.value=editDraft.text;state.replyTo=editDraft.reply;state.attachment=editDraft.attachment;}editDraft=null;c.autoSizeComposer();c.syncComposeExtras();}
   function beginEdit(message){if(message.authorId!==state.me?.id)return;saveDraft();if(!edit)editDraft={text:el.messageInput.value,reply:state.replyTo,attachment:state.attachment};edit=message;editor.hidden=false;state.replyTo=null;state.attachment=null;el.messageInput.value=message.text||'';c.autoSizeComposer();c.syncComposeExtras();el.messageInput.focus();}
-  let pendingSend=null;
+  const outbox=window.GsnOutbox({storage:localStorage,
+   send:record=>{if(state.me?.id!==record.authorId)throw Error('Account changed. Sign back in to retry.');return c.api('/api/channels/'+encodeURIComponent(record.channelId)+'/messages',{method:'POST',body:{text:record.text,replyTo:record.replyTo||null,attachments:record.attachments}});},
+   changed:account=>{if(state.me?.id===account)c.renderMessages();},warning:c.toast,
+   delivered:(account,channelId,message)=>{if(state.me?.id!==account)return;state.mutationVersions.set(channelId,(state.mutationVersions.get(channelId)||0)+1);const list=state.messages.get(channelId)||[];c.cacheMessages(channelId,c.normalizeMessages([...list.filter(m=>m.id!==message.id),message]));shell.sound('sent');c.renderSidebar();}
+  });
   async function send(){
    if(sending||!state.activeChannel||!state.me)return;const channel=state.activeChannel,account=state.me.id,raw=el.messageInput.value,text=raw.trim(),attachment=state.attachment,reply=state.replyTo,editing=edit;
-   if(!text&&!attachment&&!editing?.attachments?.length)return;sending=true;c.syncSendButton();saveDraft();feedback.textContent=editing?'Saving changes…':'Sending…';
+   if(!text&&!attachment&&!editing?.attachments?.length)return;
+   if(!editing){
+    if(text.length>4000){feedback.textContent='Keep messages under 4,000 characters. Your draft is kept.';return;}
+    try{outbox.enqueue(account,{channelId:channel.id,text,replyTo:reply?.id,attachments:attachment?[attachment]:[]});}
+    catch(error){feedback.textContent=error.message;return;}
+    // Persist before clearing. Acknowledgements never touch the next draft.
+    el.messageInput.value='';state.replyTo=null;state.attachment=null;feedback.textContent='';
+    drafts.set(channel.id,{text:''});const all=storage.get(key(),{});delete all[channel.id];storage.set(key(),all);
+    c.autoSizeComposer();c.syncComposeExtras();c.syncSendButton();saveDraft();el.messageInput.focus();return;
+   }
+   sending=true;c.syncSendButton();saveDraft();feedback.textContent='Saving changes…';
    const body={text,...(reply?{replyTo:reply.id}:{}),...(attachment?{attachments:[attachment]}:{})};
-   if(!editing){pendingSend={id:'pending-'+Date.now(),channelId:channel.id,authorId:account,text,createdAt:Date.now(),replyTo:reply?.id,attachments:attachment?[attachment]:[],pending:true};c.renderMessages();}
    try{
     const payload=await c.api(editing?'/api/messages/'+encodeURIComponent(editing.id):'/api/channels/'+encodeURIComponent(channel.id)+'/messages',{method:editing?'PATCH':'POST',body});
     if(state.me?.id!==account)return;
-    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');pendingSend=null;if(!editing)shell.sound('sent');
+    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');
     state.mutationVersions.set(channel.id,(state.mutationVersions.get(channel.id)||0)+1);
     const list=state.messages.get(channel.id)||[];c.cacheMessages(channel.id,c.normalizeMessages([...list.filter(m=>m.id!==payload.message.id),payload.message]));
     // Acknowledgments must never clear a newer draft or update a different channel.
@@ -103,7 +116,7 @@
     else {const d=drafts.get(channel.id);if(d?.text===raw&&d.attachment===attachment){drafts.set(channel.id,{text:''});const all=storage.get(key(),{});delete all[channel.id];storage.set(key(),all);}}
     c.renderSidebar();
    }catch(error){if(state.activeChannel?.id===channel.id){feedback.replaceChildren(node('span','',error.message+' Your draft is kept. '),button('Retry send',null,()=>send()));}else c.toast('Message to '+c.channelTitle(channel)+' was not confirmed. Its draft is kept.');}
-   finally{pendingSend=null;sending=false;c.renderMessages();c.syncSendButton();}
+   finally{sending=false;c.renderMessages();c.syncSendButton();}
   }
   function profileTrigger(target,user){target.tabIndex=0;target.setAttribute('role','button');target.setAttribute('aria-label','View profile of '+c.cleanDisplayName(user));target.onclick=e=>{e.stopPropagation();profile(user,target);};target.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();profile(user,target);}};}
   function closeModal(){if(!modal)return;modal.remove();modal=null;returnFocus?.focus({preventScroll:true});}
@@ -125,7 +138,7 @@
   function toggleMembers(value){memberOpen=value;memberPanel.hidden=!value;el.app.classList.toggle('dc-members-open',value);memberButton.setAttribute('aria-pressed',String(value));if(value)memberDraw();}
   function refresh(){
    if(!state.me)return;shell.sync();const scope=state.activeChannel?.kind==='dm'?state.activeChannel.recipientId:'community';
-   if(memberSource!==state.members||memberScope!==scope){memberSource=state.members;memberScope=scope;memberRows=scope==='community'?state.members:state.members.filter(u=>[state.me.id,scope].includes(u.id));memberRows=[...memberRows].sort((a,b)=>c.cleanDisplayName(a).localeCompare(c.cleanDisplayName(b)));memberLabel.textContent='MEMBERS — '+memberRows.length;memberDraw();}
+   if(memberSource!==state.members||memberScope!==scope||state.loadingMembers){memberSource=state.members;memberScope=scope;memberRows=scope==='community'?state.members:state.members.filter(u=>[state.me.id,scope].includes(u.id));memberRows=[...memberRows].sort((a,b)=>c.cleanDisplayName(a).localeCompare(c.cleanDisplayName(b)));memberLabel.textContent=state.loadingMembers?'LOADING MEMBERS…':'MEMBERS — '+memberRows.length;memberDraw();}
    const muted=state.mutedChannels.has(state.activeChannel?.id);muteButton.setAttribute('aria-pressed',String(muted));muteButton.title=muted?'Unmute channel notifications':'Mute channel notifications';muteButton.setAttribute('aria-label',muteButton.title);memberButton.setAttribute('aria-pressed',String(memberOpen));
   }
   function markVisibleRead(){const ch=state.activeChannel;if(!ch||social.visible||document.hidden||!c.timeline.bottom||readPending.has(ch.id))return;const latest=(state.messages.get(ch.id)||[]).at(-1)?.createdAt||0;if(latest<=Math.max(state.unreads[ch.id]||0,readTimes.get(ch.id)||0))return;readPending.add(ch.id);void c.api('/api/channels/'+encodeURIComponent(ch.id)+'/read',{method:'POST',body:{}}).then(()=>{state.unreads[ch.id]=latest;readTimes.set(ch.id,latest);c.renderSidebar();}).catch(()=>{}).finally(()=>readPending.delete(ch.id));}
@@ -141,15 +154,36 @@
   }
   let emojiCatalog=null,emojiRequest=null;
   async function chooseEmoji(anchor,onSelect){
-   const panel=dialog('Choose emoji','dc-emoji-dialog'),input=node('input','dc-search-input'),category=node('select'),tone=node('select'),grid=node('div','dc-emoji-grid'),recentKey='gsn-chat-emoji:'+state.me?.id;
-   input.type='search';input.placeholder='Search emoji';input.setAttribute('aria-label','Search emoji');category.setAttribute('aria-label','Emoji category');tone.setAttribute('aria-label','Skin tone');
-   for(const [value,label]of [['recent','Frequently used'],['all','All emoji'],['faces','Smileys & people'],['nature','Animals & nature'],['food','Food & drink'],['travel','Travel & places'],['objects','Objects & symbols'],['flags','Flags']])category.append(new Option(label,value));
-   for(const [value,label]of [['','All skin tones'],['light skin tone','Light'],['medium-light skin tone','Medium light'],['medium skin tone','Medium'],['medium-dark skin tone','Medium dark'],['dark skin tone','Dark']])tone.append(new Option(label,value));
-   const filters=node('div','dc-search-filters');filters.append(category,tone);panel.append(input,filters,grid);queueMicrotask(()=>input.focus());grid.textContent='Loading emoji…';
-   const groups={faces:/face|person|man|woman|hand|smil|heart|kiss|body|boy|girl|people|finger|skin tone/,nature:/animal|cat|dog|bird|plant|flower|tree|weather|sun|moon|fish|bear|insect/,food:/food|fruit|drink|vegetable|bread|rice|cake|coffee|tea|pizza|meal/,travel:/car|train|travel|building|mountain|boat|airplane|place|vehicle|transport/,flags:/flag|regional indicator/};let limit=120;
-   function render(){grid.replaceChildren();const q=input.value.trim().toLowerCase(),recent=storage.get(recentKey,[]),frequent=recent.length?recent:['👍','❤️','😂','🔥','🎉','👀','😀','🎮'];const all=emojiCatalog||frequent.map(emoji=>({emoji,name:emoji,keywords:[]}));let items=all.filter(e=>{const name=(e.name+' '+(e.keywords||[]).join(' ')).toLowerCase();if(tone.value&&!name.includes(tone.value))return false;if(q)return (name+' '+e.emoji).includes(q);if(category.value==='recent')return frequent.includes(e.emoji);if(category.value==='all')return true;if(category.value==='objects')return !Object.values(groups).some(re=>re.test(name));return groups[category.value]?.test(name);});if(category.value==='recent'&&!q)items.sort((a,b)=>frequent.indexOf(a.emoji)-frequent.indexOf(b.emoji));for(const e of items.slice(0,limit)){const b=button(e.name,null,()=>{storage.set(recentKey,[e.emoji,...recent.filter(x=>x!==e.emoji)].slice(0,32));closeModal();onSelect(e.emoji);});b.textContent=e.emoji;grid.append(b);}if(!items.length)grid.textContent='No emoji found.';if(items.length>limit)grid.append(button('More emoji',null,()=>{limit+=120;render();}));}
+   const panel=dialog('Emoji','dc-emoji-dialog dc-emoji-picker'),input=node('input','dc-search-input'),tone=node('select'),grid=node('div','dc-emoji-grid'),recentKey='gsn-chat-emoji:'+state.me?.id;
+   modal.classList.add('dc-emoji-backdrop');panel.setAttribute('aria-modal','false');
+   const r=anchor.getBoundingClientRect(),width=Math.min(440,innerWidth-16);panel.style.left=Math.max(8,Math.min(innerWidth-width-8,r.right-width))+'px';if(r.top>280){panel.style.bottom=Math.max(8,innerHeight-r.top+8)+'px';panel.style.maxHeight=Math.min(500,r.top-16)+'px';}else{panel.style.top=Math.min(r.bottom+8,innerHeight-240)+'px';panel.style.maxHeight=Math.max(220,innerHeight-r.bottom-16)+'px';}
+   const tabs=node('div','dc-picker-tabs');tabs.append(button('GIFs',null,()=>{closeModal();c.openGifPicker();}),node('strong','','Emoji'));
+   const heading=panel.querySelector('.dc-dialog-heading');heading.querySelector('h2').replaceWith(tabs);
+   input.type='search';input.placeholder='Find the perfect emoji';input.setAttribute('aria-label','Search emoji');tone.setAttribute('aria-label','Skin tone');
+   for(const [value,label]of [['','🟡 Default'],['light skin tone','🏻 Light'],['medium-light skin tone','🏼 Medium light'],['medium skin tone','🏽 Medium'],['medium-dark skin tone','🏾 Medium dark'],['dark skin tone','🏿 Dark']])tone.append(new Option(label,value));
+   tone.value=storage.get('gsn-chat-emoji-tone','');
+   const rail=node('nav','dc-emoji-categories');rail.setAttribute('aria-label','Emoji categories');
+   const categories=[['recent','Frequently used','◷'],['faces','Smileys & people','☺'],['nature','Animals & nature','♧'],['food','Food & drink','♨'],['travel','Travel & places','✈'],['activities','Activities','⚽'],['objects','Objects & symbols','♬'],['flags','Flags','⚑']];
+   let selected='faces',limit=112;const categoryButtons=new Map();
+   for(const [id,label,icon] of categories){const b=button(label,null,()=>{selected=id;input.value='';limit=112;render();});b.textContent=icon;categoryButtons.set(id,b);rail.append(b);}
+   const content=node('div','dc-emoji-content');content.append(input,grid);const body=node('div','dc-picker-body');body.append(rail,content);
+   const footer=node('div','dc-emoji-footer'),preview=node('span','dc-emoji-preview','😀'),name=node('span','','grinning face');footer.append(preview,name,tone);panel.append(body,footer);queueMicrotask(()=>input.focus());
+   const groups={faces:/face|person|man|woman|hand|smil|heart|kiss|body|boy|girl|people|finger|skin tone/,nature:/animal|cat|dog|bird|plant|flower|tree|weather|sun|moon|fish|bear|insect/,food:/food|fruit|drink|vegetable|bread|rice|cake|coffee|tea|pizza|meal/,travel:/car|train|travel|building|mountain|boat|airplane|place|vehicle|transport/,activities:/ball|sport|game|medal|trophy|golf|ski|swim|tennis/,flags:/flag|regional indicator/};
+   function render(){
+    grid.replaceChildren();const q=input.value.trim().toLowerCase(),recent=storage.get(recentKey,[]),frequent=[...new Set([...recent,'👍','❤️','😂','🔥','🎉','👀','😀','🎮'])];
+    const modifier={'light skin tone':'🏻','medium-light skin tone':'🏼','medium skin tone':'🏽','medium-dark skin tone':'🏾','dark skin tone':'🏿'}[tone.value];
+    const all=(emojiCatalog||frequent.map(emoji=>({emoji,name:emoji,keywords:[]}))).map(e=>modifier&&(e.emoji.match(/\p{Emoji_Modifier_Base}/gu)||[]).length===1&&!/\p{Emoji_Modifier}/u.test(e.emoji)?{...e,emoji:e.emoji.replace(/(\p{Emoji_Modifier_Base})\uFE0F?/u,'$1'+modifier),name:e.name+' '+tone.value}:e);
+    categoryButtons.forEach((b,id)=>b.setAttribute('aria-pressed',String(id===selected)));
+    function append(items,label){grid.append(node('h3','dc-emoji-section',label));for(const e of items){const b=button(e.name,null,event=>{storage.set(recentKey,[e.emoji,...storage.get(recentKey,[]).filter(x=>x!==e.emoji)].slice(0,32));if(!event.shiftKey)closeModal();onSelect(e.emoji);if(event.shiftKey)input.focus();});b.textContent=e.emoji;b.onmouseenter=b.onfocus=()=>{preview.textContent=e.emoji;name.textContent=e.name;};grid.append(b);}}
+    if(!q)append(frequent.slice(0,16).map(emoji=>all.find(e=>e.emoji===emoji)||{emoji,name:emoji}),'Frequently Used');
+    const items=all.filter(e=>{const text=(e.name+' '+(e.keywords||[]).join(' ')).toLowerCase();if(text.includes('skin tone')&&!text.includes(tone.value||'default skin tone'))return false;if(q)return (text+' '+e.emoji).includes(q);if(selected==='recent')return false;if(selected==='objects')return !Object.values(groups).some(re=>re.test(text));return groups[selected]?.test(text);});
+    if(items.length)append(items.slice(0,limit),q?'Search Results':categories.find(c=>c[0]===selected)[1]);
+    if(!items.length&&q)grid.append(node('p','dc-emoji-empty','No emoji found.'));
+    if(items.length>limit){const more=button('More emoji',null,()=>{limit+=112;render();});more.classList.add('dc-emoji-more');grid.append(more);}
+   }
+   render();
    if(!emojiCatalog){try{emojiRequest||=fetch(new URL('reaction-emoji.json',document.baseURI)).then(r=>{if(!r.ok)throw Error('Emoji catalog unavailable');return r.json();});emojiCatalog=await emojiRequest;}catch{emojiRequest=null;}}
-   if(panel.isConnected)render();input.oninput=()=>{limit=120;render();};category.onchange=tone.onchange=()=>{limit=120;render();};
+   if(panel.isConnected)render();input.oninput=()=>{limit=112;render();};tone.onchange=()=>{storage.set('gsn-chat-emoji-tone',tone.value);render();};
   }
   window.GsnChatUI.chooseEmoji=chooseEmoji;
   function emojiInit(){el.emojiPopover.replaceChildren();el.emojiButton.addEventListener('click',()=>{el.emojiPopover.hidden=true;chooseEmoji(el.emojiButton,emoji=>{const input=el.messageInput,start=input.selectionStart,end=input.selectionEnd;input.setRangeText(emoji,start,end,'end');c.autoSizeComposer();c.syncSendButton();saveDraft();input.focus();});});}
@@ -177,15 +211,15 @@
    if(e.key==='Escape'){if(modal){e.preventDefault();closeModal();}if(menu){menu.remove();menu=null;returnFocus?.focus();}el.app.classList.remove('dc-nav-open');}
    const scope=modal?.querySelector('[role=dialog]')||[...document.querySelectorAll('.overlay:not([hidden]),.auth-overlay:not([hidden])')].at(-1);
    if(e.key==='Tab'&&scope){const controls=[...scope.querySelectorAll('button:not(:disabled),input:not([hidden]):not([type=file]),textarea,select,a[href],[tabindex="0"]')].filter(n=>n.getClientRects().length);if(!controls.length)return;const first=controls[0],last=controls.at(-1);if(e.shiftKey&&(document.activeElement===first||!scope.contains(document.activeElement))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||!scope.contains(document.activeElement))){e.preventDefault();first.focus();}}
-   const grid=document.activeElement?.closest('.gif-results,#emojiPopover,.message-action-menu,.reaction-picker,.dc-emoji-grid');if(grid&&['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)){const all=[...grid.querySelectorAll('button:not(:disabled)')],i=all.indexOf(document.activeElement);if(i>=0){e.preventDefault();all[(i+(['ArrowLeft','ArrowUp'].includes(e.key)?-1:1)+all.length)%all.length]?.focus();}}
+   const grid=document.activeElement?.closest('.gif-results,#emojiPopover,.message-action-menu,.reaction-picker,.dc-emoji-grid');if(grid&&['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)){const all=[...grid.querySelectorAll('button:not(:disabled)')],i=all.indexOf(document.activeElement);if(i>=0){e.preventDefault();const step=grid.matches('.dc-emoji-grid')&&['ArrowUp','ArrowDown'].includes(e.key)?8:1;all[(i+(['ArrowLeft','ArrowUp'].includes(e.key)?-step:step)+all.length)%all.length]?.focus();}}
   });
   document.addEventListener('pointerdown',e=>{if(menu&&!menu.contains(e.target)&&!e.target.closest('[data-action=more]')){menu.remove();menu=null;}});
   window.addEventListener('pagehide',()=>{saveDraft();clearTimeout(draftTimer);const all=storage.get(key(),{});for(const [id,d]of drafts)all[id]=d;if(state.me)storage.set(key(),all);memberResize.disconnect();mediaObserver.disconnect();mediaCleanup.disconnect();animated.clear();cancelAnimationFrame(memberFrame);});
-  window.addEventListener('resize',()=>{c.autoSizeComposer();if(modal?.classList.contains('dc-popout-backdrop'))closeModal();});
+  window.addEventListener('resize',()=>{c.autoSizeComposer();if(modal?.matches('.dc-popout-backdrop,.dc-emoji-backdrop'))closeModal();});
   el.cancelAttachmentButton.addEventListener('click',saveDraft);el.cancelReplyButton.addEventListener('click',saveDraft);
   const shell=window.GsnDiscordShell(c,{node,button,dialog,closeModal,search,space:()=>space,socialVisible:()=>social.visible});
   el.app.dataset.space='community';document.getElementById('discordCommunity').setAttribute('aria-current','true');
-  return {pendingMessages:id=>pendingSend?.channelId===id&&pendingSend.authorId===state.me?.id?[pendingSend]:[],observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
+  return {pendingMessages:id=>state.me?outbox.list(state.me.id,id):[],retryMessage:id=>state.me&&outbox.retry(state.me.id,id),observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
    uploadProgress(loaded,total){feedback.textContent=total?'Reading image · '+Math.round(loaded/total*100)+'%':'';},
    detailsOpened(){el.detailsPanel.classList.add('dc-details-overlay');},
    loadError(retry){el.messageScroll.replaceChildren(node('p','thread-empty','This conversation could not be loaded.'),button('Try again',null,retry));}

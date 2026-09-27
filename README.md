@@ -85,3 +85,5 @@ Release v20260927-19: correct inherited colors on outlined navigation icons and 
 Release v20260927-20: remove the blue chat badge from the empty conversation screen.
 
 Release v20260927-21: prioritize message sends over background reads, reduce preview traffic, and show unconfirmed messages immediately while preserving drafts on failure. Includes removal of the blue empty-chat badge.
+
+Release v20260927-22: immediate durable message composing, faster conversation-first startup and tab-local cache, anchored emoji picker with categories/search/skin tones.

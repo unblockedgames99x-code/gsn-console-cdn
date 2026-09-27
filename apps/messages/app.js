@@ -312,7 +312,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-21/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-22/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -779,36 +779,71 @@
     copy.append(title, small); row.append(createAvatar(user), copy); return row;
   }
 
+  // Short-lived, tab-local snapshots speed up reopening Chat. Authentication
+  // always completes before reading them; logout removes this account's copy.
+  function saveWarmChat() {
+    if (!state.me || !state.channels.length) return;
+    const histories = [...state.messages].slice(-4).map(([id, rows]) => [id, rows.slice(-80)]);
+    const value = JSON.stringify({at: Date.now(), channels: state.channels, members: state.members, histories});
+    try { if (value.length < 500000) sessionStorage.setItem('gsn-chat-warm:' + state.me.id, value); } catch {}
+  }
+  function restoreWarmChat() {
+    try {
+      const data = JSON.parse(sessionStorage.getItem('gsn-chat-warm:' + state.me.id) || 'null');
+      if (!data || Date.now() - data.at > 1800000 || !Array.isArray(data.channels) || !data.channels.length) return false;
+      state.channels = data.channels.filter(channel => !isHiddenPublicRoom(channel));
+      state.members = data.members || [];
+      state.memberMap = new Map(state.members.map(member => [member.id, member]));
+      for (const [id, messages] of data.histories || []) state.messages.set(id, normalizeMessages(messages));
+      return true;
+    } catch { return false; }
+  }
+
   async function loadEverything() {
     setConnection("Connecting", false);
-    var results = await Promise.all([
-      api("/api/members"), api("/api/dm"), api("/api/friends"), api("/api/me/settings").catch(function () { return { settings: {} }; }), api("/api/unread").catch(function () { return { unread: {} }; })
-    ]);
-    state.members = results[0].members || [];
-    state.memberMap = new Map(state.members.map(function (member) { return [member.id, member]; }));
-    state.channels = (results[1].channels || []).filter(function (channel) { return !isHiddenPublicRoom(channel); });
-    state.friends = results[2].friends || [];
-    state.settings = results[3].settings || {};
-    state.unreads = results[4].unread || {};
-    await loadBlinkChannels();
-    state.channelMap = new Map(state.channels.map(function (channel) { return [channel.id, channel]; }));
-    loadMutedChannels();
-    loadPinnedChannels();
-    loadMentionNotices();
-    loadProfile();
-    updateMe();
-    updateRequestBadge();
-    renderSidebar();
-    enhanced.refresh();
-    connectSocket();
-    setConnection("Live", true);
+    const account = state.me.id, current = () => state.me?.id === account;
+    state.loadingDirectory = true; state.loadingMembers = true;
+    // Only the channel list is required to open a conversation. Do not place
+    // slow directory/settings requests ahead of the first message request.
+    const warm = restoreWarmChat();
+    if (!warm) {
+      const result = await api("/api/dm", {priority: 'foreground'});
+      if (!current()) return;
+      state.channels = (result.channels || []).filter(channel => !isHiddenPublicRoom(channel));
+    }
+    state.channelMap = new Map(state.channels.map(channel => [channel.id, channel]));
+    loadMutedChannels(); loadPinnedChannels(); loadMentionNotices(); loadProfile();
+    updateMe(); updateRequestBadge(); renderSidebar(); enhanced.refresh();
+    connectSocket(); setConnection("Live", true);
     state.loading = false;
     el.app.setAttribute("aria-busy", "false");
-    var global = state.channels.find(function (channel) { return channel.kind === "server" && String(channel.name).toLowerCase() === "general"; });
-    if (global && window.innerWidth > 560) await openChannel(global.id);
-    void loadPreviews({ initial: true }).then(()=>{previewsAt=Date.now();renderSidebar();}).catch(()=>{});
-    if (!state.profile) showProfileSetup(false);
+    const general = state.channels.find(channel => channel.kind === "server" && String(channel.name).toLowerCase() === "general");
+    const opening = general && window.innerWidth > 560 ? openChannel(general.id) : Promise.resolve();
+    const background = (path, apply) => api(path).then(data => {
+      if (!current()) return;
+      apply(data); saveWarmChat(); renderSidebar(); enhanced.refresh();
+    }).catch(error => { if (current()) toast(error.message); });
+    if (warm) void background("/api/dm", data => {
+      state.channels = (data.channels || []).filter(channel => !isHiddenPublicRoom(channel));
+      state.channelMap = new Map(state.channels.map(channel => [channel.id, channel]));
+    });
+    void background("/api/members", data => {
+      state.loadingMembers = false; state.members = data.members || [];
+      state.memberMap = new Map(state.members.map(member => [member.id, member]));
+      updateMe(); if (state.activeChannel) { updateHeader(); renderMessages(); }
+    });
+    void background("/api/friends", data => {
+      state.friends = data.friends || []; state.loadingDirectory = false; updateRequestBadge();
+    }).finally(() => { if (current()) { state.loadingDirectory = false; renderSidebar(); } });
+    void background("/api/me/settings", data => {
+      state.settings = data.settings || {}; loadProfile(); loadMutedChannels(); loadPinnedChannels(); updateMe();
+      if (!state.profile) showProfileSetup(false);
+    });
+    void background("/api/unread", data => { state.unreads = Object.assign(data.unread || {}, state.unreads); });
+    await opening;
+    if (!current()) return;
     startPolling();
+    void loadPreviews({initial: true}).then(() => { if (current()) { previewsAt = Date.now(); renderSidebar(); } }).catch(() => {});
   }
 
   var previewCursor=0;
@@ -862,7 +897,7 @@
 
   const historyOrder=new Map();
   function cacheMessages(id,messages){
-    state.messages.set(id,messages);historyOrder.delete(id);historyOrder.set(id,true);
+    state.messages.set(id,messages);historyOrder.delete(id);historyOrder.set(id,true);saveWarmChat();
     while(historyOrder.size>32){const oldest=historyOrder.keys().next().value;historyOrder.delete(oldest);
       if(oldest===state.activeChannel?.id){historyOrder.set(oldest,true);continue;}
       // Keep the sidebar preview; the complete history remains on its existing server.
@@ -885,7 +920,7 @@
     el.app.classList.add("conversation-open");
     updateHeader();
     renderSidebar();
-    if(state.messages.has(id))renderMessages();else{el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';}
+    if(state.messages.has(id))renderMessages();else{timeline.update(id,[]);el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';}
     try {
       const loaded=await loadChannelMessages(channel,{priority:'foreground'});
       if(navigation!==channelNavigation)return;
@@ -956,7 +991,11 @@
     renderAttachments(bubble, message.attachments);
     if(message.pending){
       row.classList.add('dc-message-pending');
-      const status=document.createElement('small');status.className='dc-send-status';status.textContent='Sending…';status.setAttribute('role','status');
+      const status=document.createElement('small');status.className='dc-send-status';
+      if(message.delivery==='failed'){
+        row.classList.add('dc-message-failed');status.setAttribute('role','status');status.textContent=message.error+' ';
+        const retry=document.createElement('button');retry.type='button';retry.textContent='Retry';retry.onclick=()=>enhanced.retryMessage(message.id);status.appendChild(retry);
+      }else{status.classList.add('dc-confirmation-pending');status.title='Waiting for server confirmation';status.setAttribute('aria-label','Waiting for server confirmation');status.textContent='◷';}
       stack.append(bubble,status);row.appendChild(stack);return row;
     }
     var tools = document.createElement("span"); tools.className = "message-tools";
@@ -1100,7 +1139,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-21/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-22/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1562,6 +1601,7 @@
 
   async function logout() {
     try { await api("/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
+    try { if (state.me) sessionStorage.removeItem('gsn-chat-warm:' + state.me.id); } catch {}
     if (state.socket) state.socket.close();
     window.clearInterval(state.pollTimer);
     enhanced.saveDraft();location.reload();

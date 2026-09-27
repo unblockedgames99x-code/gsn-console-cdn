@@ -67,7 +67,7 @@
     }
     function render(force = false) {
       if (panel.hidden) return;
-      const next = JSON.stringify([state.me?.id, state.friends, tab, search.value, limit]);
+      const next = JSON.stringify([state.me?.id, state.friends, state.loadingDirectory, tab, search.value, limit]);
       if (!force && next === signature) return;
       signature = next;
       tabButtons.forEach((b, id) => b.setAttribute('aria-current', String(id === tab)));
@@ -75,6 +75,7 @@
       tabButtons.get('pending').textContent = 'Pending' + (pending.length ? ' · ' + pending.length : '');
       form.hidden = tab !== 'add'; searchBox.hidden = count.hidden = list.hidden = tab === 'add';
       if (tab === 'add') return;
+      if (state.loadingDirectory) { count.textContent = 'Loading friends…'; list.replaceChildren(); return; }
       const query = search.value.trim().toLowerCase();
       const all = tab === 'pending' ? pending : state.friends.filter(r => r.state === 'friends');
       const matches = all.filter(r => (c.cleanDisplayName(r.user) + ' ' + r.user.username).toLowerCase().includes(query));
