@@ -13,3 +13,5 @@ Release v20260926-6 provides an isolated media/API bridge for the native Google 
 Release v20260926-7 adds Arcade by Greg to Media, with the supplied GAM.ONL library and an existing arcade-cabinet icon by Upnow Graphic / Flaticon.
 
 Release v20260926-8 replaces the Arcade tile and loading-screen icon with the Apple Arcade joystick logo.
+
+Release v20260926-9 keeps the media loading screen within the viewport to remove the outer scrollbar.
