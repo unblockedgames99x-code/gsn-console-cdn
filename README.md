@@ -28,3 +28,8 @@ Release v20260926-13 adds a responsive song-actions menu with artwork, grouped i
 Release v20260926-14: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 
 Release v20260927-1: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+
+Release v20260927-2: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+
+Release v20260927-2: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Games home now shows large live album artwork, track information, and previous/play-pause/next controls while music is loaded.
