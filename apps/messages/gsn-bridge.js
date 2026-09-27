@@ -16,7 +16,7 @@
   if(base&&!/^https:\/\//.test(base)&&!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(base))throw new Error('Use an HTTPS GSN Chat server.');
   const token=localStorage.getItem(key),method=options.method||'GET',version=epoch;
   const logout=path==='/api/auth/logout';
-  if(logout){epoch++;localStorage.removeItem(key);me=null;pending.clear();}
+  if(logout){epoch++;localStorage.removeItem(key);me=null;pending.clear();window.dispatchEvent(new Event('gsn-session-changed'));}
   const requestKey=method==='GET'?token+':'+path:null;
   if(requestKey&&pending.has(requestKey))return pending.get(requestKey);
   const execute=async()=>{

@@ -94,3 +94,5 @@ Release v20260927-24: updated console and app assets.
 Release v20260927-24: working server icon picker with square previews and persistent icons; matched white circled-plus Add Server button. Google Chat backend version 12.
 
 Release v20260927-25: updated console and app assets.
+
+Release v20260927-26: private DM voice/video calling, incoming answer/decline, mute/camera controls, call timer, minimize and hang-up. Google backend version 13. STUN configured; TURN configuration supported for restrictive networks.

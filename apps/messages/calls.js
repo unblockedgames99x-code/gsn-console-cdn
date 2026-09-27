@@ -1,73 +1,50 @@
-// Nocturne carries call invitations; PeerJS carries WebRTC signaling, never chat history.
-(() => {
-  // The current Cherri API has no private call invitation channel.
-  if (window.CHERRI_CHAT) {
-    for (const id of ['audioCall', 'videoCall']) document.getElementById(id).hidden = true;
-    return;
-  }
-  const modal = document.createElement('section'); modal.className='call-overlay'; modal.hidden=true; modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','Call');
-  modal.innerHTML='<div class="call-card"><video class="call-remote" autoplay playsinline></video><video class="call-local" autoplay playsinline muted hidden></video><div class="call-avatar"></div><h2></h2><p role="status"></p><div class="call-actions"><button class="answer-call" aria-label="Answer call" hidden>✓</button><button class="mute-call" aria-label="Mute microphone"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></button><button class="camera-call" aria-label="Turn camera off" hidden><svg viewBox="0 0 24 24"><rect x="2" y="5" width="13" height="14" rx="3"/><path d="m15 9 7-4v14l-7-4"/></svg></button><button class="end-call" aria-label="End call"><svg viewBox="0 0 24 24"><path d="M3 14c5-5 13-5 18 0v4h-5v-4M8 14v4H3"/></svg></button></div></div>';
-  document.body.append(modal);
-  const find = name => modal.querySelector(name), status=find('p'), remote=find('.call-remote'), local=find('.call-local');
-  let conversation, peer, connection, media, timer, current, returnFocus, invites=new Map();
-  const prefix='[GSN call] ';
-  const peerId=async id=>'gsn-'+Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nocturne:'+id)))).slice(0,16).map(v=>v.toString(16).padStart(2,'0')).join('');
-  const show = (name,text,video) => {returnFocus=document.activeElement;modal.hidden=false;find('h2').textContent=name;find('.call-avatar').textContent=(name||'?')[0].toUpperCase();status.textContent=text;find('.camera-call').hidden=!video;find('.end-call').focus();};
-  function end(hide=true) {
-    clearTimeout(timer); const active=connection;connection=null;active?.close();media?.getTracks().forEach(track=>track.stop());media=null;remote.srcObject=null;local.srcObject=null;local.hidden=true;current=null;find('.answer-call').hidden=true;find('.call-card').classList.remove('connected');
-    if(hide){modal.hidden=true;returnFocus?.focus();} else {status.textContent='Call ended';find('.end-call').setAttribute('aria-label','Close call');}
-  }
-  function fail(error){end(false);status.textContent=error?.name==='NotAllowedError'?'Microphone or camera access was declined. Enable it in your browser to call.':error.message||'The call could not connect.';}
-  function attach(call) {
-    connection=call;
-    call.on('stream',stream=>{clearTimeout(timer);remote.srcObject=stream;remote.play().catch(()=>{status.textContent='Click to play call audio';remote.controls=true;});status.textContent='Connected';if(stream.getVideoTracks().length)find('.call-card').classList.add('connected');});
-    call.on('close',()=>{if(connection===call)end(false);});call.on('error',fail);
-  }
-  async function ensurePeer() {
-    if(peer&&!peer.destroyed&&!peer.disconnected) {if(peer.open)return peer;return new Promise((resolve,reject)=>{peer.once('open',()=>resolve(peer));peer.once('error',reject);});}
-    const id=await peerId(window.NOCTURNE_CHAT.me.id);
-    peer=new Peer(id);
-    peer.on('call',call=>{
-      const invite=invites.get(call.metadata?.nonce);
-      if(!invite||invite.expires<Date.now()||call.peer!==invite.peer||current){call.close();return;}
-      current=invite;show(invite.name,'Incoming '+(invite.video?'video':'audio')+' call',invite.video);find('.answer-call').hidden=false;
-      timer=setTimeout(()=>end(),60000);connection=call;
-      find('.answer-call').onclick=async()=>{find('.answer-call').hidden=true;try{media=await navigator.mediaDevices.getUserMedia({audio:true,video:invite.video});if(!current){media.getTracks().forEach(t=>t.stop());return;}local.srcObject=media;local.hidden=!invite.video;attach(call);call.answer(media);status.textContent='Connecting…';}catch(error){fail(error);}};
-      call.on('close',()=>{if(connection===call)end(false);});
-    });
-    peer.on('error',error=>{if(current)fail(error);});
-    return new Promise((resolve,reject)=>{const deadline=setTimeout(()=>reject(new Error('Call signaling is unavailable. Please try again.')),12000);peer.once('open',()=>{clearTimeout(deadline);resolve(peer);});peer.once('error',error=>{clearTimeout(deadline);reject(error);});});
-  }
-  async function start(video) {
-    if(!conversation?.channel?.recipientId||current)return;
-    const person=conversation.person || {displayName:conversation.channel.name};
-    current={nonce:crypto.randomUUID(),video};const pendingCall=current;
-    show(person.displayName || person.username,'Connecting…',video);
-    try {
-      await ensurePeer();media=await navigator.mediaDevices.getUserMedia({audio:true,video});
-      if(current!==pendingCall){media.getTracks().forEach(t=>t.stop());return;}
-      local.srcObject=media;local.hidden=!video;
-      const recipient=conversation.channel.recipientId;
-      const invitation={nonce:current.nonce,peer:peer.id,video,expires:Date.now()+60000};
-      await window.NOCTURNE_CHAT.request('/api/dm/with/'+encodeURIComponent(recipient)+'/send',{text:prefix+JSON.stringify(invitation)});
-      if(current!==pendingCall)return;
-      status.textContent='Calling…';
-      // Let the receiver consume the authenticated invitation before signaling.
-      await new Promise(resolve=>setTimeout(resolve,900));
-      if(current!==pendingCall)return;
-      attach(peer.call(await peerId(recipient),media,{metadata:{nonce:current.nonce}}));
-      timer=setTimeout(()=>{end(false);status.textContent='No answer. The other person must have Chat open.';},60000);
-    } catch(error) {fail(error);}
-  }
-  window.addEventListener('messages-conversation',event=>{conversation=event.detail;const enabled=!!conversation.channel?.recipientId;document.getElementById('audioCall').hidden=!enabled;document.getElementById('videoCall').hidden=!enabled;if(conversation.me)ensurePeer().catch(()=>{});});
-  window.addEventListener('nocturne-dm',async event=>{
-    const message=event.detail;if(!message.text?.startsWith(prefix))return;
-    try{const invite=JSON.parse(message.text.slice(prefix.length));if(invite.expires<Date.now()||invite.expires>Date.now()+90000||invite.peer!==await peerId(message.senderId))return;invite.name=message.username || 'Incoming call';invites.set(invite.nonce,invite);setTimeout(()=>invites.delete(invite.nonce),65000);await ensurePeer();}catch{}
-  });
-  document.getElementById('audioCall').onclick=()=>start(false);document.getElementById('videoCall').onclick=()=>start(true);
-  find('.end-call').onclick=()=>end();
-  find('.mute-call').onclick=()=>{for(const track of media?.getAudioTracks()||[])track.enabled=!track.enabled;const muted=!media?.getAudioTracks()[0]?.enabled;find('.mute-call').setAttribute('aria-pressed',String(muted));find('.mute-call').setAttribute('aria-label',muted?'Unmute microphone':'Mute microphone');};
-  find('.camera-call').onclick=()=>{for(const track of media?.getVideoTracks()||[])track.enabled=!track.enabled;const off=!media?.getVideoTracks()[0]?.enabled;find('.camera-call').setAttribute('aria-pressed',String(off));find('.camera-call').setAttribute('aria-label',off?'Turn camera on':'Turn camera off');};
-  modal.addEventListener('keydown',event=>{if(event.key==='Tab'){const buttons=[...modal.querySelectorAll('button:not([hidden])')];const i=buttons.indexOf(document.activeElement);if(event.shiftKey&&i===0){event.preventDefault();buttons.at(-1).focus();}else if(!event.shiftKey&&i===buttons.length-1){event.preventDefault();buttons[0].focus();}}});
-  window.addEventListener('pagehide',()=>{end();peer?.destroy();});
+/* SPDX-License-Identifier: MIT — private GSN calls, authenticated signaling + WebRTC. */
+(()=>{'use strict';
+ const api=(path,body)=>window.GSN_CHAT.api(path,{...(body?{method:'POST',body}:{}),priority:'foreground'});
+ const audioButton=document.getElementById('audioCall'),videoButton=document.getElementById('videoCall');
+ const modal=document.createElement('section');modal.className='call-overlay';modal.hidden=true;modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','Call');
+ modal.innerHTML='<div class="call-card"><div class="call-heading"><span>DIRECT CALL</span><button class="call-minimize" aria-label="Minimize call">−</button></div><video class="call-remote" autoplay playsinline></video><video class="call-local" autoplay playsinline muted hidden></video><div class="call-avatar"></div><h2></h2><p role="status"></p><small class="call-time"></small><button class="call-play" hidden>Play call audio</button><div class="call-actions"><button class="answer-call" aria-label="Answer call" hidden><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></button><button class="mute-call" aria-label="Mute microphone" hidden><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></button><button class="camera-call" aria-label="Turn camera off" hidden><svg viewBox="0 0 24 24"><rect x="2" y="5" width="13" height="14" rx="3"/><path d="m15 9 7-4v14l-7-4"/></svg></button><button class="end-call" aria-label="End call"><svg viewBox="0 0 24 24"><path d="M3 14c5-5 13-5 18 0v4h-5v-4M8 14v4H3"/></svg></button></div></div>';
+ const resume=document.createElement('button');resume.className='call-resume';resume.hidden=true;resume.textContent='Return to call';document.body.append(modal,resume);
+ const el=s=>modal.querySelector(s),status=el('p'),remote=el('.call-remote'),local=el('.call-local');
+ let conversation=null,current=null,account=null,iceServers=[{urls:'stun:stun.l.google.com:19302'}],polling=false,pollTimer,returnFocus,ringAudio,ringTimer;
+ const me=()=>window.GSN_CHAT?.me?.id;
+ const same=c=>current===c&&me()===c.account;
+ const display=p=>p?.displayName||p?.username||'GSN member';
+ function syncButtons(){const enabled=!!conversation?.channel?.recipientId&&!!me();audioButton.hidden=videoButton.hidden=!enabled;audioButton.disabled=videoButton.disabled=!!current;}
+ function ring(stop=false){clearInterval(ringTimer);ringAudio?.close().catch(()=>{});ringAudio=null;if(stop)return;try{ringAudio=new AudioContext();const ping=()=>{if(ringAudio?.state!=='running')return;const o=ringAudio.createOscillator(),g=ringAudio.createGain();o.frequency.value=440;g.gain.setValueAtTime(.04,ringAudio.currentTime);g.gain.exponentialRampToValueAtTime(.001,ringAudio.currentTime+.35);o.connect(g);g.connect(ringAudio.destination);o.start();o.stop(ringAudio.currentTime+.35);};ping();ringTimer=setInterval(ping,2200);}catch{}}
+ function show(c,incoming){returnFocus=document.activeElement;modal.hidden=false;resume.hidden=true;el('h2').textContent=display(c.person);const avatar=el('.call-avatar');avatar.replaceChildren();if(c.person?.avatar){const img=document.createElement('img');img.src=c.person.avatar;img.alt='';avatar.append(img);}else avatar.textContent=display(c.person)[0].toUpperCase();status.textContent=incoming?'Incoming '+(c.video?'video':'voice')+' call':'Preparing '+(c.video?'video':'voice')+' call…';el('.answer-call').hidden=!incoming;el('.answer-call').disabled=false;el('.mute-call').hidden=true;el('.camera-call').hidden=true;el('.end-call').setAttribute('aria-label',incoming?'Decline call':'End call');el('.call-time').textContent='';el('.call-play').hidden=true;el('.call-card').classList.remove('connected');el('.end-call').focus();syncButtons();}
+ function dispose(c){if(!c)return;clearTimeout(c.deadline);clearTimeout(c.disconnectTimer);clearInterval(c.clock);c.pc?.close();c.media?.getTracks().forEach(t=>t.stop());ring(true);remote.srcObject=null;local.srcObject=null;local.hidden=true;el('.mute-call').hidden=el('.camera-call').hidden=true;el('.answer-call').hidden=true;el('.call-play').hidden=true;el('.call-card').classList.remove('connected');}
+ function finish(c,text='Call ended',notify=true,hide=false){if(current!==c)return;if(c.control?.readyState==='open'&&notify)c.control.send('end');current=null;dispose(c);if(notify&&c.sent&&me()===c.account)void api('/api/calls/'+c.id+'/end',{reason:c.incoming&&!c.answering?'declined':'ended'}).catch(()=>{});resume.hidden=true;modal.hidden=hide;status.textContent=text;el('.end-call').setAttribute('aria-label','Close call');el('.call-minimize').hidden=true;syncButtons();if(hide)returnFocus?.focus();}
+ function failure(c,e){if(!same(c))return;const text=e?.name==='NotAllowedError'?'Microphone or camera access was denied. Allow access in your browser and try again.':e?.name==='NotFoundError'?'No microphone or camera was found. Connect a device and try again.':e?.message||'The call could not connect.';finish(c,text);}
+ function control(c,dc){c.control=dc;dc.onmessage=e=>{if(e.data==='end'&&same(c))finish(c,'Call ended',false);};}
+ function peer(c){const pc=c.pc=new RTCPeerConnection({iceServers});if(!c.incoming)control(c,pc.createDataChannel('call-control'));else pc.ondatachannel=e=>control(c,e.channel);
+  pc.ontrack=e=>{if(!same(c))return;const stream=e.streams[0]||new MediaStream([e.track]);if(remote.srcObject!==stream){remote.srcObject=stream;remote.play().catch(error=>{if(error.name!=='AbortError'&&same(c))el('.call-play').hidden=false;});}if(c.video)el('.call-card').classList.add('connected');};
+  pc.onconnectionstatechange=()=>{if(!same(c))return;if(pc.connectionState==='connected'){clearTimeout(c.deadline);clearTimeout(c.disconnectTimer);ring(true);status.textContent=c.video?'Video connected':'Voice connected';if(!c.connectedAt){c.connectedAt=Date.now();c.clock=setInterval(()=>{const s=Math.floor((Date.now()-c.connectedAt)/1000);el('.call-time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},1000);}}else if(pc.connectionState==='failed')failure(c,Error('Could not connect on this network. Try another network.'));else if(pc.connectionState==='disconnected'){status.textContent='Reconnecting…';clearTimeout(c.disconnectTimer);c.disconnectTimer=setTimeout(()=>same(c)&&finish(c,'Connection lost'),15000);}};return pc;
+ }
+ async function getMedia(c){if(!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection)throw Error('Calling requires a secure browser with microphone support.');const media=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:c.video?{width:{ideal:640},height:{ideal:480}}:false});if(!same(c)){media.getTracks().forEach(t=>t.stop());return false;}c.media=media;for(const t of media.getTracks())c.pc.addTrack(t,media);local.srcObject=media;local.hidden=!c.video;el('.mute-call').hidden=false;el('.camera-call').hidden=!c.video;for(const s of ['.mute-call','.camera-call'])el(s).setAttribute('aria-pressed','false');el('.mute-call').setAttribute('aria-label','Mute microphone');el('.camera-call').setAttribute('aria-label','Turn camera off');return true;}
+ async function gather(c,description){await c.pc.setLocalDescription(description);if(c.pc.iceGatheringState!=='complete')await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{cleanup();reject(Error('Network discovery timed out. Please try again.'));},12000);function cleanup(){clearTimeout(timer);c.pc.removeEventListener('icegatheringstatechange',check);c.pc.removeEventListener('connectionstatechange',check);}function check(){if(!same(c)||c.pc.signalingState==='closed'){cleanup();reject(Error('Call cancelled.'));}else if(c.pc.iceGatheringState==='complete'){cleanup();resolve();}}c.pc.addEventListener('icegatheringstatechange',check);c.pc.addEventListener('connectionstatechange',check);check();});return c.pc.localDescription.sdp;}
+ async function start(video){if(current||!conversation?.channel?.recipientId||!me())return;const c=current={id:crypto.randomUUID(),account:me(),channelId:conversation.channel.id,person:conversation.person,video,incoming:false};show(c,false);el('.call-minimize').hidden=false;
+  try{const config=await api('/api/calls');if(!same(c))return;iceServers=config.iceServers||iceServers;peer(c);if(!await getMedia(c))return;const offer=await gather(c,await c.pc.createOffer());if(!same(c))return;status.textContent='Calling…';const result=await api('/api/calls',{id:c.id,channelId:c.channelId,offer,video});if(!same(c)){if(me()===c.account)void api('/api/calls/'+c.id+'/end',{reason:'cancelled'}).catch(()=>{});return;}c.sent=true;c.expires=result.call.expires;c.deadline=setTimeout(()=>same(c)&&finish(c,'No answer. The other person needs Chat open.'),90000);ring();pollSoon();}catch(e){failure(c,e);}
+ }
+ async function answer(){const c=current;if(!c?.incoming||c.answering)return;c.answering=true;el('.answer-call').disabled=true;ring(true);status.textContent='Connecting…';
+  try{peer(c);if(!await getMedia(c))return;await c.pc.setRemoteDescription({type:'offer',sdp:c.offer});const answer=await gather(c,await c.pc.createAnswer());if(!same(c))return;await api('/api/calls/'+c.id+'/answer',{answer});if(!same(c))return;el('.answer-call').hidden=true;el('.end-call').setAttribute('aria-label','End call');clearTimeout(c.deadline);if(!c.connectedAt)c.deadline=setTimeout(()=>same(c)&&failure(c,Error('The call could not connect on this network.')),45000);pollSoon();}catch(e){if(e.status===409&&same(c))finish(c,'Call already answered or ended',false);else failure(c,e);}
+ }
+ async function poll(){if(polling)return;polling=true;const uid=me();try{if(uid!==account){if(current)finish(current,'Signed out',false,true);account=uid;syncButtons();}if(!uid)return;const c=current;const data=await api(c?.sent?'/api/calls/'+c.id:'/api/calls');if(me()!==uid)return;iceServers=data.iceServers||iceServers;
+   if(c&&same(c)&&data.call){const call=data.call;if(call.state==='ended'){finish(c,call.reason==='declined'?'Call declined':call.reason==='expired'?'No answer or connection lost':'Call ended',false);return;}if(!c.incoming&&call.answer&&!c.pc.remoteDescription){await c.pc.setRemoteDescription({type:'answer',sdp:call.answer});if(!same(c))return;ring(true);if(!c.connectedAt)status.textContent='Connecting…';clearTimeout(c.deadline);if(!c.connectedAt)c.deadline=setTimeout(()=>same(c)&&failure(c,Error('The call could not connect on this network.')),45000);}if(call.state==='accepted'&&Date.now()-(c.heartbeat||0)>25000){c.heartbeat=Date.now();await api('/api/calls/'+c.id+'/heartbeat',{});}}
+   else if(!current){const call=data.calls?.find(x=>x.calleeId===uid&&x.state==='ringing');if(call){const incoming=current={...call,account:uid,person:call.caller,incoming:true,sent:true};show(incoming,true);el('.call-minimize').hidden=false;ring();incoming.deadline=setTimeout(()=>same(incoming)&&finish(incoming,'Missed call',true),Math.max(1000,call.expires-Date.now()));}}
+  }catch(e){if(current&&[401,404].includes(e.status))finish(current,'Call ended',false);}
+  finally{polling=false;clearTimeout(pollTimer);pollTimer=setTimeout(poll,current?2000:5000);}
+ }
+ function pollSoon(){clearTimeout(pollTimer);void poll();}
+ audioButton.onclick=()=>start(false);videoButton.onclick=()=>start(true);el('.answer-call').onclick=answer;
+ el('.end-call').onclick=()=>{if(current)finish(current,'Call ended',true,true);else{modal.hidden=true;returnFocus?.focus();}};
+ el('.mute-call').onclick=()=>{const tracks=current?.media?.getAudioTracks()||[],enabled=!tracks[0]?.enabled;tracks.forEach(t=>t.enabled=enabled);el('.mute-call').setAttribute('aria-pressed',String(!enabled));el('.mute-call').setAttribute('aria-label',enabled?'Mute microphone':'Unmute microphone');};
+ el('.camera-call').onclick=()=>{const tracks=current?.media?.getVideoTracks()||[],enabled=!tracks[0]?.enabled;tracks.forEach(t=>t.enabled=enabled);el('.camera-call').setAttribute('aria-pressed',String(!enabled));el('.camera-call').setAttribute('aria-label',enabled?'Turn camera off':'Turn camera on');};
+ el('.call-play').onclick=()=>remote.play().then(()=>el('.call-play').hidden=true).catch(()=>{});
+ el('.call-minimize').onclick=()=>{modal.hidden=true;resume.hidden=false;returnFocus?.focus();};resume.onclick=()=>{modal.hidden=false;resume.hidden=true;el('.end-call').focus();};
+ modal.addEventListener('keydown',e=>{if(e.key==='Tab'){const all=[...modal.querySelectorAll('button')].filter(b=>!b.hidden&&!b.disabled&&b.getClientRects().length),first=all[0],last=all.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}if(e.key==='Escape'&&current)el('.call-minimize').click();});
+ window.addEventListener('messages-conversation',e=>{conversation=e.detail;syncButtons();if(me()!==account)pollSoon();});
+ window.addEventListener('gsn-session-changed',()=>{if(current)finish(current,'Signed out',false,true);syncButtons();pollSoon();});window.addEventListener('storage',e=>{if(e.key==='gsn-chat-session-v1'&&current)finish(current,'Session changed',false,true);});
+ window.addEventListener('pagehide',()=>{clearTimeout(pollTimer);if(current)finish(current,'Call ended',true,true);});window.addEventListener('online',pollSoon);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pollSoon();});
+ pollSoon();
 })();
