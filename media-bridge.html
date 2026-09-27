@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b14;color:white}body{font:16px system-ui}iframe{position:fixed;inset:0;display:block;margin:0;border:0;width:100%;height:100%;background:#080b14}#status{position:fixed;inset:0;z-index:1;box-sizing:border-box;padding:24px;background:#080b14}</style></head><body><div id="status">Connecting…</div><script>
+<!doctype html><html><head><link rel="stylesheet" href="./apps/shared/app-scrollbars.css"><meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b14;color:white}body{font:16px system-ui}iframe{position:fixed;inset:0;display:block;margin:0;border:0;width:100%;height:100%;background:#080b14}#status{position:fixed;inset:0;z-index:1;box-sizing:border-box;padding:24px;background:#080b14}</style></head><body><div id="status">Connecting…</div><script>
 (()=>{'use strict';
  const params=new URLSearchParams(location.search),root=new URL('./',location.href),parentOrigin=params.get('parentOrigin');
  if(!parentOrigin||!/^https?:\/\//.test(parentOrigin))return;

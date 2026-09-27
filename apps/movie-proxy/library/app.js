@@ -581,6 +581,7 @@
     return wrapPlayerUrl(remote, resumeAt);
   }
   function wrapPlayerUrl(remote, resumeAt) {
+    if (window.GSN_MOVIE_PLAYER) return {srcdoc:window.GSN_MOVIE_PLAYER(remote, playerLoadId, Math.max(0, resumeAt || 0))};
     var player = new URL("../index.html", location.href);
     player.searchParams.set("url", remote);
     player.searchParams.set("consoleOrigin", location.origin);
@@ -624,6 +625,7 @@
     var progress = currentData().progress[activeTitle.id];
     var resumeAt = embeddedResumeAt || (progress ? progress.time : 0);
     var frame = $("[data-vidfast-player]");
+    frame.removeAttribute('srcdoc');
     frame.src = "about:blank";
     var loadId = ++playerLoadId;
     if (providerResolver) providerResolver.abort();
@@ -639,7 +641,8 @@
       })
     ]).then(function (url) {
       if (loadId !== playerLoadId || activePlayerMode !== 'embedded') return;
-      frame.src = url;
+      if (url && url.srcdoc) { frame.removeAttribute('src'); frame.srcdoc = url.srcdoc; }
+      else frame.src = url;
       setPlayerMessage('', false);
     }).catch(function (error) {
       if (loadId === playerLoadId) failEmbeddedPlayer(error.message);
@@ -1129,6 +1132,7 @@
       activePlayerMode = "video";
       $('[data-source-controls]').hidden = true;
       frame.hidden = true;
+      frame.removeAttribute('srcdoc');
       frame.src = "about:blank";
       video.hidden = false;
       startPlayerSource(0, resumeAt);
@@ -1158,6 +1162,7 @@
     video.load();
     video.hidden = false;
     frame.hidden = true;
+    frame.removeAttribute('srcdoc');
     frame.src = "about:blank";
     activePlayerMode = "";
     activePlayerProvider = window.MovieProviders.defaultId;
@@ -1440,7 +1445,7 @@
     });
     window.addEventListener("message", function (event) {
       var frame = $('[data-vidfast-player]');
-      if (activePlayerMode === 'embedded' && event.source === frame.contentWindow && event.origin === location.origin && String(event.data?.attempt) === String(playerLoadId)) {
+      if (activePlayerMode === 'embedded' && event.source === frame.contentWindow && event.origin === (window.GSN_MOVIE_ORIGIN || location.origin) && String(event.data?.attempt) === String(playerLoadId)) {
         if (event.data.type === 'movie-player-error') failEmbeddedPlayer(String(event.data.message || 'This source is unavailable.'));
         if (event.data.type === 'movie-playback-progress') {
           var time = Number(event.data.time), duration = Number(event.data.duration);

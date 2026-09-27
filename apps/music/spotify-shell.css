@@ -241,11 +241,11 @@ input:focus-visible {
   min-height: 0;
   padding: 18px 24px 38px !important;
   overflow-y: auto !important;
-  scrollbar-width: thin !important;
+  scrollbar-width: none !important;
   scrollbar-color: rgba(255,255,255,.28) transparent !important;
   background: transparent !important;
 }
-.content-area::-webkit-scrollbar { display: block !important; width: 10px; }
+.content-area::-webkit-scrollbar { display: none !important; width: 0; }
 .content-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,.28) !important; border: 2px solid transparent !important; background-clip: padding-box !important; }
 
 .music-welcome { margin-bottom: 28px; }
@@ -376,3 +376,4 @@ input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+

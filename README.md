@@ -17,3 +17,6 @@ Release v20260926-8 replaces the Arcade tile and loading-screen icon with the Ap
 Release v20260926-9 keeps the media loading screen within the viewport to remove the outer scrollbar.
 
 Release v20260926-10 implements restart, rest mode, and scoped browser data reset on power off.
+
+Release v20260926-11 hides app scrollbars while preserving wheel, touch and keyboard scrolling.
+
