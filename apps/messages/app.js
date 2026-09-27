@@ -314,7 +314,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-26/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-27/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -1145,7 +1145,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-26/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-27/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1605,12 +1605,19 @@
     finally { el.authSubmit.disabled = false; }
   }
 
-  async function logout() {
-    try { await api("/api/auth/logout", { method: "POST", body: {} }); } catch (error) {}
+  function logout() {
+    if(state.signingOut)return;state.signingOut=true;
+    enhanced.saveDraft();
     try { if (state.me) sessionStorage.removeItem('gsn-chat-warm:' + state.me.id); } catch {}
     if (state.socket) state.socket.close();
     window.clearInterval(state.pollTimer);
-    enhanced.saveDraft();location.reload();
+    // The bridge clears the local session synchronously; revocation continues
+    // in a keepalive request, even if Google's server is slow or unavailable.
+    void api("/api/auth/logout", { method: "POST", body: {} }).catch(function () {});
+    state.me=null;state.activeChannel=null;el.app.hidden=true;
+    document.querySelectorAll('.overlay,.dc-modal-backdrop,.dc-popout-backdrop,.dc-emoji-backdrop').forEach(function(node){node.hidden=true;});
+    setAuthMode('login');el.authPassword.value='';showOverlay(el.authOverlay);
+    location.reload();
   }
 
   function setAuthMode(mode) {

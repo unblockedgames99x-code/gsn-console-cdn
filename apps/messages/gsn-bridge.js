@@ -17,13 +17,18 @@
   const token=localStorage.getItem(key),method=options.method||'GET',version=epoch;
   const logout=path==='/api/auth/logout';
   if(logout){epoch++;localStorage.removeItem(key);me=null;pending.clear();window.dispatchEvent(new Event('gsn-session-changed'));}
+  // Anonymous startup must show the sign-in screen without waiting for a server.
+  if(!token&&!['/api/auth/login','/api/auth/register'].includes(path)){
+   if(logout)return {ok:true};
+   throw Object.assign(new Error('Sign in with your GSN Chat account.'),{status:401});
+  }
   const requestKey=method==='GET'?token+':'+path:null;
   if(requestKey&&pending.has(requestKey))return pending.get(requestKey);
   const execute=async()=>{
    if(!logout&&(epoch!==version||localStorage.getItem(key)!==token))throw Object.assign(new Error("Your session changed. Please try again."),{status:409});
    const headers=googleScript?{'Content-Type':'text/plain;charset=utf-8'}:{Accept:'application/json',...(token?{Authorization:'Bearer '+token}:{})};
    if(!googleScript&&options.body!==undefined)headers['Content-Type']='application/json';
-   const response=await fetch(googleScript?base:base+'/api/gsn-chat'+path,{method:googleScript?'POST':method,headers,body:googleScript?JSON.stringify({path,method,token,body:options.body}):options.body===undefined?undefined:JSON.stringify(options.body),credentials:'omit',cache:'no-store',redirect:'follow',signal:AbortSignal.timeout(googleScript?45000:15000)});
+   const response=await fetch(googleScript?base:base+'/api/gsn-chat'+path,{method:googleScript?'POST':method,headers,body:googleScript?JSON.stringify({path,method,token,body:options.body}):options.body===undefined?undefined:JSON.stringify(options.body),credentials:'omit',cache:'no-store',redirect:'follow',keepalive:logout,signal:AbortSignal.timeout(logout?10000:googleScript?45000:15000)});
    const payload=await response.json().catch(()=>({ok:false,error:'The GSN server returned an invalid response.'}));
    if(!logout&&(epoch!==version||localStorage.getItem(key)!==token))throw Object.assign(new Error('Your session changed. Please try again.'),{status:409});
    if(!response.ok||payload.ok===false)throw Object.assign(new Error(payload.error||'GSN Chat is unavailable.'),{status:payload.status||response.status});
@@ -36,7 +41,8 @@
   // only read-only requests may be retried automatically after transient failures.
   const run=async()=>{for(let attempt=0;;attempt++){try{return await execute();}catch(error){if(method!=='GET'||attempt>=2||![429,500,503].includes(error.status))throw error;await new Promise(r=>setTimeout(r,1000*2**attempt));}}};
   const write=method!=='GET'&&!/\/read$/.test(path);
-  const task=googleScript?schedule(run,write,options.priority==='foreground'):run();
+  // Revocation must bypass a stalled read/write lane and survive the reload.
+  const task=googleScript&&!logout?schedule(run,write,options.priority==='foreground'):run();
   if(requestKey)pending.set(requestKey,task);
   try{return await task;}finally{if(pending.get(requestKey)===task)pending.delete(requestKey);}
  }
