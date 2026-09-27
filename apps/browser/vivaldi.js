@@ -89,45 +89,6 @@
   syncEngine();
   $('b-wisp').insertAdjacentHTML('beforeend','<span>Server</span>');
   $('wisp-panel').querySelector('.wisp-panel-title span').textContent = 'Scramjet · Proxy server';
-  const start = $('new-tab');
-  start.insertAdjacentHTML('beforeend', '<button class="cbtn start-settings-button" id="start-settings-button" aria-label="Start page settings" aria-expanded="false" aria-controls="start-settings"><i class="ri-settings-3-line"></i></button><section class="start-settings" id="start-settings" aria-label="Start page settings" hidden><strong>Start Page</strong><label><input type="checkbox" id="show-wallpaper" checked> Show wallpaper</label><label><input type="checkbox" id="show-clock"> Clock widget</label></section><div class="clock-widget" id="clock-widget" hidden><time></time><div></div></div><div class="start-actions"><button id="add-shortcut">＋ Shortcut</button><button id="add-widget">＋ Widget</button></div>');
-  $('add-shortcut').addEventListener('click', () => window.NEO_BOOKMARK_DIALOG.open());
-  let clockTimer;
-  function clockTick() {
-    clearTimeout(clockTimer);
-    if ($('clock-widget').hidden || document.hidden) return;
-    const now = new Date();
-    $('clock-widget').querySelector('time').textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    $('clock-widget').querySelector('div').textContent = now.toLocaleDateString([], {weekday:'long',month:'long',day:'numeric'});
-    clockTimer = setTimeout(clockTick, 60000 - now.getSeconds()*1000);
-  }
-  function setClock(show) {
-    $('clock-widget').hidden = !show;
-    $('show-clock').checked = show;
-    try { localStorage.setItem('neo:browser:clock', String(show)); } catch {}
-    clockTick();
-  }
-  $('add-widget').addEventListener('click', () => setClock($('clock-widget').hidden));
-  $('show-clock').addEventListener('change', event => setClock(event.target.checked));
-  $('show-wallpaper').addEventListener('change', event => {
-    start.classList.toggle('no-wallpaper', !event.target.checked);
-    try { localStorage.setItem('neo:browser:wallpaper', String(event.target.checked)); } catch {}
-  });
-  function closeSettings() { $('start-settings').hidden = true; $('start-settings-button').setAttribute('aria-expanded','false'); }
-  $('start-settings-button').addEventListener('click', () => {
-    $('start-settings').hidden = !$('start-settings').hidden;
-    $('start-settings-button').setAttribute('aria-expanded',String(!$('start-settings').hidden));
-  });
-  document.addEventListener('pointerdown', event => { if (!event.target.closest('#start-settings,#start-settings-button')) closeSettings(); });
-  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeSettings(); });
-  document.addEventListener('visibilitychange', clockTick);
-  window.addEventListener('pagehide', () => clearTimeout(clockTimer));
-  try {
-    setClock(localStorage.getItem('neo:browser:clock') === 'true');
-    const wallpaper = localStorage.getItem('neo:browser:wallpaper') !== 'false';
-    $('show-wallpaper').checked = wallpaper;
-    start.classList.toggle('no-wallpaper', !wallpaper);
-  } catch {}
   // Update only tab labels; no whole-page observers or idle polling.
   function nameStartTabs() {
     $('tabbar').querySelectorAll('.ttl').forEach(label => {

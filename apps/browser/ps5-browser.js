@@ -4,8 +4,6 @@
   document.documentElement.style.colorScheme = "dark";
   document.querySelector(".nt-logo").innerHTML = 'Browser<small>by &lt;GSN&gt;</small>';
   document.querySelector(".nt-section-title").textContent = "Your favorites";
-  $("add-shortcut").textContent = "+ Add favorite";
-  $("add-widget").textContent = "+ Clock";
   $("url").setAttribute("aria-label", "Search or enter a web address");
   $("nt-input").setAttribute("aria-label", "Search the web");
   $("b-wisp").setAttribute("aria-label", "Connection settings");

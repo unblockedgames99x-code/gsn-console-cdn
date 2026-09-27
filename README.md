@@ -63,3 +63,6 @@ Release v20260927-11: remove inherited sandbox restrictions from StarStream Movi
 
 Release v20260927-12: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
 Release v20260927-12: remove Browser title/logo/clock header and align connection settings to the remaining toolbar.
+
+Release v20260927-13: preserve the CDN launcher during Browser startup, retain HTML/API routing in nested workers, and wait for the Movies worker to activate.
+Release v20260927-13: remove the extra start-page action buttons, settings gear/menu, and clock widget.
