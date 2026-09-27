@@ -147,8 +147,9 @@ html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-b
 .dc-emoji-preview{font-size:28px}
 .dc-emoji-footer>span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dc-emoji-footer select{width:100px;min-width:0;padding:5px;border:0;background:#2b2d31;color:#dbdee1;font-size:11px}
-.discord-rail #discordAddServer{color:#23a55a;background:#232428;font-size:32px;font-weight:300;line-height:1;border-radius:50%;margin-top:8px}
-.discord-rail #discordAddServer:hover,.discord-rail #discordAddServer:focus-visible{background:#23a55a;color:white;border-radius:16px}
+.discord-rail #discordAddServer{color:#ebedf0;background:#222225;display:grid;place-items:center;padding:0;border:0;border-radius:12px;margin-top:0}
+.discord-rail #discordAddServer svg{width:20px;height:20px;fill:currentColor;stroke:none}
+.discord-rail #discordAddServer:hover,.discord-rail #discordAddServer:focus-visible{background:#323338;color:#fff;border-radius:12px}
 .discord-rail .dc-custom-server{background:#313338;color:#dbdee1;font-size:16px;font-weight:700}
 .discord-rail .dc-custom-server[aria-current=true],.discord-rail .dc-custom-server:hover{background:#5865f2;color:white;border-radius:16px}
 .dc-server-dialog{width:440px;max-width:calc(100vw - 24px);border-radius:8px;background:#313338;padding:24px}
@@ -161,3 +162,10 @@ html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-b
 .dc-server-dialog .dc-server-submit{display:block;width:100%;background:#5865f2;color:white;border:0;margin:12px 0;min-height:42px;font-weight:600}
 .dc-server-dialog .dc-server-submit:disabled{opacity:.6;cursor:wait}
 .dc-server-dialog>button:last-child{display:block;width:100%;background:#232428;border:0;margin-top:12px;min-height:40px}
+
+.dc-server-dialog button.dc-server-emblem{padding:0;background:transparent;border:2px dashed #80848e;cursor:pointer;overflow:hidden;color:#dbdee1;display:grid;place-items:center;flex:none}
+.dc-server-dialog button.dc-server-emblem:hover{border-color:#ebedf0;color:#fff;background:#383a40}
+.dc-server-emblem img{width:100%;height:100%;object-fit:cover;display:block}
+.dc-server-dialog button.dc-server-emblem.has-icon{border:0}
+.dc-server-dialog .dc-remove-server-icon{display:block;margin:0 auto;padding:0;border:0;background:none;font-size:12px;color:#b5bac1;min-height:24px}
+.dc-server-dialog .dc-remove-server-icon[hidden]{display:none}

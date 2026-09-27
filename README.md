@@ -89,3 +89,6 @@ Release v20260927-21: prioritize message sends over background reads, reduce pre
 Release v20260927-22: immediate durable message composing, faster conversation-first startup and tab-local cache, anchored emoji picker with categories/search/skin tones.
 
 Release v20260927-23: create and join private GSN servers from the new plus button; persistent server rail, default general channel, owner invite codes and backend membership checks.
+
+Release v20260927-24: updated console and app assets.
+Release v20260927-24: working server icon picker with square previews and persistent icons; matched white circled-plus Add Server button. Google Chat backend version 12.

@@ -80,14 +80,14 @@
   document.getElementById('discordHome').onclick=()=>setSpace('home','friends');document.getElementById('discordCommunity').onclick=()=>selectServer('community');
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{setSpace('home',b.dataset.view);}));
   function setSpace(value,view='chats',friendTab){if(value==='home'&&view!=='chats')social.show(friendTab|| (view==='requests'?'pending':'all'));else social.hide();space=value;state.activeView=view;el.app.dataset.space=value;document.querySelector('.sidebar-title h1').textContent=value==='home'?'Direct Messages':serverTitle();document.getElementById('discordHome').setAttribute('aria-current',String(value==='home'));document.getElementById('discordCommunity').setAttribute('aria-current',String(value==='community'&&state.activeServerId==='community'));c.renderSidebar();}
-  const addServer=button('Add a server',null,()=>serverDialog());addServer.id='discordAddServer';addServer.textContent='+';document.querySelector('.discord-rail').append(addServer);
+  const addServer=button('Add a server',null,()=>serverDialog());addServer.id='discordAddServer';addServer.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10 1a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM9 5v4H5v2h4v4h2v-4h4V9h-4V5Z"/></svg>';document.querySelector('.discord-rail').append(addServer);
   let serverSignature='';
   function serverTitle(){return state.servers.find(s=>s.id===state.activeServerId)?.name||'GSN Community';}
   function selectServer(id){el.searchInput.value='';state.activeServerId=id;setSpace('community');const room=state.channels.find(ch=>ch.kind==='server'&&(ch.serverId||'community')===id);if(room)c.openChannel(room.id);}
   function renderServers(){
    const signature=JSON.stringify([state.servers,state.activeServerId,space]);if(signature===serverSignature)return;serverSignature=signature;
    document.querySelectorAll('.dc-custom-server').forEach(b=>b.remove());
-   for(const server of state.servers){const b=button(server.name,null,()=>selectServer(server.id));b.className='dc-custom-server';b.textContent=server.name.split(/\s+/).slice(0,2).map(word=>Array.from(word)[0]).join('').toUpperCase();b.setAttribute('aria-current',String(space==='community'&&server.id===state.activeServerId));addServer.before(b);}
+   for(const server of state.servers){const b=button(server.name,null,()=>selectServer(server.id));b.className='dc-custom-server';b.textContent=server.name.split(/\s+/).slice(0,2).map(word=>Array.from(word)[0]).join('').toUpperCase();if(server.icon){const image=node('img');image.src=server.icon;image.alt='';image.onerror=()=>{image.remove();b.textContent=server.name.slice(0,2).toUpperCase();};b.replaceChildren(image);}b.setAttribute('aria-current',String(space==='community'&&server.id===state.activeServerId));addServer.before(b);}
    document.getElementById('discordCommunity').setAttribute('aria-current',String(space==='community'&&state.activeServerId==='community'));
    if(space==='community')document.querySelector('.sidebar-title h1').textContent=serverTitle();
   }
@@ -98,12 +98,23 @@
   }
   function serverDialog(join=false){
    const panel=dialog(join?'Join a Server':'Create Your Server','dc-server-dialog');
-   const emblem=node('div','dc-server-emblem',join?'↗':'+');panel.append(emblem,node('p','dc-server-description',join?'Enter an invite code from a server owner.':'Give your friends a place to hang out. Your server starts with a #general channel.'));
+   let serverIcon='',preparingIcon=false;
+   const emblem=join?node('div','dc-server-emblem','↗'):button('Upload server icon',null,()=>iconInput.click());emblem.classList.add('dc-server-emblem');if(!join)emblem.textContent='+';
+   const iconInput=node('input');iconInput.type='file';iconInput.accept='image/png,image/jpeg,image/webp,image/gif';iconInput.hidden=true;iconInput.setAttribute('aria-label','Choose server icon');
+   const removeIcon=button('Remove server icon',null,()=>{serverIcon='';iconInput.value='';emblem.textContent='+';emblem.classList.remove('has-icon');emblem.setAttribute('aria-label','Upload server icon');emblem.title='Upload server icon';removeIcon.hidden=true;});removeIcon.classList.add('dc-remove-server-icon');removeIcon.hidden=true;
+   panel.append(emblem,iconInput,removeIcon,node('p','dc-server-description',join?'Enter an invite code from a server owner.':'Give your friends a place to hang out. Your server starts with a #general channel.'));
    const form=node('form'),label=node('label','dc-server-label',join?'INVITE CODE':'SERVER NAME'),input=node('input','dc-search-input'),status=node('p','dc-server-status');
    input.required=true;input.maxLength=join?64:80;input.setAttribute('aria-label',join?'Invite code':'Server name');input.placeholder=join?'Paste an invite code':state.me?.displayName+"’s server";label.append(input);status.setAttribute('role','status');
    const submit=button(join?'Join Server':'Create',null);submit.type='submit';submit.classList.add('dc-server-submit');form.append(label,status,submit);panel.append(form,button(join?'Create my own server':'Have an invite? Join a Server',null,()=>serverDialog(!join)));
-   form.onsubmit=async event=>{event.preventDefault();const value=input.value.trim();if(!value||submit.disabled)return;const account=state.me?.id;submit.disabled=true;status.textContent=join?'Joining server…':'Creating your server…';
-    try{const result=await c.api(join?'/api/servers/join':'/api/servers',{method:'POST',body:join?{inviteCode:value}:{name:value}});if(state.me?.id!==account)return;if(!result.server?.id)throw Error('The server did not confirm the change.');acceptServer(result);}
+   iconInput.onchange=async()=>{const file=iconInput.files?.[0];if(!file)return;preparingIcon=true;submit.disabled=true;emblem.disabled=true;status.textContent='Preparing server icon…';
+    try{if(!/^image\/(png|jpeg|webp|gif)$/.test(file.type)||file.size>10*1024*1024)throw Error('Choose a PNG, JPG, WebP or GIF under 10 MB.');
+     let preparedIcon;const image=await createImageBitmap(file);try{const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const ctx=canvas.getContext('2d'),side=Math.min(image.width,image.height);ctx.drawImage(image,(image.width-side)/2,(image.height-side)/2,side,side,0,0,256,256);preparedIcon=canvas.toDataURL('image/webp',.86);}finally{image.close();}
+     if(preparedIcon.length>200000)throw Error('This image is too detailed. Choose a smaller image.');
+     serverIcon=preparedIcon;const preview=node('img');preview.src=serverIcon;preview.alt='Selected server icon';emblem.replaceChildren(preview);emblem.classList.add('has-icon');emblem.setAttribute('aria-label','Change server icon');emblem.title='Change server icon';removeIcon.hidden=false;status.textContent='';
+    }catch(error){status.textContent=error.message||'That image could not be opened.';}finally{preparingIcon=false;submit.disabled=false;emblem.disabled=false;iconInput.value='';}
+   };
+   form.onsubmit=async event=>{event.preventDefault();const value=input.value.trim();if(!value||submit.disabled||preparingIcon)return;const account=state.me?.id;submit.disabled=true;status.textContent=join?'Joining server…':'Creating your server…';
+    try{const result=await c.api(join?'/api/servers/join':'/api/servers',{method:'POST',body:join?{inviteCode:value}:{name:value,icon:serverIcon}});if(state.me?.id!==account)return;if(!result.server?.id)throw Error('The server did not confirm the change.');acceptServer(result);}
     catch(error){if(panel.isConnected){status.textContent=error.message;submit.disabled=false;}}
    };queueMicrotask(()=>input.focus());
   }
