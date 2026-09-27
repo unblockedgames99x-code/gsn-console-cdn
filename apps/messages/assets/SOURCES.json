@@ -1,0 +1,54 @@
+{
+  "icons": {
+    "repository": "https://github.com/ionic-team/ionicons",
+    "commit": "d1e2c48641fd5f4910ee42a144dc1c84b1a9a4ee",
+    "license": "MIT"
+  },
+  "files": [
+    {
+      "file": "ionicons-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/ionic-team/ionicons/d1e2c48641fd5f4910ee42a144dc1c84b1a9a4ee/LICENSE",
+      "sha256": "c89dabc60b2e4e1a04b33bd7010b5a56bb4725ffe8c00d793a5ae009fbbfebd8"
+    },
+    {
+      "file": "notification.wav",
+      "source": "https://raw.githubusercontent.com/Calinou/kenney-interface-sounds/4596a49eaf5a533948d49a47467f606bcdea70ff/addons/kenney_interface_sounds/confirmation_002.wav",
+      "sha256": "b23339f3fdcd9f54520ca73caa3a9ae93ecfb3675acdaf1468990feb5d55d5fa"
+    },
+    {
+      "file": "sent.wav",
+      "source": "https://raw.githubusercontent.com/Calinou/kenney-interface-sounds/4596a49eaf5a533948d49a47467f606bcdea70ff/addons/kenney_interface_sounds/select_001.wav",
+      "sha256": "3d9e86003f8ebd1a3f6f3d8af65b6b682562a46d532ccd204dcba21305b950ff"
+    },
+    {
+      "file": "kenney-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/Calinou/kenney-interface-sounds/4596a49eaf5a533948d49a47467f606bcdea70ff/LICENSE.txt",
+      "sha256": "f7966c773bbed0eca6a9c75081c44a178b38eae112724dbb5fdfbd4192d118a9"
+    },
+    {
+      "file": "noto-sans-400.woff2",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.3.0/files/noto-sans-latin-400-normal.woff2",
+      "sha256": "09aee8065d25508f23a4c3d92cd777ac869c52d93fd868a88f025d888a7937d6"
+    },
+    {
+      "file": "noto-sans-500.woff2",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.3.0/files/noto-sans-latin-500-normal.woff2",
+      "sha256": "1d35aaecc5c7a375d87c12787e1e4c5d6a695315b757e1e18a479d1a2f84e973"
+    },
+    {
+      "file": "noto-sans-600.woff2",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.3.0/files/noto-sans-latin-600-normal.woff2",
+      "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed"
+    },
+    {
+      "file": "noto-sans-700.woff2",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.3.0/files/noto-sans-latin-700-normal.woff2",
+      "sha256": "e77bfe1db912f687b0319b60de158cfada67f89c8ee4f8e2bd6020f970accbfb"
+    },
+    {
+      "file": "noto-sans-LICENSE.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.3.0/LICENSE",
+      "sha256": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1"
+    }
+  ]
+}

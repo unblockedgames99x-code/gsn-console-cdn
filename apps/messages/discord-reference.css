@@ -1,0 +1,120 @@
+/* Measured against the supplied 2559 × 1439 Discord desktop capture.
+   Branding and data remain GSN. Font: Noto Sans (OFL), Discord's documented fallback. */
+@font-face{font-family:GSNChat;src:url('./assets/noto-sans-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:GSNChat;src:url('./assets/noto-sans-500.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:GSNChat;src:url('./assets/noto-sans-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:GSNChat;src:url('./assets/noto-sans-700.woff2') format('woff2');font-weight:700;font-display:swap}
+html[data-neo-app=chat][data-chat-layout=discord]{--dc-rail:72px;--dc-sidebar:304px;--dc-members:264px;--dc-header:48px;--dc-top:32px;--dc-bg:#1a1a1e;--dc-panel:#1a1a1e;--dc-sidebar-bg:#121214;--dc-rail-bg:#121214;--dc-text:#dbdee1;--dc-muted:#94959c;--dc-hover:#25262b;--dc-selected:#2c2d32;--dc-border:#25262b;--dc-white:#f2f3f5;--dc-composer:#222327;--dc-account:#202024;--dc-accent:#5865f2;--dc-group-gap:16px;--dc-line:22px;font-family:GSNChat,'Segoe UI',sans-serif}
+html[data-dc-theme=ash]{--dc-bg:#313338!important;--dc-panel:#2b2d31!important;--dc-sidebar-bg:#2b2d31!important;--dc-rail-bg:#1e1f22!important;--dc-composer:#383a40!important;--dc-border:#3f4147!important;--dc-account:#232428!important;--dc-selected:#404249!important}
+html[data-dc-theme=onyx]{--dc-bg:#0b0b0c!important;--dc-panel:#0b0b0c!important;--dc-sidebar-bg:#070708!important;--dc-rail-bg:#070708!important;--dc-composer:#171719!important;--dc-account:#19191c!important}
+html[data-neo-app=chat][data-chat-layout=discord][data-dc-density=compact]{--dc-group-gap:8px;--dc-line:20px}
+html[data-neo-app=chat][data-chat-layout=discord][data-dc-density=spacious]{--dc-group-gap:24px;--dc-line:26px}
+html[data-neo-app=chat][data-chat-layout=discord] :is(body,.app,.dc-dialog,.overlay,button,input,textarea,select){font-family:GSNChat,'Segoe UI',sans-serif}
+html[data-neo-app=chat][data-chat-layout=discord] .app{position:fixed;inset:var(--dc-top) 0 0;height:calc(100dvh - var(--dc-top));width:100%;font-size:14px;line-height:1.375;border:0;border-radius:0}
+.dc-titlebar{position:fixed;top:0;left:0;right:0;height:32px;background:var(--dc-rail-bg);display:flex;align-items:center;justify-content:space-between;z-index:55;padding:0 10px;color:var(--dc-muted);font-size:12px}
+.dc-titlebar .dc-button{width:28px;height:28px;min-height:28px;padding:6px;color:var(--dc-muted)}
+.dc-titlebar .dc-button svg{width:16px;height:16px}
+.dc-titlebar .dc-button:disabled{opacity:.25}
+.dc-titlebar .dc-mobile-drawer{display:none}
+.dc-history,.dc-window-actions{display:flex;gap:2px}.dc-window-heading{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;pointer-events:none}
+.dc-window-heading img{width:16px;height:16px;border-radius:4px}.dc-window-title{font-size:12px;font-weight:600;color:#b5bac1;white-space:nowrap}
+html[data-neo-app=chat][data-chat-layout=discord] :is(.dc-button,.icon-button,.composer-tool,.send-button,.message-tools button,.view-tabs button) svg{fill:currentColor;stroke:none;width:22px;height:22px}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail{padding:0 0 76px;gap:8px;border:0}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button{width:40px;height:40px;min-height:40px;flex:0 0 40px;border-radius:12px;position:relative;background:#242529;color:#dbdee1;box-shadow:none;outline-offset:3px}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button img{width:100%;height:100%;border-radius:inherit;object-fit:cover;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button::before{left:-16px}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button:hover,html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button[aria-current=true]{border-radius:12px;background:#5865f2}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail button[aria-current=true]::before{height:32px}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail svg{fill:currentColor;stroke:none;width:24px;height:24px}
+html[data-neo-app=chat][data-chat-layout=discord] .discord-rail hr{width:32px;height:1px;min-height:1px;margin:0;border:0;background:#292a2f}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar{width:100%;padding-bottom:76px;border-top:1px solid var(--dc-border);border-left:1px solid var(--dc-border);border-radius:8px 0 0 0}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title{padding:0 16px;height:48px;gap:8px;position:relative;cursor:pointer}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title h1{font-size:16px;font-weight:600;flex:1;max-width:calc(100% - 34px);overflow:hidden;text-overflow:ellipsis;line-height:24px}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title:hover{background:#ffffff04}
+.dc-community-menu{padding:4px;width:26px;min-height:26px;color:var(--dc-text)}.dc-community-menu svg{width:16px!important;height:16px!important}
+html[data-neo-app=chat][data-chat-layout=discord] .app[data-space=community] :is(.sidebar>.search-box,.sidebar-title .compose-button){display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .connection-label{position:absolute;right:4px;top:4px;width:4px;height:4px;opacity:.65}
+html[data-neo-app=chat][data-chat-layout=discord] .connection-label.connected{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .app[data-space=home] .sidebar-title{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .app[data-space=home] .sidebar>.search-box{order:-1;margin:10px 12px 14px;height:28px;min-height:28px;border-radius:4px;background:#202024;border:1px solid #ffffff06;padding:0 8px}
+html[data-neo-app=chat][data-chat-layout=discord] .view-tabs{margin:0 8px 8px;min-height:96px;gap:2px}
+html[data-neo-app=chat][data-chat-layout=discord] .view-tabs button{height:40px;padding:8px 12px;font-size:15px;gap:14px;border-radius:6px}
+html[data-neo-app=chat][data-chat-layout=discord] .sidebar-content{padding:0 8px 12px}
+html[data-neo-app=chat][data-chat-layout=discord] .section-label{font-size:12px;line-height:16px;font-weight:500;margin:24px 4px 6px;letter-spacing:0;text-transform:none}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row{margin:1px 0;padding:4px 8px;min-height:32px;height:32px;border-radius:6px;gap:8px}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row .row-copy > span{font-size:15px;font-weight:500}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation-row[data-kind=dm]{height:42px;min-height:42px;margin:2px 0}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-social-open .conversation-row.active{background:transparent}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar{position:absolute;left:8px;bottom:8px;width:calc(var(--dc-rail) + var(--dc-sidebar) - 16px);height:58px;min-height:58px;padding:8px;background:var(--dc-account);border:1px solid #ffffff04;border-radius:8px;z-index:48;gap:8px;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar .avatar-button{width:36px;height:36px;padding:0;flex:0 0 36px;border-radius:50%;background:transparent}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar .avatar{width:36px;height:36px;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .account-copy{flex:1;overflow:hidden}.account-copy strong{font-weight:600;font-size:13px}.account-copy small{font-size:11px;color:var(--dc-muted)}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar .dc-button{margin:0;width:32px;height:32px;padding:6px;flex:0 0 32px;color:#b5bac1}
+html[data-neo-app=chat][data-chat-layout=discord] .account-bar .dc-sound-button[aria-pressed=true]{color:#f57980;background:#f5798018}
+.dc-sidebar-resizer{position:absolute;top:48px;bottom:76px;left:calc(var(--dc-rail) + var(--dc-sidebar) - 3px);width:6px;cursor:col-resize;z-index:15;touch-action:none}
+.dc-sidebar-resizer:hover,.dc-sidebar-resizer:focus-visible{background:#5865f277}
+html[data-neo-app=chat][data-chat-layout=discord] .chat-view{padding-top:48px;box-sizing:border-box}
+html[data-neo-app=chat][data-chat-layout=discord] .chat-header{position:fixed;top:32px;left:calc(var(--dc-rail) + var(--dc-sidebar));right:0;height:48px;z-index:25;padding:0 16px;gap:12px;background:var(--dc-bg)}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person strong{font-size:16px;font-weight:600}
+html[data-neo-app=chat][data-chat-layout=discord] .header-person small{font-size:13px;max-width:420px}
+html[data-neo-app=chat][data-chat-layout=discord] .header-actions{gap:12px}
+html[data-neo-app=chat][data-chat-layout=discord] .header-actions .dc-button{color:#a4a5ad;width:28px;min-height:28px;padding:3px}
+html[data-neo-app=chat][data-chat-layout=discord] .header-actions .dc-button:hover{background:transparent;color:#f2f3f5}
+html[data-neo-app=chat][data-chat-layout=discord] .header-actions .dc-search-button{width:224px;height:28px;min-height:28px;border:1px solid #303136;border-radius:6px;background:#18191c;padding:3px 7px;font-size:12px}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-search-button svg{width:16px;height:16px}
+html[data-neo-app=chat][data-chat-layout=discord] #infoButton{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-members{background:var(--dc-panel);padding-top:48px;border-color:var(--dc-border)}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-member-heading{height:48px;padding:20px 16px 8px;font-size:12px;font-weight:500;letter-spacing:0}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-member-heading strong{font-weight:500}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-member{font-size:14px;font-weight:500;gap:12px;padding:4px 8px;border-radius:6px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group{min-height:var(--dc-line);padding-right:24px;padding-left:16px;gap:16px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group.group-start{padding-top:var(--dc-group-gap);min-height:calc(44px + var(--dc-group-gap))}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group:has(.message-reply-preview)>.message-avatar{margin-top:20px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-bubble{font-size:16px;line-height:var(--dc-line);font-weight:400}
+html[data-neo-app=chat][data-chat-layout=discord] .message-author{font-size:15px;line-height:22px;font-weight:600}
+html[data-neo-app=chat][data-chat-layout=discord] .message-meta{top:2px;left:4px;width:56px;line-height:22px;font-size:10px;color:var(--dc-muted)}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group:focus-within .message-meta{opacity:1}
+html[data-neo-app=chat][data-chat-layout=discord] .message-tools{top:-14px!important;right:16px;transform:translateY(2px);border:1px solid #36373c;border-radius:6px;padding:2px;box-shadow:0 2px 4px #0005;background:var(--dc-composer)}
+html[data-neo-app=chat][data-chat-layout=discord] .message-tools button{width:32px;height:28px;padding:4px;color:#b5bac1;border-radius:4px}
+html[data-neo-app=chat][data-chat-layout=discord] .message-tools svg{width:20px;height:20px;fill:currentColor;stroke:none}
+html[data-neo-app=chat][data-chat-layout=discord] .message-tools button:hover{color:white;background:#ffffff12}
+html[data-neo-app=chat][data-chat-layout=discord] .message-reply-preview{position:relative;font-size:12px;line-height:18px;margin-bottom:2px;padding:0;color:#a3a4ac}
+html[data-neo-app=chat][data-chat-layout=discord] .reply-preview-arrow{position:absolute;width:30px;height:14px;left:-40px;top:8px;border-top:2px solid #55565d;border-left:2px solid #55565d;border-radius:6px 0 0 0;font-size:0}
+html[data-neo-app=chat][data-chat-layout=discord] .composer{margin:12px 8px 4px;padding:0 12px;height:auto;min-height:56px;border-radius:8px;border:1px solid #ffffff04;background:var(--dc-composer);gap:12px;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] #messageInput{padding:15px 0;font-size:15px;line-height:24px;min-height:54px;color:var(--dc-text)}
+html[data-neo-app=chat][data-chat-layout=discord] #messageInput::placeholder{color:#74757d}
+html[data-neo-app=chat][data-chat-layout=discord] .composer-tool{width:24px;height:32px;flex:0 0 24px;padding:0;color:#b5bac1;border:0;border-radius:4px;background:none;box-shadow:none}
+html[data-neo-app=chat][data-chat-layout=discord] .composer .emoji-button{position:static;transform:none;margin:0;padding:0;align-self:center}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-gif-button{background:#b5bac1;color:#222327;border:0;height:18px;min-height:18px;border-radius:3px;font-size:10px;font-weight:700;width:22px;padding:1px;line-height:16px}
+html[data-neo-app=chat][data-chat-layout=discord] .send-button{width:28px;height:28px;color:#b5bac1}
+html[data-neo-app=chat][data-chat-layout=discord] .send-button:disabled{opacity:.3}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-compose-feedback:empty{min-height:2px;height:2px;margin-bottom:0}
+html[data-neo-app=chat][data-chat-layout=discord] .message-group.is-mentioned{background:#f0b2320f}
+html[data-neo-app=chat][data-chat-layout=discord] .avatar{background:var(--avatar-color,#5865f2);box-shadow:none}
+.dc-shell-menu{width:228px;padding:6px;background:#111214;border:1px solid #303136;border-radius:8px}
+.dc-shell-menu .dc-button{height:34px;justify-content:space-between;font-size:13px;padding:6px 8px;color:#b5bac1}
+.dc-shell-menu .dc-button:hover{background:#5865f2;color:white}.dc-shell-menu svg{width:18px;height:18px}
+.dc-inbox{width:440px}.dc-inbox>.dc-button{width:100%;justify-content:flex-start}.dc-inbox .unread-badge{margin-left:auto}.dc-inbox-empty{padding:64px 20px;text-align:center;color:var(--dc-muted)}
+.dc-shortcut{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid #ffffff0c}.dc-shortcut kbd{background:#111214;border:1px solid #42434a;border-bottom-width:3px;padding:4px 7px;border-radius:4px;font:11px GSNChat,sans-serif}
+.dc-settings-dialog{width:960px;max-width:calc(100vw - 32px);height:720px;max-height:90dvh;padding:0;border:1px solid #35363c;border-radius:8px;background:var(--dc-bg)}
+.dc-settings-dialog>.dc-dialog-heading{padding:16px 24px;margin:0;border-bottom:1px solid var(--dc-border)}
+.dc-settings-layout{display:grid;grid-template-columns:210px minmax(0,1fr);height:calc(100% - 64px);min-height:0}
+.dc-settings-nav{background:var(--dc-sidebar-bg);padding:24px 12px;display:flex;flex-direction:column;gap:3px}.dc-settings-nav h3{font-size:11px;color:var(--dc-muted);margin:0 12px 8px}.dc-settings-nav .dc-button{justify-content:flex-start;font-size:14px;padding:8px 12px;gap:10px}.dc-settings-nav .dc-button[aria-current=true]{background:var(--dc-selected);color:white}
+.dc-settings-content{padding:28px 32px;overflow:auto}.dc-settings-content>h2{margin:0 0 24px;font-size:20px}.dc-settings-content>h3{font-size:15px;margin:24px 0 14px}.dc-account-card{background:var(--dc-sidebar-bg);border-radius:8px;overflow:hidden;padding-bottom:20px}.dc-account-banner{height:100px;background:#454e72}.dc-account-identity{display:flex;align-items:center;gap:16px;padding:0 20px;margin-top:-24px}.dc-account-identity .avatar{width:80px;height:80px;border:6px solid var(--dc-sidebar-bg);flex:0 0 80px;font-size:28px}.dc-account-identity h3{font-size:19px;margin-top:30px;overflow-wrap:anywhere}.dc-account-fields{margin:20px;padding:16px;background:var(--dc-bg);border-radius:8px}.dc-account-fields small{font-size:11px;color:var(--dc-muted);font-weight:700}.dc-account-fields p{font-size:14px;margin:6px 0 18px}.dc-account-fields p:last-child{margin-bottom:0}.dc-account-card>.dc-button{margin:0 20px;background:var(--dc-accent);color:white}
+.dc-setting-row{display:flex;gap:24px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--dc-border);padding:20px 0}.dc-setting-row span{display:grid;gap:8px}.dc-setting-row strong{font-size:15px;font-weight:500}.dc-setting-row small{font-size:12px;color:var(--dc-muted)}.dc-setting-row input{appearance:none;width:40px;height:24px;flex:0 0 40px;border-radius:12px;background:#686970;position:relative;cursor:pointer;border:0}.dc-setting-row input::after{content:'';position:absolute;width:18px;height:18px;top:3px;left:3px;border-radius:50%;background:white;transition:transform .15s}.dc-setting-row input:checked{background:#5865f2}.dc-setting-row input:checked::after{transform:translateX(16px)}
+.dc-theme-choices,.dc-density-choices{display:flex;gap:12px}.dc-theme-choices .dc-button{height:76px;width:110px;border:2px solid transparent;background:#121214;color:white;align-items:flex-end;padding:10px}.dc-theme-choices [data-theme=ash]{background:#34353a}.dc-theme-choices [data-theme=onyx]{background:#000}.dc-theme-choices .dc-button[aria-pressed=true],.dc-density-choices .dc-button[aria-pressed=true]{border:2px solid #8891ff}.dc-density-choices .dc-button{border:2px solid #36373c;background:#25262b;flex:1;height:44px}
+.dc-settings-note{margin-top:24px;font-size:12px;color:var(--dc-muted)}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-profile{padding:0 16px 16px;width:340px;background:#202024;border:1px solid #32333a;border-radius:12px;overflow:hidden}
+.dc-profile>.dc-dialog-heading{height:0;margin:0;position:relative;z-index:2}.dc-profile>.dc-dialog-heading h2{display:none}.dc-profile>.dc-dialog-heading>.dc-button{position:absolute;right:-6px;top:6px;width:28px;min-height:28px;padding:4px;background:#0006;border-radius:50%}
+.dc-profile .dc-profile-banner{margin:0 -16px 52px;height:104px;background:#454e72}.dc-profile .dc-profile-avatar{left:16px;bottom:-38px;width:88px!important;height:88px!important;border:6px solid #202024}.dc-profile h3{font-size:22px;font-weight:700;margin-top:0}.dc-profile h4{margin-top:20px}.dc-profile>.dc-button{border-radius:6px;background:#32333a;min-height:32px;padding:8px 14px}.dc-profile>.dc-button:first-of-type{background:#5865f2;color:white}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-friends-header{height:48px;min-height:48px;gap:16px;border-color:var(--dc-border)}
+.dc-friends-title{font-weight:600}.dc-friends-tabs{gap:16px}.dc-friends-tabs .dc-button{font-size:14px;font-weight:500}.dc-friend-person strong{font-weight:600}.dc-friends-body{padding:18px 30px}.dc-friend-search{background:#141416}.dc-friend-row{height:64px;min-height:64px}.dc-friend-copy strong{font-size:15px}.dc-friend-row>.dc-button{background:#141416}
+html[data-neo-app=chat][data-chat-layout=discord] .auth-overlay{background:#17171b!important;gap:24px}.auth-brand .brand-mark{border-radius:12px!important;box-shadow:none!important}
+html[data-neo-app=chat][data-chat-layout=discord] .auth-card{background:#232428!important;box-shadow:0 8px 30px #0005;border:1px solid #ffffff05;border-radius:8px}.auth-card .server-note{color:#b5bac1!important}.auth-card input{outline-offset:2px}
+html[data-neo-app=chat][data-chat-layout=discord] .profile-card{background:#232428!important;border-radius:8px;box-shadow:0 8px 30px #0005}.profile-card .primary-button{background:#5865f2!important;color:white!important;box-shadow:none!important}.profile-card .eyebrow{color:#b5bac1}.profile-card .step-dots{display:none}
+html[data-neo-app=chat][data-chat-layout=discord] .profile-card{width:480px;padding:24px;font-size:14px}.profile-card .modal-heading h2{font-size:22px}.profile-card .eyebrow{display:none}.profile-card .memoji-studio{background:#1a1a1e;border-radius:8px;padding:16px;box-shadow:none;border:0}.profile-card .memoji-stage{background:none;height:112px}.profile-card .memoji-preview{width:96px;height:96px;box-shadow:none;border:0}.dc-avatar-choices summary{font-size:13px;cursor:pointer;padding:12px 0 0;color:#c3c4cb}.dc-avatar-choices[open] summary{padding-bottom:12px}.profile-card .memoji-option-grid{grid-template-columns:repeat(6,minmax(0,1fr));max-height:220px;overflow:auto;gap:8px}.profile-card .upload-card{background:#2b2d31;border:1px solid #41434a;border-radius:6px;margin-top:16px}.profile-card .profile-name-label{font-size:12px}.profile-card input{background:#1e1f22!important;border:1px solid #41434a!important;border-radius:4px!important;color:#dbdee1}.profile-card .modal-actions{margin-top:20px}.profile-card :is(.primary-button,.ghost-button){border-radius:4px;font-size:14px}.profile-card .modal-intro{font-size:14px;color:#b5bac1}
+@media(max-width:1100px){html[data-neo-app=chat][data-chat-layout=discord] .app.dc-members-open{grid-template-columns:var(--dc-rail) var(--dc-sidebar) minmax(0,1fr)}html[data-neo-app=chat][data-chat-layout=discord] .dc-members{top:48px;padding-top:0}.header-actions .dc-search-button{width:140px!important}.dc-search-button span{display:block!important}}
+@media(max-width:850px){html[data-neo-app=chat][data-chat-layout=discord] .header-actions{gap:4px}.header-actions .dc-search-button{width:28px!important;border:0!important;background:none!important}.dc-search-button span{display:none!important}}
+@media(max-width:700px){html[data-neo-app=chat][data-chat-layout=discord] .app,html[data-neo-app=chat][data-chat-layout=discord] .app.dc-members-open{grid-template-columns:minmax(0,1fr)}html[data-neo-app=chat][data-chat-layout=discord] .chat-header{left:0;padding:0 8px;gap:8px}html[data-neo-app=chat][data-chat-layout=discord] .sidebar{left:64px;width:240px;border-radius:0}html[data-neo-app=chat][data-chat-layout=discord] .account-bar{display:none;width:288px;left:8px;bottom:8px}html[data-neo-app=chat][data-chat-layout=discord] .dc-nav-open>.account-bar{display:flex}.dc-sidebar-resizer{display:none}html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title-actions{display:flex}html[data-neo-app=chat][data-chat-layout=discord] .sidebar-title{padding:0 8px}.dc-window-title{max-width:180px;overflow:hidden;text-overflow:ellipsis}.dc-history{visibility:hidden}.dc-window-heading{left:12px;transform:none}.dc-titlebar{justify-content:flex-end}.dc-settings-dialog{height:90dvh;max-width:100%;width:100%}.dc-settings-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}.dc-settings-nav{padding:8px;flex-direction:row;overflow:auto;gap:4px}.dc-settings-nav h3{display:none}.dc-settings-nav .dc-button{font-size:12px;padding:6px;white-space:nowrap}.dc-settings-nav .dc-button svg{display:none}.dc-settings-content{padding:20px 16px}.dc-account-identity{gap:10px}.dc-account-identity h3{font-size:15px}.dc-friends-header{height:76px!important;min-height:76px!important}.dc-friends-tabs{gap:8px}.dc-friends-body{padding:16px 12px}.dc-shortcut{font-size:12px}.dc-shortcut kbd{font-size:10px}html[data-neo-app=chat][data-chat-layout=discord] .composer{gap:8px;margin:8px}html[data-neo-app=chat][data-chat-layout=discord] #messageInput{font-size:14px}.dc-theme-choices .dc-button{width:auto;flex:1}}
+@media(max-width:700px){.dc-titlebar .dc-mobile-drawer{display:flex;position:absolute;left:6px}.dc-window-heading{left:42px}.dc-titlebar .dc-history{display:none}}
+html[data-neo-app=chat][data-chat-layout=discord] .conversation{transform:none!important}

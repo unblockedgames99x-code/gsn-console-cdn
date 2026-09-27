@@ -72,15 +72,15 @@
   const searchButton=button('Search messages','search',()=>search());searchButton.classList.add('dc-search-button');searchButton.append(node('span','','Search'));
   const muteButton=button('Mute channel notifications','bell',()=>{if(state.activeChannel){c.toggleChannelMuted(state.activeChannel);refresh();}});
   document.querySelector('.header-actions').prepend(muteButton,memberButton,searchButton);
-  const settings=button('User settings','more',()=>c.showProfileSetup(true));document.querySelector('.account-bar').append(settings);
-  const gif=button('Choose a GIF',null,c.openGifPicker);gif.classList.add('dc-gif-button');gif.textContent='GIF';el.composer.insertBefore(gif,el.sendButton);
+  const settings=button('User settings','settings',()=>shell.settings());document.querySelector('.account-bar').append(settings);
+  const gif=button('Choose a GIF',null,c.openGifPicker);gif.classList.add('dc-gif-button');gif.textContent='GIF';el.composer.insertBefore(gif,el.sendButton);el.composer.insertBefore(el.emojiButton,el.sendButton);document.querySelector('#attachButton use').setAttribute('href','#i-attach');
   const nav=button('Open channels','chat',()=>el.app.classList.toggle('dc-nav-open'));nav.classList.add('dc-nav-button');document.querySelector('.chat-header').prepend(nav);
   const navClose=button('Close channels','close',()=>el.app.classList.remove('dc-nav-open'));navClose.classList.add('dc-nav-close');document.querySelector('.sidebar-title-actions').prepend(navClose);
   const social=window.GsnFriends(c,{node,button,profile,saveDraft,navigate:id=>setSpace('home',id==='pending'?'requests':id==='chats'?'chats':'friends',id)});
   document.getElementById('discordHome').onclick=()=>setSpace('home','friends');document.getElementById('discordCommunity').onclick=()=>setSpace('community');
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{setSpace('home',b.dataset.view);}));
   function setSpace(value,view='chats',friendTab){if(value==='home'&&view!=='chats')social.show(friendTab|| (view==='requests'?'pending':'all'));else social.hide();space=value;state.activeView=view;el.app.dataset.space=value;document.querySelector('.sidebar-title h1').textContent=value==='home'?'Direct Messages':'GSN Community';document.getElementById('discordHome').setAttribute('aria-current',String(value==='home'));document.getElementById('discordCommunity').setAttribute('aria-current',String(value==='community'));c.renderSidebar();}
-  function sidebar(){social.render();const count=state.channels.filter(x=>x.kind==='server').reduce((n,x)=>n+c.unreadCount(x.id),0);document.getElementById('discordCommunity').classList.toggle('has-unread',!!count);document.querySelectorAll('.conversation-row').forEach(b=>b.setAttribute('aria-current',String(b.classList.contains('active'))));}
+  function sidebar(){shell.sync();social.render();const count=state.channels.filter(x=>x.kind==='server').reduce((n,x)=>n+c.unreadCount(x.id),0);document.getElementById('discordCommunity').classList.toggle('has-unread',!!count);document.querySelectorAll('.conversation-row').forEach(b=>b.setAttribute('aria-current',String(b.classList.contains('active'))));}
   function category(label,kind){label.tabIndex=0;label.setAttribute('role','button');label.setAttribute('aria-expanded',String(!collapsedSet.has(kind)));label.textContent=(collapsedSet.has(kind)?'›  ':'⌄  ')+label.textContent;label.onclick=()=>{if(collapsedSet.has(kind))collapsedSet.delete(kind);else collapsedSet.add(kind);c.renderSidebar();};label.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();label.click();}};}
   function saveDraft(){if(!state.me||!state.activeChannel||edit)return;const value={text:el.messageInput.value,reply:state.replyTo?.id||null,attachment:state.attachment};drafts.set(state.activeChannel.id,value);clearTimeout(draftTimer);draftTimer=setTimeout(()=>{const all=storage.get(key(),{});for(const [id,d]of drafts)if(d.text||d.reply||d.attachment)all[id]=d;else delete all[id];if(!storage.set(key(),all))feedback.textContent='Storage is full. Keep this tab open to preserve your draft.';},150);}
   function restoreDraft(id){setSpace(state.activeChannel?.kind==='server'?'community':'home');cancelEdit();const d=drafts.get(id)||storage.get(key(),{})[id]||{};el.messageInput.value=d.text||'';state.replyTo=(state.messages.get(id)||[]).find(m=>m.id===d.reply)||null;state.attachment=d.attachment||null;c.autoSizeComposer();feedback.textContent='';el.app.classList.remove('dc-nav-open');}
@@ -93,7 +93,7 @@
    try{
     const payload=await c.api(editing?'/api/messages/'+encodeURIComponent(editing.id):'/api/channels/'+encodeURIComponent(channel.id)+'/messages',{method:editing?'PATCH':'POST',body});
     if(state.me?.id!==account)return;
-    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');
+    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');if(!editing)shell.sound('sent');
     state.mutationVersions.set(channel.id,(state.mutationVersions.get(channel.id)||0)+1);
     const list=state.messages.get(channel.id)||[];c.cacheMessages(channel.id,c.normalizeMessages([...list.filter(m=>m.id!==payload.message.id),payload.message]));
     // Acknowledgments must never clear a newer draft or update a different channel.
@@ -122,7 +122,7 @@
   const memberResize=new ResizeObserver(()=>memberDraw());memberResize.observe(memberScroll);
   function toggleMembers(value){memberOpen=value;memberPanel.hidden=!value;el.app.classList.toggle('dc-members-open',value);memberButton.setAttribute('aria-pressed',String(value));if(value)memberDraw();}
   function refresh(){
-   if(!state.me)return;const scope=state.activeChannel?.kind==='dm'?state.activeChannel.recipientId:'community';
+   if(!state.me)return;shell.sync();const scope=state.activeChannel?.kind==='dm'?state.activeChannel.recipientId:'community';
    if(memberSource!==state.members||memberScope!==scope){memberSource=state.members;memberScope=scope;memberRows=scope==='community'?state.members:state.members.filter(u=>[state.me.id,scope].includes(u.id));memberRows=[...memberRows].sort((a,b)=>c.cleanDisplayName(a).localeCompare(c.cleanDisplayName(b)));memberLabel.textContent='MEMBERS — '+memberRows.length;memberDraw();}
    const muted=state.mutedChannels.has(state.activeChannel?.id);muteButton.setAttribute('aria-pressed',String(muted));muteButton.title=muted?'Unmute channel notifications':'Mute channel notifications';muteButton.setAttribute('aria-label',muteButton.title);memberButton.setAttribute('aria-pressed',String(memberOpen));
   }
@@ -181,8 +181,9 @@
   window.addEventListener('pagehide',()=>{saveDraft();clearTimeout(draftTimer);const all=storage.get(key(),{});for(const [id,d]of drafts)all[id]=d;if(state.me)storage.set(key(),all);memberResize.disconnect();mediaObserver.disconnect();mediaCleanup.disconnect();animated.clear();cancelAnimationFrame(memberFrame);});
   window.addEventListener('resize',()=>{c.autoSizeComposer();if(modal?.classList.contains('dc-popout-backdrop'))closeModal();});
   el.cancelAttachmentButton.addEventListener('click',saveDraft);el.cancelReplyButton.addEventListener('click',saveDraft);
+  const shell=window.GsnDiscordShell(c,{node,button,dialog,closeModal,search,space:()=>space,socialVisible:()=>social.visible});
   el.app.dataset.space='community';document.getElementById('discordCommunity').setAttribute('aria-current','true');
-  return {get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
+  return {observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
    uploadProgress(loaded,total){feedback.textContent=total?'Reading image · '+Math.round(loaded/total*100)+'%':'';},
    detailsOpened(){el.detailsPanel.classList.add('dc-details-overlay');},
    loadError(retry){el.messageScroll.replaceChildren(node('p','thread-empty','This conversation could not be loaded.'),button('Try again',null,retry));}

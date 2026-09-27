@@ -312,7 +312,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-17/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-18/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -823,7 +823,7 @@
       }
     }));
     channels.forEach(function (channel) {
-      scanMentionNotifications(channel, state.messages.get(channel.id) || [], Boolean(options.initial));
+      scanMentionNotifications(channel, state.messages.get(channel.id) || [], Boolean(options.initial));enhanced.observeMessages(channel,state.messages.get(channel.id)||[],Boolean(options.initial));
     });
   }
 
@@ -888,7 +888,7 @@
     try {
       const loaded=await loadChannelMessages(channel);
       if(navigation!==channelNavigation)return;
-      cacheMessages(id,loaded);
+      cacheMessages(id,loaded);enhanced.observeMessages(channel,loaded,true);
       renderMessages();
       enhanced.markVisibleRead();
       if(navigation!==channelNavigation)return;
@@ -947,7 +947,7 @@
     if (groupStart && state.activeChannel) {
       var name = document.createElement("span"); name.className = "message-author"; name.textContent = cleanDisplayName(author);
       enhanced.profileTrigger(name,author);
-      var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=new Date(message.createdAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});timestamp.title=new Date(message.createdAt).toLocaleString();const heading=document.createElement('div');heading.className='dc-message-heading';heading.append(name,timestamp);stack.appendChild(heading);
+      var timestamp=document.createElement('time');timestamp.className='discord-message-time';timestamp.dateTime=new Date(message.createdAt).toISOString();timestamp.textContent=(new Date(message.createdAt).toDateString()===new Date().toDateString()?'':new Date(message.createdAt).toDateString()===new Date(Date.now()-86400000).toDateString()?'Yesterday at ':new Date(message.createdAt).toLocaleDateString()+' ')+new Date(message.createdAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});timestamp.title=new Date(message.createdAt).toLocaleString();const heading=document.createElement('div');heading.className='dc-message-heading';heading.append(name,timestamp);stack.appendChild(heading);
     }
     var bubble = document.createElement("div"); bubble.className = "message-bubble";
     if (message.text) appendMessageText(bubble, message.text);
@@ -970,8 +970,8 @@
       },
       onError:toast
     });
-    if (groupEnd) {
-      var meta = document.createElement("time"); meta.className = "message-meta"; meta.dateTime = new Date(Number(message.createdAt || Date.now())).toISOString(); meta.textContent = (mine ? "Delivered · " : "") + formatTime(message.createdAt) + (message.editedAt ? " · Edited" : ""); stack.appendChild(meta);
+    if (!groupStart) {
+      var meta = document.createElement("time"); meta.className = "message-meta"; meta.dateTime = new Date(Number(message.createdAt || Date.now())).toISOString(); meta.textContent = new Date(message.createdAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});meta.title=new Date(message.createdAt).toLocaleString(); stack.appendChild(meta);
     }
     row.appendChild(stack); row.addEventListener("contextmenu",event=>{if(event.target.closest("a")||getSelection().toString())return;event.preventDefault();enhanced.messageMenu(moreButton,message);}); return row;
   }
@@ -1094,7 +1094,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-17/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-18/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1360,7 +1360,7 @@
       if(channel){
         const known=new Set((state.messages.get(channel.id)||[]).map(message=>message.id));
         const messages=await loadChannelMessages(channel);
-        cacheMessages(channel.id,messages);
+        cacheMessages(channel.id,messages);enhanced.observeMessages(channel,messages);
         scanMentionNotifications(channel,messages.filter(message=>!known.has(message.id)),false);
         if(state.activeChannel?.id===channel.id){renderMessages();enhanced.markVisibleRead();}
       }
