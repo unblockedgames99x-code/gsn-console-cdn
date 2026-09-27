@@ -176,13 +176,13 @@
     });
   }
 
-  async function loadChannelMessages(channel) {
+  async function loadChannelMessages(channel, options) {
     if (channel.backend === "blink") {
       var raw = await blinkRequest("dms/" + channel.blinkPair + "/messages");
       return normalizeBlinkMessages(raw, channel);
     }
     const version=state.mutationVersions.get(channel.id)||0;
-    var payload = await api("/api/channels/" + encodeURIComponent(channel.id) + "/messages");
+    var payload = await api("/api/channels/" + encodeURIComponent(channel.id) + "/messages", options);
     if(version!==(state.mutationVersions.get(channel.id)||0))return state.messages.get(channel.id)||[];
     return normalizeMessages(payload.messages);
   }
@@ -312,7 +312,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-20/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-21/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -799,14 +799,14 @@
     updateMe();
     updateRequestBadge();
     renderSidebar();
-    void loadPreviews({ initial: true }).then(renderSidebar).catch(()=>{});
     enhanced.refresh();
     connectSocket();
     setConnection("Live", true);
     state.loading = false;
     el.app.setAttribute("aria-busy", "false");
     var global = state.channels.find(function (channel) { return channel.kind === "server" && String(channel.name).toLowerCase() === "general"; });
-    if (global && window.innerWidth > 560) openChannel(global.id);
+    if (global && window.innerWidth > 560) await openChannel(global.id);
+    void loadPreviews({ initial: true }).then(()=>{previewsAt=Date.now();renderSidebar();}).catch(()=>{});
     if (!state.profile) showProfileSetup(false);
     startPolling();
   }
@@ -814,8 +814,9 @@
   var previewCursor=0;
   async function loadPreviews(options) {
     options = options || {};
+    if(window.GSN_CHAT?.busySending)return;
     var all=state.channels.filter(c=>c.id!==state.activeChannel?.id);
-    var channels=Array.from({length:Math.min(3,all.length)},()=>all[previewCursor++ % all.length]);
+    var channels=Array.from({length:Math.min(window.GSN_CHAT?.previewLimit||3,all.length)},()=>all[previewCursor++ % all.length]);
     let cursor=0;
     await Promise.all(Array.from({length:4},async()=>{
       while(cursor<channels.length){const channel=channels[cursor++];
@@ -886,7 +887,7 @@
     renderSidebar();
     if(state.messages.has(id))renderMessages();else{el.messageScroll.innerHTML = '<div class="thread-loading"><span></span><p>Loading messages…</p></div>';}
     try {
-      const loaded=await loadChannelMessages(channel);
+      const loaded=await loadChannelMessages(channel,{priority:'foreground'});
       if(navigation!==channelNavigation)return;
       cacheMessages(id,loaded);enhanced.observeMessages(channel,loaded,true);
       renderMessages();
@@ -922,7 +923,7 @@
     read:()=>enhanced.markVisibleRead()
   });
   function renderMessages(){
-    if(state.activeChannel)timeline.update(state.activeChannel.id,state.messages.get(state.activeChannel.id)||[]);
+    if(state.activeChannel)timeline.update(state.activeChannel.id,[...(state.messages.get(state.activeChannel.id)||[]),...enhanced.pendingMessages(state.activeChannel.id)]);
   }
 
   function messageNode(message, groupStart, groupEnd) {
@@ -953,6 +954,11 @@
     if (message.text) appendMessageText(bubble, message.text);
     if(message.editedAt){const edited=document.createElement("small");edited.className="edited-marker";edited.textContent=" (edited)";edited.title=new Date(message.editedAt).toLocaleString();bubble.append(edited);}
     renderAttachments(bubble, message.attachments);
+    if(message.pending){
+      row.classList.add('dc-message-pending');
+      const status=document.createElement('small');status.className='dc-send-status';status.textContent='Sending…';status.setAttribute('role','status');
+      stack.append(bubble,status);row.appendChild(stack);return row;
+    }
     var tools = document.createElement("span"); tools.className = "message-tools";
     var replyButton = document.createElement("button"); replyButton.type = "button"; replyButton.title = "Reply"; replyButton.setAttribute("aria-label", "Reply"); replyButton.innerHTML = '<svg aria-hidden="true"><use href="#i-reply"></use></svg>'; replyButton.dataset.action = "reply"; tools.appendChild(replyButton);
     {
@@ -1094,7 +1100,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-20/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-21/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1352,7 +1358,7 @@
   async function pollChat(){
     clearTimeout(state.pollTimer);
     if(polling||!state.me)return;
-    if(document.hidden){state.pollTimer=setTimeout(pollChat,15000);return;}
+    if(document.hidden||window.GSN_CHAT?.busySending){state.pollTimer=setTimeout(pollChat,document.hidden?15000:1000);return;}
     polling=true;
     try{
       if(!navigator.onLine)throw new Error('Offline');

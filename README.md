@@ -83,3 +83,5 @@ Release v20260927-18: reference-measured GSN Chat shell, local licensed icons/fo
 Release v20260927-19: correct inherited colors on outlined navigation icons and search; includes the complete reference-driven Chat update from v18.
 
 Release v20260927-20: remove the blue chat badge from the empty conversation screen.
+
+Release v20260927-21: prioritize message sends over background reads, reduce preview traffic, and show unconfirmed messages immediately while preserving drafts on failure. Includes removal of the blue empty-chat badge.

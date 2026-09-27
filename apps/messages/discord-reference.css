@@ -119,3 +119,4 @@ html[data-neo-app=chat][data-chat-layout=discord] .profile-card{width:480px;padd
 @media(max-width:700px){.dc-titlebar .dc-mobile-drawer{display:flex;position:absolute;left:6px}.dc-window-heading{left:42px}.dc-titlebar .dc-history{display:none}}
 html[data-neo-app=chat][data-chat-layout=discord] .conversation{transform:none!important}
 html[data-neo-app=chat][data-chat-layout=discord] .search-box svg{fill:currentColor;stroke:none;color:#94959c}
+html[data-neo-app=chat][data-chat-layout=discord] .dc-message-pending .message-bubble{opacity:.6}.dc-send-status{display:block;font-size:11px;line-height:18px;color:var(--dc-muted)}

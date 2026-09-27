@@ -86,14 +86,16 @@
   function restoreDraft(id){setSpace(state.activeChannel?.kind==='server'?'community':'home');cancelEdit();const d=drafts.get(id)||storage.get(key(),{})[id]||{};el.messageInput.value=d.text||'';state.replyTo=(state.messages.get(id)||[]).find(m=>m.id===d.reply)||null;state.attachment=d.attachment||null;c.autoSizeComposer();feedback.textContent='';el.app.classList.remove('dc-nav-open');}
   function cancelEdit(){if(!edit)return;edit=null;editor.hidden=true;if(editDraft){el.messageInput.value=editDraft.text;state.replyTo=editDraft.reply;state.attachment=editDraft.attachment;}editDraft=null;c.autoSizeComposer();c.syncComposeExtras();}
   function beginEdit(message){if(message.authorId!==state.me?.id)return;saveDraft();if(!edit)editDraft={text:el.messageInput.value,reply:state.replyTo,attachment:state.attachment};edit=message;editor.hidden=false;state.replyTo=null;state.attachment=null;el.messageInput.value=message.text||'';c.autoSizeComposer();c.syncComposeExtras();el.messageInput.focus();}
+  let pendingSend=null;
   async function send(){
    if(sending||!state.activeChannel||!state.me)return;const channel=state.activeChannel,account=state.me.id,raw=el.messageInput.value,text=raw.trim(),attachment=state.attachment,reply=state.replyTo,editing=edit;
    if(!text&&!attachment&&!editing?.attachments?.length)return;sending=true;c.syncSendButton();saveDraft();feedback.textContent=editing?'Saving changes…':'Sending…';
    const body={text,...(reply?{replyTo:reply.id}:{}),...(attachment?{attachments:[attachment]}:{})};
+   if(!editing){pendingSend={id:'pending-'+Date.now(),channelId:channel.id,authorId:account,text,createdAt:Date.now(),replyTo:reply?.id,attachments:attachment?[attachment]:[],pending:true};c.renderMessages();}
    try{
     const payload=await c.api(editing?'/api/messages/'+encodeURIComponent(editing.id):'/api/channels/'+encodeURIComponent(channel.id)+'/messages',{method:editing?'PATCH':'POST',body});
     if(state.me?.id!==account)return;
-    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');if(!editing)shell.sound('sent');
+    if(!payload.message?.id)throw new Error('The server did not confirm the message. Check the conversation before retrying.');pendingSend=null;if(!editing)shell.sound('sent');
     state.mutationVersions.set(channel.id,(state.mutationVersions.get(channel.id)||0)+1);
     const list=state.messages.get(channel.id)||[];c.cacheMessages(channel.id,c.normalizeMessages([...list.filter(m=>m.id!==payload.message.id),payload.message]));
     // Acknowledgments must never clear a newer draft or update a different channel.
@@ -101,7 +103,7 @@
     else {const d=drafts.get(channel.id);if(d?.text===raw&&d.attachment===attachment){drafts.set(channel.id,{text:''});const all=storage.get(key(),{});delete all[channel.id];storage.set(key(),all);}}
     c.renderSidebar();
    }catch(error){if(state.activeChannel?.id===channel.id){feedback.replaceChildren(node('span','',error.message+' Your draft is kept. '),button('Retry send',null,()=>send()));}else c.toast('Message to '+c.channelTitle(channel)+' was not confirmed. Its draft is kept.');}
-   finally{sending=false;c.syncSendButton();}
+   finally{pendingSend=null;sending=false;c.renderMessages();c.syncSendButton();}
   }
   function profileTrigger(target,user){target.tabIndex=0;target.setAttribute('role','button');target.setAttribute('aria-label','View profile of '+c.cleanDisplayName(user));target.onclick=e=>{e.stopPropagation();profile(user,target);};target.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();profile(user,target);}};}
   function closeModal(){if(!modal)return;modal.remove();modal=null;returnFocus?.focus({preventScroll:true});}
@@ -183,7 +185,7 @@
   el.cancelAttachmentButton.addEventListener('click',saveDraft);el.cancelReplyButton.addEventListener('click',saveDraft);
   const shell=window.GsnDiscordShell(c,{node,button,dialog,closeModal,search,space:()=>space,socialVisible:()=>social.visible});
   el.app.dataset.space='community';document.getElementById('discordCommunity').setAttribute('aria-current','true');
-  return {observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
+  return {pendingMessages:id=>pendingSend?.channelId===id&&pendingSend.authorId===state.me?.id?[pendingSend]:[],observeMessages:(channel,messages,initial)=>shell.observe(channel,messages,initial),get space(){return space},get sending(){return sending},category,collapsed:k=>collapsedSet.has(k),sidebar,refresh,profile,profileTrigger,emojiInit,attachmentImage,saveDraft,restoreDraft,cancelEdit,edit:beginEdit,send,markVisibleRead,messageMenu,upload,
    uploadProgress(loaded,total){feedback.textContent=total?'Reading image · '+Math.round(loaded/total*100)+'%':'';},
    detailsOpened(){el.detailsPanel.classList.add('dc-details-overlay');},
    loadError(retry){el.messageScroll.replaceChildren(node('p','thread-empty','This conversation could not be loaded.'),button('Try again',null,retry));}

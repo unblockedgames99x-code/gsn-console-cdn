@@ -2,7 +2,15 @@
 (()=>{'use strict';
  const key='gsn-chat-session-v1',base=(window.GSN_CHAT_SERVER||'').replace(/\/$/,'');
  const googleScript=/^https:\/\/script.google.com\/macros\/s\/[^/]+\/exec$/.test(base);
- const pending=new Map();let me=null,epoch=0,queue=Promise.resolve();
+ const pending=new Map();let me=null,epoch=0,reading=false,writing=false;
+ const reads=[],writes=[];
+ // One user-action lane can bypass a slow read. Do not start more background
+ // work while a write is pending; Apps Script still serializes storage access.
+ function drain(){
+  if(!writing&&writes.length){writing=true;const job=writes.shift();job.run().then(job.resolve,job.reject).finally(()=>{writing=false;drain();});}
+  if(!reading&&!writing&&!writes.length&&reads.length){reading=true;const job=reads.shift();job.run().then(job.resolve,job.reject).finally(()=>{reading=false;drain();});}
+ }
+ function schedule(run,write,foreground){return new Promise((resolve,reject)=>{const lane=write?writes:reads,job={run,resolve,reject};if(foreground&&!write)lane.unshift(job);else lane.push(job);drain();});}
  async function api(path,options={}){
   if(!base&&location.hostname.endsWith('jsdelivr.net'))throw new Error('Connect the GSN Chat server before signing in.');
   if(base&&!/^https:\/\//.test(base)&&!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(base))throw new Error('Use an HTTPS GSN Chat server.');
@@ -27,11 +35,12 @@
   // Apps Script serializes requests with a script lock. Limit in-tab contention;
   // only read-only requests may be retried automatically after transient failures.
   const run=async()=>{for(let attempt=0;;attempt++){try{return await execute();}catch(error){if(method!=='GET'||attempt>=2||![429,500,503].includes(error.status))throw error;await new Promise(r=>setTimeout(r,1000*2**attempt));}}};
-  const task=googleScript?queue.then(run):run();if(googleScript)queue=task.catch(()=>{});
+  const write=method!=='GET'&&!/\/read$/.test(path);
+  const task=googleScript?schedule(run,write,options.priority==='foreground'):run();
   if(requestKey)pending.set(requestKey,task);
   try{return await task;}finally{if(pending.get(requestKey)===task)pending.delete(requestKey);}
  }
  // Polling is coordinated by the client; one scheduler serves channels and DMs.
- window.GSN_CHAT={api,get me(){return me},pollInterval:googleScript?10000:2500};
+ window.GSN_CHAT={api,get me(){return me},get busySending(){return writing||writes.length>0},previewLimit:googleScript?1:3,pollInterval:googleScript?10000:2500};
  window.NEO_CHAT_BRIDGE={api,mode:'neo',active:true,subscribe(){}};
 })();
