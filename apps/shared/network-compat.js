@@ -1,6 +1,11 @@
 /* Compatibility only: native implementations stay untouched. */
 (() => {
   if (typeof AbortController === 'undefined' || typeof AbortSignal === 'undefined') return;
+  if (AbortSignal.prototype && !AbortSignal.prototype.throwIfAborted) {
+    AbortSignal.prototype.throwIfAborted = function () {
+      if (this.aborted) throw this.reason || new DOMException('The request was cancelled.', 'AbortError');
+    };
+  }
   if (!AbortSignal.timeout) AbortSignal.timeout = milliseconds => {
     const controller = new AbortController();
     setTimeout(() => controller.abort(new DOMException('The request timed out.', 'TimeoutError')), milliseconds);

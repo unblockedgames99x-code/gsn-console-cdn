@@ -110,3 +110,5 @@ Release v20260927-31: Stable message viewport during confirmation, polling and c
 Release v20260928-1: updated console and app assets.
 
 Release v20260928-1: updated console and app assets.
+
+Release v20260928-2: updated console and app assets.
