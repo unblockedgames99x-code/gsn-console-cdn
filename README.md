@@ -120,3 +120,5 @@ Release v20260928-4: updated console and app assets.
 Release v20260928-5: updated console and app assets.
 
 Release v20260928-6: updated console and app assets.
+
+Release v20260928-7: updated console and app assets.
