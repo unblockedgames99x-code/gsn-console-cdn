@@ -183,8 +183,6 @@
   const destinations=[['home','Home','home'],['search','Search','search'],['library','Library','library'],['liked','Liked Songs','heart'],['recent','Recently Played','rotate-ccw'],['made','Made for You','music-2'],['albums','Albums','disc'],['artists','Artists','users'],['playlists','Playlists','list-music'],['settings','Settings','settings']];
   destinations.forEach(([id,label,icon])=>{const b=button(label,icon,()=>navigate(id),'music-nav');b.dataset.musicView=id;const span=document.createElement('span');span.textContent=label;b.append(span);$('musicNav').append(b);});
   document.querySelector('.playlist-heading').append(button('Create playlist','plus',()=>createPlaylist()));playlistNav();
-  document.querySelector('.profile-chip').replaceWith(button('Open Control Center',null,()=>parent.postMessage({type:'neo-music-control-center'},location.origin),'music-console'));
-  document.querySelector('.music-console').innerHTML='<img src="../../assets/home.svg" alt="">';
   const filters=document.querySelector('.music-filter-pills');filters.replaceChildren();
   ['tracks','albums','artists','playlists'].forEach(type=>filters.append(button(type.charAt(0).toUpperCase()+type.slice(1),null,()=>{searchType=type;filters.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===type));if(view==='search')filterSearch();else navigate(type==='tracks'?'home':type);})));
   filters.firstChild.classList.add('active');
