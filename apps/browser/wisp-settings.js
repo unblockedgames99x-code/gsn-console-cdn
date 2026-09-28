@@ -3,8 +3,10 @@
 
   var STORAGE_KEY = "neo:browser:wisp:v1";
   var MODE_KEY = "neo:browser:wisp-mode:v2";
-  var DEFAULT_WISP = "wss://d27jvgogyihpmk.cloudfront.net/wisp/";
+  var DEFAULT_WISP = "wss://cleanweb5641.b-cdn.net/w/";
   var SERVERS = Object.freeze([
+    Object.freeze({ name: "Cleanweb · Serum", url: DEFAULT_WISP }),
+    Object.freeze({ name: "Artemata · Abstract", url: "wss://artemata.it/wisp/534141f4509ce83f5bd805d11df1d7ce5d30a6679fd4c27dbf28fc7c2fb4a710/" }),
     Object.freeze({ name: "Nocturne CloudFront", url: "wss://d27jvgogyihpmk.cloudfront.net/wisp/" }),
     Object.freeze({ name: "Nocturne", url: "wss://nocturne.lol/wisp/" }),
     Object.freeze({ name: "Reference Wisp", url: "wss://athollcottage.com/connection/" }),
@@ -118,9 +120,9 @@
 
   // Migrate automatic selection once to the requested default; preserve a
   // deliberately selected manual server and subsequent failover choices.
-  if (readStorage('ps5:nocturne-default:v1') !== '1') {
+  if (readStorage('ps5:cleanweb-default:v1') !== '1') {
     if (configuredMode() === 'auto') writeStorage(STORAGE_KEY, DEFAULT_WISP);
-    writeStorage('ps5:nocturne-default:v1', '1');
+    writeStorage('ps5:cleanweb-default:v1', '1');
   }
   window.NEO_PROXY_ENGINE = "Scramjet";
   window.NEO_WISP_SERVERS = SERVERS;

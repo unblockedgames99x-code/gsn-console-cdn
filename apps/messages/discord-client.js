@@ -33,14 +33,23 @@
   function calc(){offsets=[0];entries.forEach(e=>offsets.push(offsets.at(-1)+(sizes.get(e.key)||estimate(e))));}
   function locate(y){let lo=0,hi=entries.length;while(lo<hi){const m=(lo+hi)>>1;if(offsets[m+1]<y)lo=m+1;else hi=m;}return lo;}
   function schedule(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});}
-  function draw(){
+  function draw(viewTop=root.scrollTop){
    if(suspended||!root.clientHeight||!entries.length)return;rendering=true;
-   const start=Math.max(0,locate(root.scrollTop-500)),end=Math.min(entries.length,locate(root.scrollTop+root.clientHeight+600)+1);
+   if(atBottom)viewTop=Math.max(0,offsets.at(-1)-root.clientHeight);
+   const start=Math.max(0,locate(viewTop-500)),end=Math.min(entries.length,locate(viewTop+root.clientHeight+600)+1);
    top.style.height=offsets[start]+'px';bottom.style.height=Math.max(0,offsets.at(-1)-offsets[end])+'px';
    const wanted=[top],next=new Map();
    for(let i=start;i<end;i++){const e=entries[i];let cached=nodes.get(e.key);if(!cached||cached.signature!==e.signature){let row;if(e.day)row=node('div','day-divider',hooks.day(e.message.createdAt));else row=hooks.row(e.message,e.start,e.end);row.dataset.virtualKey=e.key;cached={node:row,signature:e.signature};}next.set(e.key,cached);wanted.push(cached.node);}
    wanted.push(bottom);const keep=new Set(wanted);for(const child of [...root.children])if(!keep.has(child)){ro.unobserve(child);child.remove();}
    let cursor=root.firstChild;for(const child of wanted){if(child===cursor)cursor=cursor.nextSibling;else root.insertBefore(child,cursor);if(child.dataset.virtualKey)ro.observe(child);}
+   // Measure the newly mounted range before the browser paints. Otherwise an
+   // acknowledgement/poll can show estimated spacer heights for one frame.
+   const anchor=locate(viewTop);let measured=false,delta=0;
+   for(let i=start;i<end;i++){const e=entries[i],h=Math.ceil(next.get(e.key).node.getBoundingClientRect().height),prev=sizes.get(e.key)||estimate(e);if(h&&h!==prev){sizes.set(e.key,h);if(i<anchor)delta+=h-prev;measured=true;}}
+   if(measured){calc();top.style.height=offsets[start]+'px';bottom.style.height=Math.max(0,offsets.at(-1)-offsets[end])+'px';viewTop+=delta;}
+   // Restore once the real rows and spacers are in place. Inflating a spacer
+   // before every update briefly selected a different range and moved the view.
+   root.scrollTop=atBottom?root.scrollHeight:viewTop;
    nodes=next;rendering=false;positions.set(id,{top:root.scrollTop,bottom:atBottom});
   }
   function reset(next){if(id)positions.set(id,{top:root.scrollTop,bottom:atBottom});id=next;atBottom=positions.get(next)?.bottom??true;nodes.clear();ro.disconnect();entries=[];known.clear();unseen=0;jump.hidden=true;announce.textContent="";root.replaceChildren();}
@@ -54,9 +63,8 @@
    known=new Set(data.map(identity));list=data;const byId=new Map(data.map(m=>[m.id,m]));entries=[];
    data.forEach((m,i)=>{const prev=data[i-1],next=data[i+1],day=!prev||new Date(prev.createdAt).toDateString()!==new Date(m.createdAt).toDateString();if(day)entries.push({key:id+':day:'+identity(m),day:true,message:m,signature:String(m.createdAt)});const start=day||!!m.replyTo||prev.authorId!==m.authorId||m.createdAt-prev.createdAt>300000,end=!next||next.authorId!==m.authorId||next.createdAt-m.createdAt>300000||!!next.replyTo;entries.push({key:id+':'+identity(m),message:m,start,end,signature:JSON.stringify([m,start,end,hooks.user(m.authorId),byId.get(m.replyTo)])});});
    calc();if(!entries.length){ro.disconnect();nodes.clear();root.replaceChildren(node('div','thread-empty','No messages yet. Say hello.'));return;}
-   if(changed){const saved=positions.get(id);atBottom=saved?.bottom??true;root.replaceChildren(top,bottom);top.style.height=offsets.at(-1)+'px';root.scrollTop=atBottom?offsets.at(-1):saved.top;}
-   else if(atBottom){top.style.height=offsets.at(-1)+'px';root.scrollTop=offsets.at(-1);}
-   draw();if(atBottom){root.scrollTop=root.scrollHeight;schedule();}
+   if(changed){const saved=positions.get(id);atBottom=saved?.bottom??true;draw(saved?.top||0);}
+   else draw();
    // Height metadata is bounded independently of channel/message caches.
    if(sizes.size>4000){const live=new Set(entries.map(e=>e.key));for(const k of sizes.keys())if(!live.has(k))sizes.delete(k);}
    if(positions.size>32)positions.delete(positions.keys().next().value);
@@ -64,7 +72,11 @@
   function jumpTo(messageId){const i=entries.findIndex(e=>!e.day&&e.message.id===messageId);if(i<0)return false;atBottom=false;root.scrollTop=Math.max(0,offsets[i]-70);draw();const row=nodes.get(entries[i].key)?.node;row?.classList.add('dc-located');row?.setAttribute('tabindex','-1');row?.focus({preventScroll:true});setTimeout(()=>row?.classList.remove('dc-located'),2500);return true;}
   root.addEventListener('scroll',()=>{if(suspended||!root.clientHeight)return;atBottom=root.scrollHeight-root.scrollTop-root.clientHeight<60;if(atBottom){unseen=0;jump.hidden=true;hooks.read();}schedule();},{passive:true});
   jump.onclick=()=>{atBottom=true;root.scrollTop=root.scrollHeight;unseen=0;jump.hidden=true;draw();hooks.read();};
-  const containerObserver=new ResizeObserver(()=>{if(suspended||!root.clientHeight)return;sizes.clear();calc();schedule();});containerObserver.observe(root);
+  // Composer growth changes only the viewport height, not message wrapping.
+  // Discarding row measurements here made every send rebuild the history from
+  // estimates, then jump again as ResizeObserver measured the real rows.
+  let measuredWidth=root.clientWidth;
+  const containerObserver=new ResizeObserver(()=>{if(suspended||!root.clientHeight)return;const width=root.clientWidth;if(width!==measuredWidth){measuredWidth=width;sizes.clear();calc();}draw();if(atBottom)root.scrollTop=root.scrollHeight;});containerObserver.observe(root);
   window.addEventListener('pagehide',()=>{ro.disconnect();containerObserver.disconnect();cancelAnimationFrame(frame);},{once:true});
   return {acknowledge,pause(){if(!suspended)resumePosition={top:root.scrollTop,bottom:atBottom};suspended=true;},resume(){if(!suspended)return;suspended=false;atBottom=resumePosition?.bottom??true;root.scrollTop=atBottom?root.scrollHeight:(resumePosition?.top||0);draw();schedule();},update,reset,jump:jumpTo,get bottom(){return atBottom},get count(){return nodes.size}};
  }

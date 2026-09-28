@@ -8,6 +8,9 @@
   let switches = [];
   const transient = /error code (?:5|6|7|18|28|35|52|55|56|92)\b|network error|failed to fetch|transport (?:failed|error)/i;
   const pause = () => new Promise(resolve => setTimeout(resolve, 180));
+  const checkAbort = signal => {
+    if (signal?.aborted) throw signal.reason || new DOMException('Request aborted', 'AbortError');
+  };
 
   async function changeConnection(failed) {
     const manager = scope.NEO_WISP_MANAGER;
@@ -28,19 +31,26 @@
 
   async function send(transport, args) {
     const signal = args[4];
-    signal?.throwIfAborted();
+    checkAbort(signal);
     const abort = new AbortController();
-    const combined = signal ? AbortSignal.any([signal, abort.signal]) : abort.signal;
+    // Older Chromebook Chrome versions lack AbortSignal.any/throwIfAborted.
+    // Forward cancellation without depending on either newer API.
+    const cancel = () => abort.abort(signal.reason);
+    const combineNative = signal && typeof AbortSignal.any === 'function';
+    const combined = combineNative ? AbortSignal.any([signal, abort.signal]) : abort.signal;
+    if (!combineNative) signal?.addEventListener('abort', cancel, { once: true });
     let timedOut = false;
     // Only bound the wait for headers; large game downloads keep streaming.
     const timer = setTimeout(() => { timedOut = true; abort.abort(); }, 15000);
     try {
       return await transport.requestOnce(...args.slice(0, 4), combined);
     } catch (error) {
+      signal?.removeEventListener('abort', cancel);
       if (timedOut && !signal?.aborted) throw new TypeError('Request failed with error code 28: connection timed out');
       throw error;
     } finally {
       clearTimeout(timer);
+      // After headers, cancellation must still reach the streaming body.
     }
   }
 
@@ -51,7 +61,7 @@
       if (!/^(GET|HEAD)$/i.test(args[1]) || args[2] != null) return transport.requestOnce(...args);
       let error;
       for (let attempt = 0; attempt < 4; attempt++) {
-        args[4]?.throwIfAborted();
+        checkAbort(args[4]);
         const selected = current || transport;
         try { return await send(selected, args); }
         catch (failure) {
