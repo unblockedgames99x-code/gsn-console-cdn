@@ -93,7 +93,8 @@
   };
 
   var originalPlayTrack = playTrack;
-  playTrack = function (track) {
+  playTrack = function (track, options) {
+    if(options?.reload)return originalPlayTrack(track,options);
     trackCache.set(String(track.id), track);
     var visible = Array.from(document.querySelectorAll(".music-card[data-id]")).map(function (card) {
       return trackCache.get(String(card.dataset.id));
@@ -103,10 +104,11 @@
     queueIndex = playQueue.findIndex(function (item) { return String(item.id) === String(track.id); });
     originalOrder = playQueue.slice();
     if (shuffle) setShuffle(true);
-    originalPlayTrack(track);
+    var playback=originalPlayTrack(track,options);
     setupAudioExtras();
     renderQueue();
     emitState();
+    return playback;
   };
 
   function setupAudioExtras() {
@@ -150,10 +152,11 @@
   function playQueued(index) {
     if (!playQueue[index]) return;
     queueIndex = index;
-    originalPlayTrack(playQueue[index]);
+    var playback=originalPlayTrack(playQueue[index]);
     setupAudioExtras();
     renderQueue();
     emitState();
+    return playback;
   }
 
   function setQueue(tracks, index, play) {
@@ -283,6 +286,18 @@
     queue: function () { return playQueue.slice(); },
     index: function () { return queueIndex; },
     setQueue: setQueue,
+    restore: function (session) {
+      if(!Array.isArray(session?.queue))return;
+      var selected=session.queue[session.index]||session.queue[0];
+      var queue=session.queue.map(normalizeTrack).filter(Boolean);
+      var index=Math.max(0,queue.findIndex(t=>String(t.id)===String(selected?.id)&&t.source===selected?.source));
+      currentTrack=queue[index]||null;
+      musicLoadedTrack=null;
+      var position=Number(session.position);
+      musicResumeState=currentTrack&&Number.isFinite(position)&&position>0?{track:currentTrack,position}:null;
+      setQueue(queue,index,false);
+    },
+    position: function () { return musicResumeState?.track===currentTrack?musicResumeState.position:musicResumeState?.track===currentTrack?musicResumeState.position:audioEl?.currentTime||0; },
     playAt: playQueued,
     shuffle: function () { return shuffle; },
     setShuffle: setShuffle,
@@ -303,18 +318,18 @@
     },
     next: playNext,
     previous: playPrevious,
-    play: function () { if (!audioEl && playQueue.length) { playQueued(queueIndex); return Promise.resolve(); } setupAudioExtras(); return playMusicAudio(); },
+    play: function () { if (!audioEl && playQueue.length) { return playQueued(queueIndex); } setupAudioExtras(); return playMusicAudio(); },
     pause: pauseMusicPlayback,
-    retry: function () { return currentTrack ? originalPlayTrack(currentTrack,{reload:true,position:audioEl?.currentTime||0}) : Promise.resolve(); },
+    retry: function () { return currentTrack ? originalPlayTrack(currentTrack,{reload:true,position:musicResumeState?.track===currentTrack?musicResumeState.position:audioEl?.currentTime||0}) : Promise.resolve(); },
     toggle: function () {
       setupAudioExtras();
-      if (!audioEl && playQueue.length) { playQueued(queueIndex); return Promise.resolve(); }
+      if (!audioEl && playQueue.length) { return playQueued(queueIndex); }
       if (!audioEl) return Promise.resolve();
       if (audioEl.paused || audioEl.ended) return playMusicAudio();
       pauseMusicPlayback();
       return Promise.resolve();
     },
-    seek: function (value) { if (audioEl) audioEl.currentTime = Math.max(0, Number(value) || 0); },
+    seek: function (value) { var position=Math.max(0,Number(value)||0); if(!Number.isFinite(position))return; if(currentTrack&&(!audioEl||musicResumeState?.track===currentTrack))musicResumeState={track:currentTrack,position}; else if(audioEl)audioEl.currentTime=position; emitState(); },
     setVolume: setVolume,
     repeatMode: function () { return repeatMode; },
     setRepeatMode: setRepeatMode,
@@ -330,6 +345,7 @@
       emitState();
     },
     stop: function () {
+      musicResumeState=null;
       if (!audioEl) return;
       pauseMusicPlayback();
       audioEl.currentTime = 0;

@@ -10,7 +10,6 @@
   let recent = read('neo-ps5-recent', []);
   let searches = read('neo-ps5-searches', []);
   let view = 'home', searchType = 'tracks', results = [], selectedPlaylist = null;
-  let pendingPosition = read('neo-ps5-session', null)?.position || 0;
   let lastTrack = '', audioBound = null, lastSaved = 0, playbackError = '', queueSignature = '';
   const originalCard = renderCard;
   const originalHome = fetchHome;
@@ -246,11 +245,11 @@
     const range=cardGrid.querySelector('input');range.value=$('volumeSlider').value;range.oninput=()=>P.setVolume(range.value);
     cardGrid.append(button('Open queue',null,()=>{$('queuePanel').classList.add('visible');queueUI(true);}),button('Close music session',null,()=>{P.stop();parent.postMessage({type:'neo-music-close'},location.origin);}));
   }
-  function state(){const a=audioEl;return {ready:true,active:!!currentTrack,playing:!!a&&!a.paused&&!a.ended&&!a.error,title:currentTrack?.title||'',artist:currentTrack?.artist||'',cover:currentTrack?.thumb||'',position:a?.currentTime??pendingPosition,duration:Number.isFinite(a?.duration)?a.duration:currentTrack?.duration||0,volume:a?.volume??Number($('volumeSlider').value),muted:a?.muted??P.muted(),shuffle:P.shuffle(),repeat:P.repeatMode(),error:playbackError,buffering:!!a&&!a.paused&&a.readyState<3};}
+  function state(){const a=audioEl;return {ready:true,active:!!currentTrack,playing:!!a&&!a.paused&&!a.ended&&!a.error,title:currentTrack?.title||'',artist:currentTrack?.artist||'',cover:currentTrack?.thumb||'',position:P.position(),duration:Number.isFinite(a?.duration)?a.duration:currentTrack?.duration||0,volume:a?.volume??Number($('volumeSlider').value),muted:a?.muted??P.muted(),shuffle:P.shuffle(),repeat:P.repeatMode(),error:playbackError,buffering:!!a&&!a.paused&&a.readyState<3};}
   let mediaMetadataKey="";
   function sync(){
     if(audioEl&&audioBound!==audioEl){audioBound=audioEl;['playing','pause','durationchange','timeupdate','volumechange','waiting','ended'].forEach(name=>audioEl.addEventListener(name,()=>{if(name==='playing'){playbackError='';status.hidden=true;}sync();}));audioEl.addEventListener('error',()=>error('This track could not load. Retry or choose another song.'));}
-    const s=state();if(currentTrack&&currentTrack.id!==lastTrack){if(lastTrack)pendingPosition=0;lastTrack=currentTrack.id;npmView.style.setProperty('--track-cover',`url(${JSON.stringify(currentTrack.thumb||'')})`);recent=[currentTrack,...recent.filter(t=>t.id!==currentTrack.id)].slice(0,40);save('neo-ps5-recent',recent);lyricsId='';}
+    const s=state();if(currentTrack&&currentTrack.id!==lastTrack){lastTrack=currentTrack.id;npmView.style.setProperty('--track-cover',`url(${JSON.stringify(currentTrack.thumb||'')})`);recent=[currentTrack,...recent.filter(t=>t.id!==currentTrack.id)].slice(0,40);save('neo-ps5-recent',recent);lyricsId='';}
     for(const slider of [seek,fullSeek]){slider.max=s.duration||100;slider.value=s.position;slider.disabled=!s.active;}
     $('npCurrentTime').textContent=formatTime(s.position);$('npDurationInline').textContent=formatTime(s.duration);
     seek.style.setProperty('--range-progress',`${s.duration?Math.min(100,s.position/s.duration*100):0}%`);
@@ -266,7 +265,7 @@
     queueUI();parent.postMessage({type:'neo-music-state',state:s},location.origin);
     if('mediaSession'in navigator){try{navigator.mediaSession.playbackState=s.playing?'playing':'paused';const metadataKey=JSON.stringify([s.active,s.title,s.artist,s.cover]);if(metadataKey!==mediaMetadataKey){navigator.mediaSession.metadata=s.active?new MediaMetadata({title:s.title,artist:s.artist,artwork:s.cover?[{src:s.cover}]:[]}):null;mediaMetadataKey=metadataKey;}}catch{}}
   }
-  function command(action,value){if(action==='play'||action==='toggle')return P[action]().catch(()=>error('Press Play to allow audio.'));if(action==='pause')P.pause();if(action==='next')P.next();if(action==='previous')P.previous();if(action==='seek'){if(audioEl)P.seek(value);else pendingPosition=Number(value)||0;}if(action==='volume')P.setVolume(value);if(action==='mute')P.setMuted(value);if(action==='stop')P.stop();sync();}
+  function command(action,value){if(action==='play'||action==='toggle')return P[action]().catch(()=>error('Press Play to allow audio.'));if(action==='pause')P.pause();if(action==='next')P.next();if(action==='previous')P.previous();if(action==='seek')P.seek(value);if(action==='volume')P.setVolume(value);if(action==='mute')P.setMuted(value);if(action==='stop')P.stop();sync();}
   window.addEventListener('message',event=>{if(event.source!==parent||event.origin!==location.origin)return;if(event.data?.type==='neo-music-command')command(event.data.action,event.data.value);
     if(event.data?.type==='neo-music-navigation'){
       const el=document.activeElement,key=event.data.key;
@@ -292,9 +291,7 @@
   });
   if('mediaSession'in navigator){for(const [name,action]of Object.entries({play:'play',pause:'pause',nexttrack:'next',previoustrack:'previous'})){try{navigator.mediaSession.setActionHandler(name,()=>command(action));}catch{}}try{navigator.mediaSession.setActionHandler('seekto',e=>command('seek',e.seekTime));}catch{}}
   const session=read('neo-ps5-session',null);
-  if(session?.queue?.length){P.setQueue(session.queue,session.index,false);currentTrack=session.queue[session.index]||session.queue[0];npTitle.textContent=currentTrack.title;npArtist.textContent=currentTrack.artist;npmTrackTitle.textContent=currentTrack.title;npmTrackArtist.textContent=currentTrack.artist;applyCoverFallback(npmCover,currentTrack.thumb);applyCoverFallback(npThumb,currentTrack.thumb);
-    const restore=()=>{if(audioEl){audioEl.addEventListener('loadedmetadata',()=>{if(audioEl.duration>pendingPosition)audioEl.currentTime=pendingPosition||0;pendingPosition=0;},{once:true});window.removeEventListener('neo-meting-statechange',restore);}};window.addEventListener('neo-meting-statechange',restore);
-  }
+  if(session?.queue?.length){P.restore(session);if(currentTrack){npTitle.textContent=currentTrack.title;npArtist.textContent=currentTrack.artist;npmTrackTitle.textContent=currentTrack.title;npmTrackArtist.textContent=currentTrack.artist;applyCoverFallback(npmCover,currentTrack.thumb);applyCoverFallback(npThumb,currentTrack.thumb);}}
   status.hidden=true;sync();navigate('home');
   // Native titles also provide tooltips for keyboard/gamepad focusable icons.
   document.querySelectorAll('button[aria-label]').forEach(b=>{if(!b.title)b.title=b.getAttribute('aria-label');});
