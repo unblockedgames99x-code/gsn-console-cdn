@@ -133,7 +133,7 @@ function openMusicEventStream(url) {
     Promise.resolve().then(async()=>{
         const route=await resolveMusicRoute(url,'music-catalog');
         arm();
-        const response=await fetch(route,{signal:controller.signal,cache:'no-store',credentials:'omit',headers:{Accept:'text/event-stream'}});
+        const response=await fetch(route,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'text/event-stream'}});
         if(!response.ok||!response.body) throw new Error(`Music server returned ${response.status}.`);
         const reader=response.body.getReader();
         const decoder=new TextDecoder();
@@ -228,7 +228,7 @@ async function searchVinyl(query) {
     currentEventSource={close(){controller.abort();}};
     try {
         const url=MUSIC_API.searchUrl?MUSIC_API.searchUrl(query):`${API_BASE}/_o/m/search?q=${encodeURIComponent(query)}`;
-        const response=await fetch(url,{signal:controller.signal,cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+        const response=await fetch(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error(`Music server returned ${response.status}.`);
         const payload=await response.json();
         const tracks=(Array.isArray(payload)?payload:(Array.isArray(payload?.items)?payload.items:Array.isArray(payload?.results)?payload.results:[])).map(normalizeTrack).filter(Boolean).slice(0,20);
@@ -305,7 +305,7 @@ async function fetchHome() {
     currentEventSource={close(){controller.abort();}};
     try {
         const url=MUSIC_API.homeUrl?MUSIC_API.homeUrl():`${API_BASE}/_o/m/discover`;
-        const response=await fetch(url,{signal:controller.signal,cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+        const response=await fetch(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error(`Music server returned ${response.status}.`);
         const liveSections=validHomeSections(await response.json().then(data=>MUSIC_API.homeSections?MUSIC_API.homeSections(data):data));
         if(controller.signal.aborted)return;

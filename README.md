@@ -106,3 +106,7 @@ Release v20260927-29: Music uses the provider API directly on the CDN instead of
 Release v20260927-30: Messages appear immediately without a pending clock; server acknowledgement retains the displayed message identity, timestamp and measured row height to avoid scroll jumps. Failed sends retain Retry.
 
 Release v20260927-31: Stable message viewport during confirmation, polling and composer resize. Browser automatic connection uses the verified Cleanweb Wisp relay with existing fallback servers; cancellation supports older Chrome APIs.
+
+Release v20260928-1: updated console and app assets.
+
+Release v20260928-1: updated console and app assets.

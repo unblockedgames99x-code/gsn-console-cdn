@@ -314,7 +314,7 @@
     toast(title + " in " + channelTitle(channel) + ".");
     if ("Notification" in window && Notification.permission === "granted" && (document.hidden || !document.hasFocus())) {
       try {
-        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-31/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
+        var notice = new Notification(title, { body: displayMessageText(message.text).slice(0, 140), icon: "/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-1/assets/chat-icon.png", tag: "neo-chat-mention-" + mentionNoticeId(channel, message) });
         notice.onclick = function () { window.focus(); openChannel(channel.id); notice.close(); };
       } catch (error) {}
     }
@@ -783,12 +783,21 @@
 
   // Short-lived, tab-local snapshots speed up reopening Chat. Authentication
   // always completes before reading them; logout removes this account's copy.
+  let warmSaveTimer=null;
   function saveWarmChat() {
+    if(warmSaveTimer!==null)return;
+    warmSaveTimer=window.requestIdleCallback?requestIdleCallback(flushWarmChat,{timeout:1500}):setTimeout(flushWarmChat,250);
+  }
+  function flushWarmChat() {
+    if(warmSaveTimer!==null){if(window.cancelIdleCallback)cancelIdleCallback(warmSaveTimer);else clearTimeout(warmSaveTimer);warmSaveTimer=null;}
     if (!state.me || !state.channels.length) return;
+    // A delayed cache write must never recreate a signed-out account's snapshot.
+    try{if(window.GSN_CHAT&&!localStorage.getItem('gsn-chat-session-v1'))return;}catch{return;}
     const histories = [...state.messages].slice(-4).map(([id, rows]) => [id, rows.slice(-80)]);
     const value = JSON.stringify({at: Date.now(), channels: state.channels, servers: state.servers, members: state.members, histories});
     try { if (value.length < 500000) sessionStorage.setItem('gsn-chat-warm:' + state.me.id, value); } catch {}
   }
+  window.addEventListener('pagehide',()=>{if(warmSaveTimer!==null)flushWarmChat();});
   function restoreWarmChat() {
     try {
       const data = JSON.parse(sessionStorage.getItem('gsn-chat-warm:' + state.me.id) || 'null');
@@ -1147,7 +1156,7 @@
   }
 
   async function searchGifSnap(query, signal, page = 1) {
-    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260927-31/api/console-services/gifs/search", location.origin);
+    var url = new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-1/api/console-services/gifs/search", location.origin);
     url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
     url.searchParams.set("limit", "24");
@@ -1401,10 +1410,10 @@
     state.socket.send(JSON.stringify({ t: "typing", channel: state.activeChannel.id }));
   }
 
-  let polling=false,pollFailures=0,metadataAt=0,previewsAt=0;
+  let polling=false,pollStopped=false,pollFailures=0,metadataAt=0,previewsAt=0;
   async function pollChat(){
     clearTimeout(state.pollTimer);
-    if(polling||!state.me)return;
+    if(polling||pollStopped||!state.me)return;
     if(document.hidden||window.GSN_CHAT?.busySending){state.pollTimer=setTimeout(pollChat,document.hidden?15000:1000);return;}
     polling=true;
     try{
@@ -1423,11 +1432,14 @@
       }
       if(Date.now()-previewsAt>30000){await loadPreviews();previewsAt=Date.now();}renderSidebar();pollFailures=0;setConnection('Connected · updates every '+((window.GSN_CHAT?.pollInterval||10000)/1000)+' seconds',true);
     }catch(error){pollFailures++;setConnection(navigator.onLine?'Reconnecting · '+error.message:'Offline · drafts saved',false);}
-    finally{polling=false;state.pollTimer=setTimeout(pollChat,Math.min(60000,(window.GSN_CHAT?.pollInterval||10000)*2**Math.min(pollFailures,3)));}
+    finally{polling=false;if(!pollStopped)state.pollTimer=setTimeout(pollChat,Math.min(60000,(window.GSN_CHAT?.pollInterval||10000)*2**Math.min(pollFailures,3))*(pollFailures ? .8+Math.random()*.2 : 1));}
   }
   function startPolling(){clearTimeout(state.pollTimer);metadataAt=Date.now();state.pollTimer=setTimeout(pollChat,window.GSN_CHAT?.pollInterval||10000);}
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)void pollChat();});
   window.addEventListener('online',()=>void pollChat());
+  window.addEventListener('offline',()=>{clearTimeout(state.pollTimer);if(state.me)setConnection('Offline · drafts saved',false);});
+  window.addEventListener('pagehide',()=>{pollStopped=true;clearTimeout(state.pollTimer);});
+  window.addEventListener('pageshow',event=>{pollStopped=false;if(event.persisted)void pollChat();});
 
   function renderPeople(query) {
     query = String(query || "").trim().toLowerCase();

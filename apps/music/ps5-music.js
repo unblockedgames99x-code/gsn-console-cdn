@@ -185,7 +185,7 @@
   destinations.forEach(([id,label,icon])=>{const b=button(label,icon,()=>navigate(id),'music-nav');b.dataset.musicView=id;const span=document.createElement('span');span.textContent=label;b.append(span);$('musicNav').append(b);});
   document.querySelector('.playlist-heading').append(button('Create playlist','plus',()=>createPlaylist()));playlistNav();
   document.querySelector('.profile-chip').replaceWith(button('Open Control Center',null,()=>parent.postMessage({type:'neo-music-control-center'},location.origin),'music-console'));
-  document.querySelector('.music-console').innerHTML='<img src="../../assets/playstation.svg" alt="PlayStation">';
+  document.querySelector('.music-console').innerHTML='<img src="../../assets/home.svg" alt="">';
   const filters=document.querySelector('.music-filter-pills');filters.replaceChildren();
   ['tracks','albums','artists','playlists'].forEach(type=>filters.append(button(type.charAt(0).toUpperCase()+type.slice(1),null,()=>{searchType=type;filters.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===type));if(view==='search')filterSearch();else navigate(type==='tracks'?'home':type);})));
   filters.firstChild.classList.add('active');
@@ -235,7 +235,7 @@
     if(lyricsId===currentTrack.id&&box.textContent)return;
     lyricsAbort?.abort();lyricsAbort=new AbortController();lyricsId=currentTrack.id;box.textContent='Finding lyrics…';
     try{const url=new URL('https://lrclib.net/api/get');url.searchParams.set('track_name',currentTrack.title);url.searchParams.set('artist_name',currentTrack.artist);if(currentTrack.album)url.searchParams.set('album_name',currentTrack.album);
-      const response=await fetch(url,{signal:lyricsAbort.signal});if(!response.ok)throw Error();const data=await response.json();box.textContent=data.instrumental?'Instrumental — no lyrics.':data.plainLyrics||'Lyrics are not available for this track.';
+      const response=await fetch(url,{signal:AbortSignal.any([lyricsAbort.signal,AbortSignal.timeout(15000)])});if(!response.ok)throw Error();const data=await response.json();box.textContent=data.instrumental?'Instrumental — no lyrics.':data.plainLyrics||'Lyrics are not available for this track.';
     }catch(e){if(e.name!=='AbortError')box.textContent='Lyrics are unavailable for this track. Try another song.';}
   }
   const lyrics=document.createElement('div');lyrics.id='musicLyrics';lyrics.textContent='Select Lyrics to load words for this song.';document.querySelector('.np-right').append(lyrics);amLyricsEl.hidden=true;
@@ -246,6 +246,7 @@
     cardGrid.append(button('Open queue',null,()=>{$('queuePanel').classList.add('visible');queueUI(true);}),button('Close music session',null,()=>{P.stop();parent.postMessage({type:'neo-music-close'},location.origin);}));
   }
   function state(){const a=audioEl;return {ready:true,active:!!currentTrack,playing:!!a&&!a.paused&&!a.ended&&!a.error,title:currentTrack?.title||'',artist:currentTrack?.artist||'',cover:currentTrack?.thumb||'',position:a?.currentTime??pendingPosition,duration:Number.isFinite(a?.duration)?a.duration:currentTrack?.duration||0,volume:a?.volume??Number($('volumeSlider').value),muted:a?.muted??P.muted(),shuffle:P.shuffle(),repeat:P.repeatMode(),error:playbackError,buffering:!!a&&!a.paused&&a.readyState<3};}
+  let mediaMetadataKey="";
   function sync(){
     if(audioEl&&audioBound!==audioEl){audioBound=audioEl;['playing','pause','durationchange','timeupdate','volumechange','waiting','ended'].forEach(name=>audioEl.addEventListener(name,()=>{if(name==='playing'){playbackError='';status.hidden=true;}sync();}));audioEl.addEventListener('error',()=>error('This track could not load. Retry or choose another song.'));}
     const s=state();if(currentTrack&&currentTrack.id!==lastTrack){if(lastTrack)pendingPosition=0;lastTrack=currentTrack.id;npmView.style.setProperty('--track-cover',`url(${JSON.stringify(currentTrack.thumb||'')})`);recent=[currentTrack,...recent.filter(t=>t.id!==currentTrack.id)].slice(0,40);save('neo-ps5-recent',recent);lyricsId='';}
@@ -262,7 +263,7 @@
     document.querySelectorAll('.card-fav-btn').forEach(b=>b.setAttribute('aria-pressed',isFavourite(b.dataset.id)));
     if(Date.now()-lastSaved>1000){save('neo-ps5-session',{queue:P.queue(),index:P.index(),position:s.position});lastSaved=Date.now();}
     queueUI();parent.postMessage({type:'neo-music-state',state:s},location.origin);
-    if('mediaSession'in navigator){try{navigator.mediaSession.playbackState=s.playing?'playing':'paused';if(s.active)navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist,artwork:s.cover?[{src:s.cover}]:[]});}catch{}}
+    if('mediaSession'in navigator){try{navigator.mediaSession.playbackState=s.playing?'playing':'paused';const metadataKey=JSON.stringify([s.active,s.title,s.artist,s.cover]);if(metadataKey!==mediaMetadataKey){navigator.mediaSession.metadata=s.active?new MediaMetadata({title:s.title,artist:s.artist,artwork:s.cover?[{src:s.cover}]:[]}):null;mediaMetadataKey=metadataKey;}}catch{}}
   }
   function command(action,value){if(action==='play'||action==='toggle')return P[action]().catch(()=>error('Press Play to allow audio.'));if(action==='pause')P.pause();if(action==='next')P.next();if(action==='previous')P.previous();if(action==='seek'){if(audioEl)P.seek(value);else pendingPosition=Number(value)||0;}if(action==='volume')P.setVolume(value);if(action==='mute')P.setMuted(value);if(action==='stop')P.stop();sync();}
   window.addEventListener('message',event=>{if(event.source!==parent||event.origin!==location.origin)return;if(event.data?.type==='neo-music-command')command(event.data.action,event.data.value);
