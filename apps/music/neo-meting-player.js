@@ -77,7 +77,7 @@
     // Enabling repeat after the last note should restart the existing audio.
     if (repeatMode !== "off" && audioEl && wasEnded) {
       audioEl.currentTime = 0;
-      audioEl.play().catch(function () { window.dispatchEvent(new Event("music-playback-error")); });
+      playMusicAudio();
     }
     emitState();
   }
@@ -123,7 +123,7 @@
     audioEl.addEventListener("ended", function () {
       if (repeatMode === "one") {
         audioEl.currentTime = 0;
-        audioEl.play().catch(function () { window.dispatchEvent(new Event("music-playback-error")); });
+        playMusicAudio();
       } else if (queueIndex < playQueue.length - 1 || repeatMode === "all") {
         playNext();
       }
@@ -303,14 +303,15 @@
     },
     next: playNext,
     previous: playPrevious,
-    play: function () { if (!audioEl && playQueue.length) { playQueued(queueIndex); return Promise.resolve(); } setupAudioExtras(); return audioEl ? audioEl.play() : Promise.resolve(); },
-    pause: function () { if (audioEl) audioEl.pause(); },
+    play: function () { if (!audioEl && playQueue.length) { playQueued(queueIndex); return Promise.resolve(); } setupAudioExtras(); return playMusicAudio(); },
+    pause: pauseMusicPlayback,
+    retry: function () { return currentTrack ? originalPlayTrack(currentTrack,{reload:true,position:audioEl?.currentTime||0}) : Promise.resolve(); },
     toggle: function () {
       setupAudioExtras();
       if (!audioEl && playQueue.length) { playQueued(queueIndex); return Promise.resolve(); }
       if (!audioEl) return Promise.resolve();
-      if (audioEl.paused || audioEl.ended) return audioEl.play();
-      audioEl.pause();
+      if (audioEl.paused || audioEl.ended) return playMusicAudio();
+      pauseMusicPlayback();
       return Promise.resolve();
     },
     seek: function (value) { if (audioEl) audioEl.currentTime = Math.max(0, Number(value) || 0); },
@@ -330,7 +331,7 @@
     },
     stop: function () {
       if (!audioEl) return;
-      audioEl.pause();
+      pauseMusicPlayback();
       audioEl.currentTime = 0;
       emitState();
     }

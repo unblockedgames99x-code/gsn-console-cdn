@@ -193,8 +193,9 @@
   searchInput.setAttribute('aria-label','Search music');
   document.querySelector('.search-wpr').append(button('Clear search','x',()=>{searchInput.value='';navigate('search');},'clear-search'));
   const status=document.createElement('div');status.id='musicPlaybackStatus';status.setAttribute('role','status');document.body.append(status);
-  function error(message){playbackError=message||'This track is unavailable.';status.replaceChildren();const text=document.createElement('span');text.textContent=playbackError;status.append(text,button('Retry playback',null,()=>{playbackError='';if(audioEl){audioEl.load();P.play().catch(e=>error(e.name==='NotAllowedError'?'Press Play to allow audio.':'This track could not play.'));}}));status.hidden=false;sync();}
-  window.addEventListener('music-playback-error',()=>error('Playback could not start. Check your connection and retry.'));
+  function error(message){playbackError=message||'This track is unavailable.';status.replaceChildren();const text=document.createElement('span');text.textContent=playbackError;status.append(text,button('Retry playback',null,()=>{playbackError='';status.hidden=true;P.retry();}));status.hidden=false;sync();}
+  window.addEventListener('music-playback-loading',()=>{playbackError='';status.hidden=true;});
+  window.addEventListener('music-playback-error',event=>{if(event.detail?.name==='AbortError')return;error(event.detail?.name==='NotAllowedError'?'Press Play to allow audio.':'Playback could not start. Check your connection and retry.');});
   const shuffle=document.querySelector('[aria-label="Shuffle"]');shuffle.id='shuffleBtn';shuffle.addEventListener('click',()=>P.setShuffle(!P.shuffle()));
   const seek=document.createElement('input');seek.type='range';seek.id='musicSeek';seek.min=0;seek.max=100;seek.step=.1;seek.value=0;seek.setAttribute('aria-label','Seek track');
   document.querySelector('.spotify-progress-track').replaceWith(seek);seek.addEventListener('input',()=>command('seek',Number(seek.value))); 

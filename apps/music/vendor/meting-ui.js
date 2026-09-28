@@ -53,6 +53,8 @@ let audioEl=null;
 let currentPlayingId=null;
 let currentTrack=null;
 let lyricsTrackId=null;
+let musicPlaybackGeneration=0;
+let musicLoadedTrack=null;
 
 function isMusicRelayUrl(value) {
     return Boolean(window.__NEO_MUSIC_API__&&typeof window.__NEO_MUSIC_API__.isRelayUrl==='function'&&window.__NEO_MUSIC_API__.isRelayUrl(value));
@@ -319,11 +321,22 @@ async function fetchHome() {
     }
 }
 
-function playTrack(track) {
-    if (currentTrack&&String(currentTrack.id)===String(track.id)&&audioEl) {
-        if (audioEl.paused) audioEl.play();
-        return;
+function reportMusicPlaybackError(error,generation=musicPlaybackGeneration) {
+    if(generation!==musicPlaybackGeneration||error?.name==='AbortError')return;
+    window.dispatchEvent(new CustomEvent('music-playback-error',{detail:{name:error?.name||'Error',message:error?.message||'Playback unavailable'}}));
+}
+function playMusicAudio() {
+    if(audioEl&&currentTrack&&musicLoadedTrack!==currentTrack)return playTrack(currentTrack,{reload:true});
+    const generation=musicPlaybackGeneration;
+    return audioEl?audioEl.play().catch(error=>reportMusicPlaybackError(error,generation)):Promise.resolve();
+}
+function pauseMusicPlayback() { musicPlaybackGeneration++; if(audioEl)audioEl.pause(); }
+function playTrack(track,{reload=false,position=0}={}) {
+    if (!reload&&currentTrack&&String(currentTrack.id)===String(track.id)&&audioEl&&!audioEl.error) {
+        if (audioEl.paused) return playMusicAudio();
+        return Promise.resolve();
     }
+    const generation=++musicPlaybackGeneration;
     const url=MUSIC_API.trackUrl?MUSIC_API.trackUrl(track.id,track):`${API_BASE}/_o/m/stream/${encodeURIComponent(track.id)}`;
     if (!audioEl) {
         audioEl=new Audio();
@@ -364,16 +377,20 @@ function playTrack(track) {
     const el=document.querySelector(`.music-card[data-id="${track.id}"]`);
     if (el) el.classList.add('playing');
     {
+        window.dispatchEvent(new Event('music-playback-loading'));
         const requestedId=String(track.id);
         npmTrackArtist.textContent=isMusicRelayUrl(url)?'Loading audio…':'Connecting to the music service…';
-        resolveMusicRoute(url,'media').then((route)=>{
-            if(!currentTrack||String(currentTrack.id)!==requestedId)return;
+        return resolveMusicRoute(url,'media').then((route)=>{
+            if(generation!==musicPlaybackGeneration||!currentTrack||String(currentTrack.id)!==requestedId)return;
             audioEl.src=route;
+            musicLoadedTrack=currentTrack;
+            if(position>0)audioEl.addEventListener('loadedmetadata',()=>{if(generation===musicPlaybackGeneration&&Number.isFinite(audioEl.duration))audioEl.currentTime=Math.min(position,Math.max(0,audioEl.duration-.1));},{once:true});
             audioEl.load();
             npmTrackArtist.textContent=track.artist;
-            audioEl.play().catch((err)=>window.dispatchEvent(new CustomEvent('music-playback-error',{detail:err.message})));
+            return playMusicAudio();
         }).catch((err)=>{
-            window.dispatchEvent(new CustomEvent('music-playback-error',{detail:err.message}));
+            if(generation!==musicPlaybackGeneration||err?.name==='AbortError')return;
+            reportMusicPlaybackError(err,generation);
             npmTrackArtist.textContent='Playback unavailable — choose another track';
             setPlayButtonState(false);
         });
@@ -400,14 +417,14 @@ function setPlayButtonState(isPlaying) {
 
 npPlayBtn.addEventListener('click',()=>{
     if (!audioEl||!currentTrack) return;
-    if (audioEl.paused) audioEl.play();
-    else audioEl.pause();
+    if (audioEl.paused) playMusicAudio();
+    else pauseMusicPlayback();
 });
 
 npmPlayBtn.addEventListener('click',()=>{
     if (!audioEl||!currentTrack) return;
-    if (audioEl.paused) audioEl.play();
-    else audioEl.pause();
+    if (audioEl.paused) playMusicAudio();
+    else pauseMusicPlayback();
 });
 
 npmBackTenBtn.addEventListener('click',()=>{
