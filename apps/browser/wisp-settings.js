@@ -4,6 +4,7 @@
   var STORAGE_KEY = "neo:browser:wisp:v1";
   var MODE_KEY = "neo:browser:wisp-mode:v2";
   var DEFAULT_WISP = "wss://cleanweb5641.b-cdn.net/w/";
+  var OPIUM_SERVERS = (window.GSN_OPIUM_SERVICES || []).map(function(server){return Object.freeze({name:server.name,url:server.wisp});});
   var SERVERS = Object.freeze([
     Object.freeze({ name: "Cleanweb · Serum", url: DEFAULT_WISP }),
     Object.freeze({ name: "Artemata · Abstract", url: "wss://artemata.it/wisp/534141f4509ce83f5bd805d11df1d7ce5d30a6679fd4c27dbf28fc7c2fb4a710/" }),
@@ -16,7 +17,7 @@
     Object.freeze({ name: "NextNode Wisp", url: "wss://nextnode9124.b-cdn.net/w/" }),
     Object.freeze({ name: "Probuilding Wisp", url: "wss://probuildingsupplies.com/w/" }),
     Object.freeze({ name: "Mercury Wisp", url: "wss://wisp.mercurywork.shop/" })
-  ]);
+  ].filter(function(server){return !OPIUM_SERVERS.some(function(entry){return entry.url===server.url;});}).concat(OPIUM_SERVERS));
 
   function normalize(value) {
     try {
