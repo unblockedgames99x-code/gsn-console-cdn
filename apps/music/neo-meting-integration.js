@@ -23,7 +23,8 @@
   await pending;
  }
  async function request(url,options={}){
-  await ready();
+  // The real request is also a health check. Don't serialize every first search
+  // or playback behind /ping; normal requests already fail over on errors.
   const original=new URL(url);
   const candidates=connection==='auto'?[host,...hosts.filter(h=>h!==host)]:[host];
   let error;

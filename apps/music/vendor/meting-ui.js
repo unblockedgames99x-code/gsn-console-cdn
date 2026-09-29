@@ -209,6 +209,10 @@ function renderCard(track) {
     <div class="card-title" title="${escapeHtml(track.title)} - ${escapeHtml(track.artist)}">${escapeHtml(track.title)}</div>
     <div class="card-artist">${escapeHtml(track.artist)}</div>`;
     applyCoverFallback(card.querySelector('.card-art img'),track.thumb);
+    let prepareTimer;
+    card.addEventListener('pointerenter',()=>{prepareTimer=setTimeout(()=>window.GSN_MUSIC_PLAYBACK?.prepare(track),180);});
+    card.addEventListener('pointerleave',()=>clearTimeout(prepareTimer));
+    card.addEventListener('focusin',()=>window.GSN_MUSIC_PLAYBACK?.prepare(track));
     card.querySelector('.card-play').addEventListener('click',(e)=>{
         e.stopPropagation();
         playTrack(track);

@@ -1,7 +1,38 @@
 (() => {
   'use strict';
   const api = window.__NEO_MUSIC_API__;
-  let active, library;
+  let active, library, prepared;
+  const manifestKey=track=>api.manifestUrl(track.id,track)+'|'+api.connection;
+  function clearPrepared(){
+    const old=prepared;prepared=null;
+    if(old){clearTimeout(old.timer);old.abort.abort();old.response?.body?.cancel().catch(()=>{});}
+  }
+  function prepare(track){
+    if(document.hidden||window.navigator?.connection?.saveData||!track?.id)return;
+    const key=manifestKey(track);if(prepared?.key===key)return;
+    clearPrepared();
+    const item={key,abort:new AbortController()};prepared=item;
+    // One short-lived manifest only: never preload audio or persist signed URLs.
+    item.timer=setTimeout(clearPrepared,15000);
+    item.promise=api.request(api.manifestUrl(track.id,track),{signal:item.abort.signal,cache:'no-store'}).then(response=>{
+      if(prepared!==item){response.body?.cancel().catch(()=>{});return null;}
+      if(!response.ok){clearPrepared();return null;}
+      item.response=response;return response;
+    }).catch(()=>null);
+  }
+  async function manifest(track,signal){
+    if(prepared?.key===manifestKey(track)){
+      const item=prepared;
+      const abort=()=>item.abort.abort();signal.addEventListener('abort',abort,{once:true});
+      try{
+        const response=await item.promise;
+        if(prepared===item){prepared=null;clearTimeout(item.timer);}
+        if(signal.aborted)throw signal.reason;
+        if(response)return response;
+      }finally{signal.removeEventListener('abort',abort);}
+    }else clearPrepared();
+    return api.request(api.manifestUrl(track.id,track),{signal,cache:'no-store'});
+  }
   const scriptUrl = new URL('./vendor/shaka-player.compiled.js', document.currentScript.src);
   function shaka() {
     if (!library) library = new Promise((resolve, reject) => {
@@ -28,7 +59,7 @@
     };
     await disposal;
     check();
-    const response = await api.request(api.manifestUrl(track.id, track), { signal: job.abort.signal, cache: 'no-store' });
+    const response = await manifest(track, job.abort.signal);
     check();
     if (!response.ok) throw new Error('Music server returned ' + response.status);
     const manifestUrl = response.url;
@@ -65,5 +96,5 @@
       audio.load();
     }
   }
-  window.GSN_MUSIC_PLAYBACK = Object.freeze({ load, cancel });
+  window.GSN_MUSIC_PLAYBACK = Object.freeze({ load, cancel, prepare });
 })();
