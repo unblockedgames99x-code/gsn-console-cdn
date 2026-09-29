@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Tools · GSN</title><link rel="stylesheet" href="tools.css"></head>
+<body><main><header><span class="eyebrow">GSN COLLECTION</span><h1>Tools</h1><p>Handy utilities for developers and creators</p></header>
+<nav aria-label="Tool categories" id="categories"></nav><section id="grid" class="grid" aria-label="Tools"></section>
+<p class="local-note">All tools run on your device.</p></main>
+<dialog id="editor" aria-labelledby="toolTitle"><form id="toolForm"><header class="dialog-header"><div><span class="eyebrow" id="toolCategory"></span><h2 id="toolTitle"></h2></div><button type="button" id="close" class="icon-button" aria-label="Close tool">×</button></header><p id="toolDescription"></p><div id="fields"></div><p id="error" role="alert"></p><div class="actions"><button type="submit" id="run" class="primary">Generate</button><button type="button" id="copy">Copy result</button><span id="status" role="status"></span></div><label class="result-label" for="result">Result</label><textarea id="result" readonly spellcheck="false" rows="6"></textarea></form></dialog>
+<script type="module" src="tools.js"></script></body></html>
