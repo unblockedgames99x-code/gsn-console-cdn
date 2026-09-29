@@ -11,7 +11,7 @@
         function getNocSession(){try{return localStorage.getItem("noc-session")}catch(_){return null}}
         var _f=window.fetch.bind(window);
         window.fetch=function(u,o){
-            if(typeof u==="string"&&u.startsWith("/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-14/api/")){
+            if(typeof u==="string"&&u.startsWith("/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-15/api/")){
                 if(B)u=B+u;
                 o=Object.assign({},o||{});
                 if(B)delete o.credentials;
@@ -25,7 +25,7 @@
         var _ES=window.EventSource;
         if(_ES){
             window.EventSource=function(url,opts){
-                if(typeof url==="string"&&url.startsWith("/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-14/api/")){
+                if(typeof url==="string"&&url.startsWith("/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-15/api/")){
                     var s=getNocSession();
                     var sep=url.indexOf("?")!==-1?"&":"?";
                     if(B)url=B+url+(s?sep+"_noc_session="+encodeURIComponent(s):"");
@@ -319,8 +319,8 @@
 
 <script>
 (function(){
-var API="/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-14/api/youtube";
-var ACCT="/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-14/api/youtube-account";
+var API="/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-15/api/youtube";
+var ACCT="/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-15/api/youtube-account";
 var currentPage="home";
 var watchId=null,watchTicket=null,watchVideo=null;
 var shortsData=[],activeShortsVideo=null;
