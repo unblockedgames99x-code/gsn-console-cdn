@@ -23,7 +23,16 @@ async function setup() {
   frame = controller.createFrame(screen, {plugins:[new $jetUtils.UrlWatcherPlugin(url => send('movie-player-location',{url}))]});
   // Exposed locally for diagnostics; remote pages live inside the rewritten frame.
   window.movieProxy = {controller, frame, transport, server:servers[connection]};
-  screen.addEventListener('load', () => { if (screen.src.includes('/~/')) { clearTimeout(loadingTimer); overlay.hidden = true; send('movie-player-ready'); } });
+  screen.addEventListener('load', () => {
+    if (!screen.src.includes('/~/')) return;
+    let text='';try{text=(screen.contentDocument?.body?.innerText||'').trim().slice(0,500);}catch{}
+    if(/^(?:Internal Server Error|Bad Gateway)|proxy.*(?:failed|error)|Request failed with error code/i.test(text)){
+      const retries=Number(params.get('connectionRetry'))||0;
+      if(retries<2){params.set('connectionRetry',String(retries+1));params.set('connection',String((connection+1)%servers.length));location.replace(location.pathname+'?'+params);return;}
+      failure(new Error('The movie connection could not load the page. Try another connection.'));return;
+    }
+    clearTimeout(loadingTimer); overlay.hidden = true; send('movie-player-ready');
+  });
   loadingTimer=setTimeout(()=>failure(new Error('The movie page is taking too long to open. Try another connection.')),30000);
   frame.go(target);
   health.reset();

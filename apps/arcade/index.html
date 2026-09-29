@@ -1,12 +1,6 @@
 <!doctype html>
-<html lang="en"><head><link rel="stylesheet" href="../shared/app-scrollbars.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade</title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden}</style></head>
-<body style="margin:0;background:#0e1020;color:white;font:16px system-ui">
-<p>Opening Arcade…</p>
-<script>
-// Launch the supplied GAM.ONL library through the existing isolated app connection.
-const target = new URL('../movie-proxy/arcade.html', location.href);
-target.search = location.search;
-target.searchParams.set('url', 'https://gam.onl/');
-location.replace(target.href);
-</script>
-</body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade</title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0e1020;color:white;font:16px system-ui}iframe{width:100%;height:100%;border:0}#home{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);border:1px solid #ffffff44;border-radius:24px;background:#111a;color:white;padding:9px 18px;opacity:0}#home:hover,#home:focus-visible{opacity:1}</style></head>
+<body><iframe src="./library.html" title="Arcade game library" allow="autoplay; fullscreen; gamepad; clipboard-write" allowfullscreen></iframe><button id="home" aria-label="Open Control Center">Home</button><script>
+const origin=new URLSearchParams(location.search).get('consoleOrigin')||location.origin;
+document.getElementById('home').onclick=()=>parent.postMessage({type:'movie-control-center'},origin);
+</script></body></html>

@@ -23,14 +23,40 @@ export function patchStarStreamPlayer(source) {
   // build's minified variable names. The chosen provider also owns new titles.
   const map = source.match(/([\w$]+)=\{1:\{name:"VidCore"/);
   const state = source.match(/\[([\w$]+),[\w$]+\]=([\w$]+)\.useState\("1"\)/);
-  if (!map || !state || !source.includes(map[1] + '[1]')) throw new Error('The Movies player changed. Its CinemaOS integration needs an update.');
-  return source.replace(state[0], state[0].replace('useState("1")', 'useState("2")'))
+  if (!map || !state || !source.includes(map[1] + '[1]')) return source;
+  const providers = source.match(/[\w$]+=\{1:\{name:"VidCore",url:[\s\S]*?name:"CinemaOS",url:[\s\S]*?\}\}/);
+  const metadataKey = source.match(/seasonDetails:[\s\S]{0,160}?api_key=\$\{([\w$]+)\}/);
+  if (!providers || !metadataKey) return source;
+  const aether = ',3:{name:"Aether",url:(id,tv,s,e)=>"https://staryv2.base44.app/gsn-aether/"+(tv?"tv":"movie")+"/"+id+"/"+(s||1)+"/"+(e||1)+"?key="+encodeURIComponent('+metadataKey[1]+')}}';
+  return source.replace(providers[0],providers[0].slice(0,-1)+aether)
+    .replace(state[0], state[0].replace('useState("1")', 'useState("3")'))
     .replace(map[1] + '[1]', map[1] + '[' + state[1] + ']')
     .replace('/\\/(movie|tv)\\/(\\d+)/', '/\\/(movie|tv|player)\\/(\\d+)/');
+}
+export async function resolveAetherRoute(remote, request, signal) {
+  const match=remote.pathname.match(/^\/gsn-aether\/(movie|tv)\/(\d+)\/(\d+)\/(\d+)$/);
+  if(remote.origin!==new URL(STARSTREAM_URL).origin || !match)return null;
+  const [,type,id,season,episode]=match;
+  let target='https://aether.ist/media/tmdb-'+type+'-'+id+'-watch';
+  if(type==='tv'){
+    const key=remote.searchParams.get('key');if(!key)throw Error('Episode details are unavailable.');
+    const url=new URL('https://api.themoviedb.org/3/tv/'+id+'/season/'+season);url.searchParams.set('api_key',key);
+    const response=await request(url,'GET',null,[['Accept','application/json']],signal);
+    if(response.status!==200)throw Error('Episode details could not load. Try another connection.');
+    const info=await new Response(response.body).json();
+    const selected=info.episodes?.find(item=>item.episode_number===Number(episode));
+    if(!info.id||!selected?.id)throw Error('This episode is unavailable.');
+    target+='/'+info.id+'/'+selected.id;
+  }
+  return target;
 }
 export function configureStarStream(transport) {
   const request = transport.request.bind(transport);
   transport.request = async (remote, method, body, headers, signal) => {
+    if(method==='GET'&&remote.origin===new URL(STARSTREAM_URL).origin&&remote.pathname.startsWith('/gsn-aether/')){
+      const target=await resolveAetherRoute(remote,request,signal);
+      if(target)return {status:200,statusText:'OK',headers:[['Content-Type','text/html; charset=utf-8']],body:new TextEncoder().encode('<!doctype html><title>Opening Aether</title><p>Opening Aether…</p><script>location.replace('+JSON.stringify(target)+')</script>')};
+    }
     const patch = remote.origin === new URL(STARSTREAM_URL).origin && /^\/assets\/index-[^/]+\.js$/.test(remote.pathname);
     const requestHeaders = patch ? [...headers.filter(([key]) => key.toLowerCase() !== 'accept-encoding'), ['Accept-Encoding', 'identity']] : headers;
     const response = await request(remote, method, body, requestHeaders, signal);

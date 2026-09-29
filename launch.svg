@@ -11,7 +11,7 @@ header,footer{display:flex;align-items:center;justify-content:space-between;gap:
 &lt;/div&gt;&lt;button id=&quot;normal&quot; class=&quot;secondary&quot;&gt;Continue in this tab →&lt;/button&gt;&lt;p id=&quot;message&quot; role=&quot;status&quot; aria-live=&quot;polite&quot;&gt;&lt;/p&gt;&lt;/main&gt;
 &lt;footer&gt;&lt;span&gt;READY WHEN YOU ARE&lt;/span&gt;&lt;span class=&quot;shapes&quot; aria-hidden=&quot;true&quot;&gt;△ ○ × □&lt;/span&gt;&lt;/footer&gt;&lt;button id=&quot;back&quot; hidden=&quot;hidden&quot;&gt;Launcher&lt;/button&gt;
 &lt;/div&gt;&lt;script&gt;
-const target=new URL(&quot;/gh/unblockedgames99x-code/gsn-console-cdn@v20260929-2/&quot;+'console.svg',document.baseURI).href;
+const target=new URL(&quot;/gh/unblockedgames99x-code/gsn-console-cdn@v20260929-3/&quot;+'console.svg',document.baseURI).href;
 const host=document.getElementById('launcher'), message=document.getElementById('message'),back=document.getElementById('back');
 const permissions='autoplay; fullscreen; gamepad; encrypted-media; picture-in-picture; clipboard-write; microphone; camera';
 function launchHere(){if(document.getElementById('game'))return;const frame=document.createElementNS('http://www.w3.org/1999/xhtml','iframe');frame.id='game';frame.title='GSN console';frame.src=target;frame.setAttribute('allow',permissions);frame.setAttribute('allowfullscreen','true');host.appendChild(frame);back.hidden=false;}
