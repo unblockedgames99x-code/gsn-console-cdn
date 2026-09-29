@@ -192,7 +192,7 @@
   const status=document.createElement('div');status.id='musicPlaybackStatus';status.setAttribute('role','status');document.body.append(status);
   function error(message){playbackError=message||'This track is unavailable.';status.replaceChildren();const text=document.createElement('span');text.textContent=playbackError;status.append(text,button('Retry playback',null,()=>{playbackError='';status.hidden=true;P.retry();}));status.hidden=false;sync();}
   window.addEventListener('music-playback-loading',()=>{playbackError='';status.hidden=true;});
-  window.addEventListener('music-playback-error',event=>{if(event.detail?.name==='AbortError')return;error(event.detail?.name==='NotAllowedError'?'Press Play to allow audio.':'Playback could not start. Check your connection and retry.');});
+  window.addEventListener('music-playback-error',event=>{if(event.detail?.name==='AbortError')return;error(event.detail?.name==='NotAllowedError'?'Press Play to allow audio.':event.detail?.name==='TimeoutError'?'This song stopped loading. Retry playback.':'This song could not load. Retry playback or choose another song.');});
   const shuffle=document.querySelector('[aria-label="Shuffle"]');shuffle.id='shuffleBtn';shuffle.addEventListener('click',()=>P.setShuffle(!P.shuffle()));
   const seek=document.createElement('input');seek.type='range';seek.id='musicSeek';seek.min=0;seek.max=100;seek.step=.1;seek.value=0;seek.setAttribute('aria-label','Seek track');
   document.querySelector('.spotify-progress-track').replaceWith(seek);seek.addEventListener('input',()=>command('seek',Number(seek.value))); 
@@ -246,7 +246,7 @@
   function state(){const a=audioEl;return {ready:true,active:!!currentTrack,playing:!!a&&!a.paused&&!a.ended&&!a.error,title:currentTrack?.title||'',artist:currentTrack?.artist||'',cover:currentTrack?.thumb||'',position:P.position(),duration:Number.isFinite(a?.duration)?a.duration:currentTrack?.duration||0,volume:a?.volume??Number($('volumeSlider').value),muted:a?.muted??P.muted(),shuffle:P.shuffle(),repeat:P.repeatMode(),error:playbackError,buffering:!!a&&!a.paused&&a.readyState<3};}
   let mediaMetadataKey="";
   function sync(){
-    if(audioEl&&audioBound!==audioEl){audioBound=audioEl;['playing','pause','durationchange','timeupdate','volumechange','waiting','ended'].forEach(name=>audioEl.addEventListener(name,()=>{if(name==='playing'){playbackError='';status.hidden=true;}sync();}));audioEl.addEventListener('error',()=>error('This track could not load. Retry or choose another song.'));}
+    if(audioEl&&audioBound!==audioEl){audioBound=audioEl;['playing','pause','durationchange','timeupdate','volumechange','waiting','ended'].forEach(name=>audioEl.addEventListener(name,()=>{if(name==='playing'){playbackError='';status.hidden=true;}sync();}));}
     const s=state();if(currentTrack&&currentTrack.id!==lastTrack){lastTrack=currentTrack.id;npmView.style.setProperty('--track-cover',`url(${JSON.stringify(currentTrack.thumb||'')})`);recent=[currentTrack,...recent.filter(t=>t.id!==currentTrack.id)].slice(0,40);save('neo-ps5-recent',recent);lyricsId='';}
     for(const slider of [seek,fullSeek]){slider.max=s.duration||100;slider.value=s.position;slider.disabled=!s.active;}
     $('npCurrentTime').textContent=formatTime(s.position);$('npDurationInline').textContent=formatTime(s.duration);
