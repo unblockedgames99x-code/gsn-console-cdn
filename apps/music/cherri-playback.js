@@ -9,7 +9,7 @@
   }
   function prepare(track){
     if(document.hidden||window.navigator?.connection?.saveData||!track?.id)return;
-    const key=manifestKey(track);if(prepared?.key===key)return;
+    const key=manifestKey(track);if(prepared?.key===key||active?.key===key)return;
     clearPrepared();
     const item={key,abort:new AbortController()};prepared=item;
     // One short-lived manifest only: never preload audio or persist signed URLs.
@@ -52,7 +52,7 @@
   }
   async function load(audio, track, { position = 0, current = () => true, onError = () => {} } = {}) {
     const disposal = cancel();
-    const job = { abort: new AbortController(), player: null };
+    const job = { abort: new AbortController(), player: null, key: manifestKey(track) };
     active = job;
     const check = () => {
       if (active !== job || job.abort.signal.aborted || !current()) throw new DOMException('Track changed', 'AbortError');

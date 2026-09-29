@@ -142,3 +142,5 @@ Release v20260928-15: updated console and app assets.
 Release v20260928-16: updated console and app assets.
 
 Release v20260928-17: updated console and app assets.
+
+Release v20260928-18: updated console and app assets.
