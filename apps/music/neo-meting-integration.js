@@ -5,7 +5,7 @@
  // This public API supports CORS for catalog, artwork and audio. Connect
  // directly so music does not depend on the console's WebSocket proxy.
  const local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
- const base=local?location.origin+'/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-11/api/console-services/music':'https://cherrion.top/api/music';
+ const base=local?location.origin+'/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-12/api/console-services/music':'https://cherrion.top/api/music';
  window.__NEO_MUSIC_SERVER_ORIGIN__=base;
  window.__NEO_MUSIC_API__=Object.freeze({
   base,
