@@ -64,7 +64,8 @@
       button.dataset.repeatMode = repeatMode;
       button.setAttribute("aria-label", label);
       button.setAttribute("aria-pressed", String(active));
-      button.title = label + (repeatMode === "off" ? " — repeat this song" : repeatMode === "one" ? " — repeat the queue" : " — turn repeat off");
+      button.title = label + (repeatMode === "off" ? " — repeat the queue" : repeatMode === "all" ? " — repeat this song" : " — turn repeat off");
+      button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10V8a3 3 0 0 1 3-3h12m-3-3 3 3-3 3M20 14v2a3 3 0 0 1-3 3H5m3-3-3 3 3 3"/>' + (repeatMode === "one" ? '<path d="m10.5 10 1.5-1v6m-1.5 0h3"/>' : '') + '</svg>';
     }
     localStorage.setItem("music-repeat-mode", repeatMode);
     localStorage.setItem("music-autoplay", String(repeatMode !== "off"));
@@ -83,7 +84,7 @@
   }
 
   function cycleRepeatMode() {
-    setRepeatMode(repeatMode === "off" ? "one" : repeatMode === "one" ? "all" : "off");
+    setRepeatMode(repeatMode === "off" ? "all" : repeatMode === "all" ? "one" : "off");
   }
 
   var originalRenderCard = renderCard;
