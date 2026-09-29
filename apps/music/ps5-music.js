@@ -294,4 +294,12 @@
   // Native titles also provide tooltips for keyboard/gamepad focusable icons.
   document.querySelectorAll('button[aria-label]').forEach(b=>{if(!b.title)b.title=b.getAttribute('aria-label');});
   lucide.createIcons();
+  const musicApi=window.__NEO_MUSIC_API__;
+  const sourceSelect=$('musicSource'),connectionSelect=$('musicConnection');
+  musicApi.sources.forEach(([value,label])=>sourceSelect.add(new Option(label,value)));
+  musicApi.hosts.forEach((value,index)=>connectionSelect.add(new Option('Server '+(index+1),value)));
+  sourceSelect.value=musicApi.source;connectionSelect.value=musicApi.connection;
+  const refreshSource=()=>{clearTimeout(debounceTimer);const q=searchInput.value.trim();if(q)searchVinyl(q);else fetchHome();};
+  sourceSelect.addEventListener('change',()=>{musicApi.setSource(sourceSelect.value);refreshSource();});
+  connectionSelect.addEventListener('change',()=>{musicApi.setConnection(connectionSelect.value);refreshSource();});
 })();

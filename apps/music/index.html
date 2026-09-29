@@ -85,6 +85,7 @@
       </div>
       <div class="search-wpr"><i data-lucide="search" class="search-icon"></i><input type="text" class="search-input" id="searchInput" autocomplete="off" placeholder="What do you want to play?"></div>
     </header>
+    <div class="music-source-controls"><label>Music source<select id="musicSource" aria-label="Music source"></select></label><label>Connection<select id="musicConnection" aria-label="Music connection"><option value="auto">Automatic (recommended)</option></select></label></div>
     <div class="content-area" id="contentArea">
       <section class="music-welcome" aria-labelledby="musicHomeTitle">
         <p>SPOTIFY</p>
@@ -134,6 +135,7 @@
     </div>
   </footer>
   <aside class="queue-panel" id="queuePanel" aria-label="Playlist queue"><div class="queue-head"><span>Up next</span><button class="np-tool-btn" id="queueCloseBtn" aria-label="Close playlist"><i data-lucide="x"></i></button></div><div class="queue-list" id="queueList"></div></aside>
+  <script src="./cherri-playback.js"></script>
   <script src="./vendor/meting-ui.js?v=20260919-scholarnook-v1"></script>
   <script src="./neo-meting-player.js?v=20260919-scholarnook-v1"></script>
   <script src="./ps5-music.js"></script>

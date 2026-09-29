@@ -232,7 +232,7 @@ async function searchVinyl(query) {
     currentEventSource={close(){controller.abort();}};
     try {
         const url=MUSIC_API.searchUrl?MUSIC_API.searchUrl(query):`${API_BASE}/_o/m/search?q=${encodeURIComponent(query)}`;
-        const response=await fetch(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+        const response=await (MUSIC_API.request||fetch)(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error(`Music server returned ${response.status}.`);
         const payload=await response.json();
         const tracks=(Array.isArray(payload)?payload:(Array.isArray(payload?.items)?payload.items:Array.isArray(payload?.results)?payload.results:[])).map(normalizeTrack).filter(Boolean).slice(0,20);
@@ -279,14 +279,14 @@ function validHomeSections(value) {
 
 function readHomeSnapshot() {
     try {
-        const saved=JSON.parse(localStorage.getItem(HOME_CACHE_KEY)||'null');
+        const saved=JSON.parse(localStorage.getItem(HOME_CACHE_KEY+':'+(MUSIC_API.source||'legacy'))||'null');
         if (!saved||Date.now()-Number(saved.savedAt||0)>86400000) return [];
         return validHomeSections(saved.sections);
     } catch (err) { return []; }
 }
 
 function saveHomeSnapshot(sections) {
-    try { localStorage.setItem(HOME_CACHE_KEY,JSON.stringify({savedAt:Date.now(),sections:validHomeSections(sections)})); }
+    try { localStorage.setItem(HOME_CACHE_KEY+':'+(MUSIC_API.source||'legacy'),JSON.stringify({savedAt:Date.now(),sections:validHomeSections(sections)})); }
     catch (err) {}
 }
 
@@ -309,7 +309,7 @@ async function fetchHome() {
     currentEventSource={close(){controller.abort();}};
     try {
         const url=MUSIC_API.homeUrl?MUSIC_API.homeUrl():`${API_BASE}/_o/m/discover`;
-        const response=await fetch(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
+        const response=await (MUSIC_API.request||fetch)(url,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]),cache:'no-store',credentials:'omit',headers:{Accept:'application/json'}});
         if(!response.ok)throw new Error(`Music server returned ${response.status}.`);
         const liveSections=validHomeSections(await response.json().then(data=>MUSIC_API.homeSections?MUSIC_API.homeSections(data):data));
         if(controller.signal.aborted)return;
@@ -429,6 +429,18 @@ function loadMusicTrack(track,{reload=false,position=musicResumeState?.track===t
         const requestedId=String(track.id);
         const fail=watchMusicPlayback(track,generation,attempt,position);
         npmTrackArtist.textContent=isMusicRelayUrl(url)?'Loading audio…':'Connecting to the music service…';
+        if(window.GSN_MUSIC_PLAYBACK){
+            if(position>0)audioEl.addEventListener('loadedmetadata',()=>{
+                if(generation!==musicPlaybackGeneration||currentTrack!==track)return;
+                if(Number.isFinite(audioEl.duration))audioEl.currentTime=position<audioEl.duration-.5?position:0;
+                musicResumeState=null;
+            },{once:true});
+            return window.GSN_MUSIC_PLAYBACK.load(audioEl,track,{position,current:()=>generation===musicPlaybackGeneration,onError:fail}).then(()=>{
+                if(generation!==musicPlaybackGeneration)return;
+                musicLoadedTrack=currentTrack;npmTrackArtist.textContent=track.artist;
+                return audioEl.play().catch(fail);
+            }).catch(fail);
+        }
         return resolveMusicRoute(url,'media').then((route)=>{
             if(generation!==musicPlaybackGeneration||!currentTrack||String(currentTrack.id)!==requestedId)return;
             audioEl.src=route;
