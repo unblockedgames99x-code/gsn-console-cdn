@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-<title>&lt;GSN&gt; · Game Library</title>
-<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" id="host" style="position:fixed;inset:0;background:#080b14;color:#eaf1fa;font:16px system-ui;display:grid;place-items:center"><div id="status" role="status">Starting &lt;GSN&gt;…</div></div></foreignObject>
+<title>GSN · Launch your console</title>
+<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" id="launcher">
+<style>
+*{box-sizing:border-box}#launcher{position:fixed;inset:0;overflow:auto;background:radial-gradient(ellipse at 82% 15%,#214a77 0,transparent 48%),radial-gradient(ellipse at 8% 100%,#102d56 0,transparent 52%),#080f1d;color:#f2f6ff;font:16px/1.5 system-ui,sans-serif;display:flex;flex-direction:column;isolation:isolate}
+#launcher:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(145deg,transparent 45%,#88b8ef12 45.1%,transparent 45.3%),linear-gradient(145deg,transparent 65%,#88b8ef0a 65.1%,transparent 65.3%);pointer-events:none}
+header,footer{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:30px 5vw}header{letter-spacing:.18em;font-size:13px}.brand{display:flex;align-items:center;gap:14px}.brand svg{width:34px;height:28px;stroke:#e8f1ff;fill:none;stroke-width:1.5}.brand strong{font-size:24px;letter-spacing:.24em}header span,footer{color:#aabbd2}main{width:min(840px,90%);margin:auto;padding:36px 0 60px}.eyebrow{color:#a7c7ed;font-size:12px;letter-spacing:.25em;text-transform:uppercase}h1{font-size:clamp(38px,5.2vw,70px);line-height:1.1;font-weight:350;letter-spacing:-.045em;margin:18px 0 20px}.intro{color:#aabbd2;font-size:18px;margin-bottom:36px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:20px}button{font:inherit;cursor:pointer}.choice{position:relative;text-align:left;color:inherit;border:1px solid #c4ddff33;border-radius:20px;padding:27px;background:linear-gradient(130deg,#ffffff0e,#ffffff04);transition:background .18s,border-color .18s,transform .18s;min-height:185px}.choice:hover{background:#ffffff13;border-color:#d9e9ff80;transform:translateY(-3px)}button:focus-visible{outline:3px solid #fff;outline-offset:5px}.choice svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.6;margin-bottom:21px}.choice strong{display:block;font-size:21px;font-weight:550}.choice span{display:block;color:#aabbd2;font-size:13px;margin-top:7px}.primary{background:linear-gradient(135deg,#dcecff,#f5f8ff);color:#102340;border-color:#fff}.primary:hover{background:#fff}.primary span{color:#405777}.secondary{display:block;margin:26px auto 0;border:0;border-radius:24px;padding:10px 20px;color:#c2d2e6;background:transparent}.secondary:hover{background:#ffffff0b;color:white}#message{min-height:24px;text-align:center;color:#c6ddf7;font-size:13px;margin:12px 0 0}footer{font-size:11px;letter-spacing:.06em;padding-top:15px;padding-bottom:24px}.shapes{letter-spacing:.8em;font-size:19px;color:#86a6ce}#game{position:absolute;inset:0;width:100%;height:100%;border:0;background:#080b14;z-index:3}#back{position:fixed;top:12px;right:16px;z-index:4;border:1px solid #ffffff30;background:#102139d9;color:#eaf1ff;border-radius:22px;padding:8px 16px;font-size:12px}#back:hover{background:#28415e}#back[hidden]{display:none}@media(max-width:540px){header,footer{padding:22px 6vw}header>span{display:none}main{padding:20px 0}.choices{grid-template-columns:1fr;gap:14px}.choice{min-height:130px;padding:20px}.choice svg{float:left;margin:7px 20px 25px 0}.choice strong{font-size:19px}.intro{font-size:15px;margin-bottom:24px}footer{font-size:10px}}@media(prefers-reduced-motion:reduce){.choice{transition:none}}
+</style>
+<header><div class="brand"><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M10 6h20c5 0 8 15 7 19s-5 4-10-3H13c-5 7-9 7-10 3S5 6 10 6Z"/><path d="M11 11v10M6 16h10"/><circle cx="28" cy="13" r="1.3"/><circle cx="32" cy="17" r="1.3"/></svg><strong>GSN</strong></div><span>PLAY HAS NO LIMITS</span></header>
+<main id="menu"><div class="eyebrow">Your games. Your media. One home.</div><h1>Your console awaits.</h1><p class="intro">Choose how you want to play.</p><div class="choices">
+<button id="blank" class="choice primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7M21 3 11 13M10 5H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/></svg><strong>Open in about:blank</strong><span>Launch your console in a new tab.</span></button>
+<button id="fullscreen" class="choice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M3 15v6h6M21 15v6h-6"/></svg><strong>Play fullscreen</strong><span>Fill your screen. Press Esc to return.</span></button>
+</div><button id="normal" class="secondary">Continue in this tab →</button><p id="message" role="status" aria-live="polite"></p></main>
+<footer><span>READY WHEN YOU ARE</span><span class="shapes" aria-hidden="true">△ ○ × □</span></footer><button id="back" hidden="hidden">Launcher</button>
+</div></foreignObject>
 <script><![CDATA[
-(async()=>{
- const root="/gh/unblockedgames99x-code/gsn-console-cdn@v20260928-22/",status=document.getElementById('status');
- try {
-  const registration=await navigator.serviceWorker.register(root+'launcher-sw.js',{scope:root});
-  const worker=registration.installing||registration.waiting||registration.active;
-  if(worker.state!=='activated')await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Connection timed out. Please refresh.')),30000);worker.addEventListener('statechange',()=>{if(worker.state==='activated'){clearTimeout(timer);resolve()}else if(worker.state==='redundant'){clearTimeout(timer);reject(Error('Please refresh to start the console.'))}})});
-  const frame=document.createElementNS('http://www.w3.org/1999/xhtml','iframe');
-  frame.title='<GSN> console';frame.setAttribute('allow','autoplay; fullscreen; gamepad; encrypted-media; picture-in-picture; clipboard-write; microphone; camera');frame.setAttribute('allowfullscreen','true');
-  frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:#080b14';
-  frame.addEventListener('load',()=>status.remove(),{once:true});frame.src=root+'index.html';document.getElementById('host').appendChild(frame);
- }catch(error){status.textContent='Could not start <GSN>. '+error.message;}
-})();
+const target=new URL("/gh/unblockedgames99x-code/gsn-console-cdn@v20260929-1/"+'console.svg',location.origin).href;
+const host=document.getElementById('launcher'), message=document.getElementById('message'),back=document.getElementById('back');
+const permissions='autoplay; fullscreen; gamepad; encrypted-media; picture-in-picture; clipboard-write; microphone; camera';
+function launchHere(){if(document.getElementById('game'))return;const frame=document.createElementNS('http://www.w3.org/1999/xhtml','iframe');frame.id='game';frame.title='GSN console';frame.src=target;frame.setAttribute('allow',permissions);frame.setAttribute('allowfullscreen','true');host.appendChild(frame);back.hidden=false;}
+document.getElementById('normal').onclick=launchHere;
+document.getElementById('fullscreen').onclick=()=>{const request=host.requestFullscreen?.();launchHere();if(request)request.catch(()=>{back.textContent='Launcher · fullscreen unavailable';});};
+back.onclick=()=>{document.getElementById('game')?.remove();back.hidden=true;back.textContent='Launcher';if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});};
+document.getElementById('blank').onclick=()=>{
+ const child=window.open('about:blank','_blank');if(!child){message.textContent='Allow pop-ups for this site, then try again.';return;}
+ const doc=child.document;doc.title='GSN · Console';doc.documentElement.style.cssText='height:100%;background:#080f1d';doc.body.style.cssText='margin:0;height:100%;background:#080f1d;color:#eaf1ff;font:14px system-ui';
+ const bar=doc.createElement('div');bar.style.cssText='height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-sizing:border-box;background:linear-gradient(110deg,#101d30,#193557)';
+ const name=doc.createElement('strong');name.textContent='GSN';name.style.letterSpacing='.22em';bar.appendChild(name);
+ const button=doc.createElement('button');button.textContent='Fullscreen';button.style.cssText='font:inherit;border:1px solid #c5dcff55;border-radius:18px;padding:6px 18px;background:#eaf3ff;color:#102139;cursor:pointer';bar.appendChild(button);doc.body.appendChild(bar);
+ const frame=doc.createElement('iframe');frame.title='GSN console';frame.src=target;frame.allow=permissions;frame.allowFullscreen=true;frame.style.cssText='display:block;width:100%;height:calc(100% - 48px);border:0;background:#080b14';doc.body.appendChild(frame);
+ button.onclick=()=>{const request=doc.fullscreenElement?doc.exitFullscreen():doc.documentElement.requestFullscreen();request.catch(()=>{button.textContent='Fullscreen unavailable';});};
+ doc.onfullscreenchange=()=>{button.textContent=doc.fullscreenElement?'Exit fullscreen':'Fullscreen';};
+ child.opener=null;message.textContent='Your console opened in a new tab.';
+};
 ]]></script></svg>
